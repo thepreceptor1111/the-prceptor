@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="
+    http://www.sitemaps.org/schemas/sitemap/0.9
+    http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd"
+>
+
+  <!-- Homepage — highest priority, crawled weekly -->
+  <url>
+    <loc>https://thepreceptorglobal.com/</loc>
+    <lastmod>2026-06-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- Book — primary conversion page -->
+  <url>
+    <loc>https://thepreceptorglobal.com/book</loc>
+    <lastmod>2026-06-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.95</priority>
+  </url>
+
+  <!-- Services — service discovery, high SEO value -->
+  <url>
+    <loc>https://thepreceptorglobal.com/services</loc>
+    <lastmod>2026-06-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.90</priority>
+  </url>
+
+  <!-- About — brand authority & trust -->
+  <url>
+    <loc>https://thepreceptorglobal.com/about</loc>
+    <lastmod>2026-06-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.80</priority>
+  </url>
+
+  <!-- Testimonials — social proof, E-E-A-T signal -->
+  <url>
+    <loc>https://thepreceptorglobal.com/testimonials</loc>
+    <lastmod>2026-06-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+
+  <!-- Contact —  utility page -->
+  <url>
+    <loc>https://thepreceptorglobal.com/contact</loc>
+    <lastmod>2026-06-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+
+  <!-- Q&A — FAQ content, long-tail keyword capture -->
+  <url>
+    <loc>https://thepreceptorglobal.com/qna</loc>
+    <lastmod>2026-06-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+
+  <!--
+    /shop intentionally excluded — placeholder page with thin content.
+    Indexing it would create a "thin content" quality signal.
+    Add it back once the shop has real product pages.
+  -->
+
+</urlset>
