@@ -23,15 +23,13 @@ export default defineConfig({
     // polyfills and other legacy transforms that bloat the Sanity vendor
     // chunk by ~10 KB and add ~150 ms to LCP.
     target: "es2020",
-    // FIX 9: Terser squeezes an extra ~3 KB vs the default esbuild minifier,
-    // especially on vendor-ui. drop_console removes all console.* calls from
-    // the production bundle.
-    minify: "terser",
-    terserOptions: {
-      compress: {
-        drop_console: true,
-        passes: 2,
-      },
+    // Using Vite's default esbuild minifier (built-in, no extra install needed).
+    // drop_console strips all console.* calls from the production bundle.
+    // NOTE: terser was previously set here but is NOT installed as a dep;
+    // esbuild is faster and sufficient for this project's bundle sizes.
+    minify: "esbuild",
+    esbuildOptions: {
+      drop: ["console", "debugger"],
     },
     rollupOptions: {
       output: {
