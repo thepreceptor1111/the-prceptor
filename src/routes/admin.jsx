@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Lock, Eye, EyeOff, Shield, ExternalLink, Calendar, LayoutDashboard,
 } from "lucide-react";
+import BlockTimePanel from "@/components/BlockTimePanel";
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
 const SESSION_KEY  = "tp_admin_unlocked";
@@ -49,7 +50,6 @@ function LockScreen({ onUnlock }) {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-hero starfield relative overflow-hidden">
-      {/* Ambient glows */}
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_20%,oklch(0.55_0.08_310_/_0.22),transparent_65%)]" />
       <div className="pointer-events-none absolute bottom-0 left-1/2 -translate-x-1/2 w-[60%] h-[50%] blur-3xl bg-[radial-gradient(ellipse,oklch(0.82_0.12_85_/_0.08),transparent_65%)]" />
 
@@ -59,7 +59,6 @@ function LockScreen({ onUnlock }) {
         className="relative w-full max-w-sm mx-6"
       >
         <div className="glass-card rounded-3xl p-10 shadow-elegant border border-gold/20">
-          {/* Shield icon */}
           <div className="flex justify-center mb-8">
             <div className="w-16 h-16 rounded-full bg-gold/10 border border-gold/30 flex items-center justify-center">
               <Shield className="w-7 h-7 text-gold" />
@@ -216,6 +215,11 @@ function AdminDashboard({ onLock }) {
                 </a>
               </div>
             </motion.div>
+
+            {/* ── Block Dates (full width on its own row) ── */}
+            <div className="sm:col-span-2">
+              <BlockTimePanel />
+            </div>
           </div>
 
           {/* Quick links row */}
