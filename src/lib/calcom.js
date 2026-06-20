@@ -28,8 +28,14 @@ export async function getDefaultSchedule() {
   return list.find(s => s.isDefault) ?? list[0]
 }
 
-/** Fetch a single schedule by ID. */
-async function getSchedule(scheduleId) {
+/**
+ * Fetch a single schedule by ID — returns the FULL object including
+ * the complete overrides[] array. Always use this after a mutation so
+ * the UI reflects the true state (the list endpoint may return a
+ * condensed shape without overrides).
+ */
+export async function getSchedule(scheduleId) {
+  if (!API_KEY) throw new Error('VITE_CALCOM_API_KEY is not set.')
   const res = await fetch(`${BASE}/schedules/${scheduleId}`, { headers: hdrs() })
   if (!res.ok) throw new Error(`Cal.com ${res.status}: ${await res.text()}`)
   const json = await res.json()
@@ -37,12 +43,35 @@ async function getSchedule(scheduleId) {
 }
 
 const DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
-const toHHMM    = (t = '') => String(t).slice(0, 5)
+
+/**
+ * Safely extract HH:MM from any time string Cal.com may return:
+ *   - "HH:MM"              → direct prefix
+ *   - "HH:MM:SS"           → slice first 5 chars
+ *   - "2025-06-20T00:00:00.000Z" → extract after 'T'
+ *
+ * Previously this was just slice(0,5) which returned "2025-" for ISO
+ * strings, breaking isBlocked() and causing blocked dates to be invisible.
+ */
+const toHHMM = (t = '') => {
+  const s = String(t)
+  // ISO timestamp: extract the time portion after 'T'
+  const isoMatch = s.match(/T(\d{2}:\d{2})/)
+  if (isoMatch) return isoMatch[1]
+  // Plain "HH:MM" or "HH:MM:SS"
+  const plainMatch = s.match(/^(\d{2}:\d{2})/)
+  if (plainMatch) return plainMatch[1]
+  // Unexpected format — return as-is (will fail isBlocked gracefully)
+  return s
+}
 
 /** Normalise a weekly slot for PATCH. */
 function normaliseWeeklySlot(slot) {
   return {
-    days:      (slot.days ?? []).map(d => typeof d === 'number' ? DAY_NAMES[d] : d),
+    days:      (slot.days ?? []).map(d => {
+      if (typeof d === 'number') return DAY_NAMES[d] ?? d
+      return d
+    }),
     startTime: toHHMM(slot.startTime),
     endTime:   toHHMM(slot.endTime),
   }
@@ -61,7 +90,7 @@ function normaliseDateOverride(o) {
  * A blocked date is one where startTime === endTime === '00:00'
  * (zero-length window = no bookable slots).
  */
-function isBlocked(o) {
+export function isBlocked(o) {
   const st = toHHMM(o.startTime)
   const et = toHHMM(o.endTime)
   return st === '00:00' && et === '00:00'
@@ -124,8 +153,8 @@ export async function blockDate(scheduleId, date) {
 export async function unblockDate(scheduleId, date) {
   if (!API_KEY) throw new Error('VITE_CALCOM_API_KEY is not set.')
 
-  const schedule = await getSchedule(scheduleId)
-  const weekly   = collectWeeklySlots(schedule)
+  const schedule  = await getSchedule(scheduleId)
+  const weekly    = collectWeeklySlots(schedule)
   const remaining = collectOverrides(schedule).filter(o => o.date !== date)
 
   const body = {
@@ -141,6 +170,3 @@ export async function unblockDate(scheduleId, date) {
   if (!res.ok) throw new Error(`Cal.com ${res.status}: ${await res.text()}`)
   return res.json()
 }
-
-/** Expose isBlocked so BlockTimePanel can identify blocked overrides in the list. */
-export { isBlocked }
