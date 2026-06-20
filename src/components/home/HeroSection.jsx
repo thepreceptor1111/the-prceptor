@@ -2,10 +2,12 @@ import { motion } from "framer-motion";
 import { useMemo } from "react";
 import { ArrowRight, Star, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
-import heroImg from "@/assets/hero-section.jpg";
 import { useSiteSettings } from "@/lib/useSiteSettings";
 
-// ── Ambient drifting gold particle ──────────────────────────────────────────
+// Hero image lives in /public — no Vite hash, matches the <link rel="preload"> in index.html exactly.
+const heroImg = "/hero-section.webp";
+
+// ── Ambient drifting gold particle ────────────────────────────────────────────
 function Particle({ x, y, size, delay, duration, drift }) {
   return (
     <motion.span
@@ -100,7 +102,7 @@ export function HeroSection() {
   const badgeText    = settings?.heroBadgeText    ?? "Premium Astrology";
   const heading1     = settings?.heroHeading1     ?? "Modern guidance,";
   const heading2Gold = settings?.heroHeading2Gold ?? "written in the stars.";
-  const bodyCopy     = settings?.heroBodyCopy     ?? "Cinematic, deeply personal astrology consultations for high-intention seekers — designed for clarity in love, career, and life's defining chapters.";
+  const bodyCopy     = settings?.heroBodyCopy     ?? "Cinematic, deeply personal astrology consultations for high-intention seekers — designed for clarity in love, career, and life’s defining chapters.";
   const cta1Label    = settings?.heroCta1Label    ?? "Book a Session";
   const cta2Label    = settings?.heroCta2Label    ?? "Explore Services";
   const clientCount  = settings?.stat2?.value     ?? "8,400+";
