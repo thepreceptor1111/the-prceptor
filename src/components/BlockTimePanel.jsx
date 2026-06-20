@@ -1,8 +1,8 @@
 // src/components/BlockTimePanel.jsx
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { CalendarOff, CalendarCheck, Loader, X, AlertCircle, CheckCircle, RefreshCw } from 'lucide-react'
-import { getDefaultSchedule, blockDate, unblockDate, isBlocked } from '@/lib/calcom'
+import { getDefaultSchedule, getSchedule, blockDate, unblockDate, isBlocked } from '@/lib/calcom'
 
 export default function BlockTimePanel() {
   const today = new Date().toISOString().split('T')[0]
@@ -16,7 +16,12 @@ export default function BlockTimePanel() {
   const [actionErr,   setActionErr]   = useState(null)
   const [successMsg,  setSuccessMsg]  = useState(null)
 
-  // Blocked dates = overrides with startTime === endTime === '00:00'
+  // Cache the schedule ID so reloads after mutations use the single-schedule
+  // endpoint (full overrides[]) instead of the list endpoint (condensed shape).
+  const scheduleIdRef = useRef(null)
+
+  // Derive blocked dates from the full schedule overrides.
+  // After Bug #4 fix in calcom.js, isBlocked correctly handles ISO timestamps.
   const blockedDates = schedule
     ? [
         ...(schedule.overrides   ?? []),
@@ -29,11 +34,25 @@ export default function BlockTimePanel() {
     setTimeout(() => setSuccessMsg(null), 3500)
   }
 
+  /**
+   * First call: getDefaultSchedule() to discover + cache the ID.
+   * Subsequent calls (after mutations): getSchedule(id) so we always
+   * receive the full object with the complete overrides[] array.
+   */
   const loadSchedule = useCallback(async () => {
     setLoadingInit(true)
     setInitError(null)
     try {
-      const s = await getDefaultSchedule()
+      let s
+      if (scheduleIdRef.current) {
+        // Use single-schedule endpoint — guaranteed full overrides[]
+        s = await getSchedule(scheduleIdRef.current)
+      } else {
+        // First mount: discover via list, then immediately re-fetch full object
+        const discovered = await getDefaultSchedule()
+        scheduleIdRef.current = discovered.id
+        s = await getSchedule(discovered.id)
+      }
       setSchedule(s)
     } catch (e) {
       setInitError(e.message)
