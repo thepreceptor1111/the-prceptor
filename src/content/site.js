@@ -6,7 +6,7 @@ export const siteConfig = {
   tagline: "Modern guidance, written in the stars.",
   description:
     "Cinematic, deeply personal astrology consultations for high-intention seekers — clarity in love, career, and life's defining chapters.",
-  email: "hello@thepreceptor.com",
+  email: "thepreceptor1111@gmail.com",
   social: {
     instagram: "https://instagram.com/thepreceptor",
     youtube: "https://youtube.com/@thepreceptor",
