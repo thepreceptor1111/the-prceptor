@@ -39,8 +39,9 @@ function Digit({ value, label }) {
 
 export function OfferTimer() {
   const { settings } = useSiteSettings();
-  // Use Sanity deadline if set, otherwise fall back to the constant
-  const deadline = settings?.offerDeadline ?? OFFER_END_DATE;
+
+  const deadline   = settings?.offerDeadline ?? OFFER_END_DATE;
+  const timerLabel = settings?.offerLabel?.trim() || "Introductory offer ends in";
 
   const [timeLeft, setTimeLeft] = useState(() => getTimeLeft(deadline));
 
@@ -56,7 +57,7 @@ export function OfferTimer() {
     <div className="flex flex-col items-center gap-4 py-4">
       <div className="flex items-center gap-2 text-xs uppercase tracking-[0.25em] text-gold/80">
         <Clock className="w-3.5 h-3.5" />
-        <span>Introductory offer ends in</span>
+        <span>{timerLabel}</span>
       </div>
       <div className="flex items-end gap-2 sm:gap-3">
         <Digit value={timeLeft.days}    label="Days" />

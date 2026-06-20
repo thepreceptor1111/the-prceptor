@@ -19,6 +19,21 @@ export const serviceSchema = defineType({
       validation: (R) => R.required(),
     }),
     defineField({
+      name: 'sessionTier',
+      title: 'Session Tier',
+      type: 'string',
+      description: 'Groups this service under a tier heading on the Services section.',
+      options: {
+        list: [
+          { title: '⚡ Quick Guidance — Short Session',  value: 'quick' },
+          { title: '🌟 Mid Level Guidance',              value: 'mid' },
+          { title: '🔮 In-depth Guidance',               value: 'indepth' },
+        ],
+        layout: 'radio',
+      },
+      validation: (R) => R.required(),
+    }),
+    defineField({
       name: 'tagline',
       title: 'Badge / Tagline',
       type: 'string',
@@ -84,17 +99,19 @@ export const serviceSchema = defineType({
       name: 'order',
       title: 'Display Order',
       type: 'number',
-      description: 'Lower number = shown first. Use 1, 2, 3 …',
+      description: 'Lower number = shown first within its tier. Use 1, 2, 3 …',
       validation: (R) => R.required().integer().positive(),
     }),
   ],
   orderings: [
-    { title: 'Display Order', name: 'orderAsc', by: [{ field: 'order', direction: 'asc' }] },
+    { title: 'Tier then Order', name: 'tierOrder', by: [{ field: 'sessionTier', direction: 'asc' }, { field: 'order', direction: 'asc' }] },
+    { title: 'Display Order',  name: 'orderAsc',  by: [{ field: 'order', direction: 'asc' }] },
   ],
   preview: {
-    select: { title: 'title', subtitle: 'tagline', order: 'order' },
+    select: { title: 'title', subtitle: 'sessionTier', order: 'order' },
     prepare({ title, subtitle, order }) {
-      return { title: `${order ? `${order}. ` : ''}${title}`, subtitle };
+      const tierLabel = { quick: '⚡ Quick', mid: '🌟 Mid', indepth: '🔮 In-depth' };
+      return { title: `${order ? `${order}. ` : ''}${title}`, subtitle: tierLabel[subtitle] ?? subtitle };
     },
   },
 });

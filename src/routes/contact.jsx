@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Mail, MapPin, Send, Instagram, Youtube, Linkedin, Clock, Globe2, ShieldCheck, Sparkles, ChevronDown, ArrowRight } from "lucide-react";
 import { Reveal } from "@/components/site/Reveal";
 import { siteConfig } from "@/content/site";
+import contactHeroImg from "@/assets/contact-hero.png";
 
 export default function ContactPageWrapper() {
   return (
@@ -108,6 +109,17 @@ function ContactPage() {
               <span className="inline-flex items-center gap-2"><Clock className="w-3.5 h-3.5 text-gold" /> 24h response</span>
               <span className="inline-flex items-center gap-2"><Globe2 className="w-3.5 h-3.5 text-gold" /> All timezones</span>
               <span className="inline-flex items-center gap-2"><ShieldCheck className="w-3.5 h-3.5 text-gold" /> Strictly confidential</span>
+            </div>
+          </Reveal>
+
+          {/* ── Contact Hero Image ── */}
+          <Reveal delay={0.4}>
+            <div className="mt-12 mx-auto max-w-2xl rounded-2xl overflow-hidden ring-1 ring-gold/20">
+              <img
+                src={contactHeroImg}
+                alt="The Preceptor — Private Consultation"
+                className="w-full h-auto object-cover"
+              />
             </div>
           </Reveal>
         </div>

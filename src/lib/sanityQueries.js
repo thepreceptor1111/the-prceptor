@@ -36,6 +36,7 @@ export const SERVICES_QUERY = groq`
     isPopular,
     isSoldOut,
     features,
+    sessionTier,
     order
   }
 `;
@@ -50,6 +51,11 @@ export const FAQ_QUERY = groq`
   }
 `;
 
+// IMPORTANT: Query by _id == "siteSettings" not _type.
+// There are two siteSettings documents in the dataset — the correct one
+// has _id == "siteSettings" (created by the Studio singleton setup).
+// The old empty document (cd046535...) was created first and would always
+// be returned by *[_type == "siteSettings"][0], causing all fields to be null.
 export const SITE_SETTINGS_QUERY = groq`
-  *[_type == "siteSettings"][0]
+  *[_id == "siteSettings"][0]
 `;
