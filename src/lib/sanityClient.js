@@ -19,27 +19,27 @@ const dataset   = import.meta.env.VITE_SANITY_DATASET ?? 'production';
 const token     = import.meta.env.VITE_SANITY_TOKEN;
 
 // Only create the client if the project ID is present.
-// This prevents the app from crashing in environments where
-// the env vars have not been set yet.
 export const sanityClient = projectId
   ? createClient({
       projectId,
       dataset,
       token,
-      useCdn: true,        // use Sanity's CDN for fast cached reads
+      // IMPORTANT: useCdn MUST be false when a token is present.
+      // Sanity's CDN (cdn.sanity.io) strips auth headers — the token
+      // never reaches the API, so every authenticated fetch silently
+      // fails and safeFetch returns the fallback (static) data.
+      // With useCdn:false, requests go directly to api.sanity.io
+      // where the Authorization header is honoured correctly.
+      useCdn: false,
       apiVersion: '2024-01-01',
+      // perspective:'published' is the default — only published documents
+      // are returned. If you ever need draft preview, set 'previewDrafts'.
+      perspective: 'published',
     })
   : null;
 
 /**
  * Safe fetch helper — always resolves, never throws.
- *
- * Usage:
- *   const data = await safeFetch(SERVICES_QUERY, fallbackData);
- *
- * @param {string}  query    - GROQ query string
- * @param {*}       fallback - value returned if client is missing or fetch fails
- * @returns {Promise<*>}
  */
 export async function safeFetch(query, fallback) {
   if (!sanityClient) {
@@ -48,8 +48,6 @@ export async function safeFetch(query, fallback) {
   }
   try {
     const result = await sanityClient.fetch(query);
-    // Sanity returns null/empty array when a document type has no documents yet.
-    // Treat that the same as a missing result and use the fallback.
     if (result === null || (Array.isArray(result) && result.length === 0)) {
       return fallback;
     }
