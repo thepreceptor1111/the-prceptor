@@ -4,48 +4,81 @@
 const API_KEY = import.meta.env.VITE_CALCOM_API_KEY
 const BASE    = 'https://api.cal.com/v2'
 
-const headers = () => ({
+const hdrs = () => ({
   Authorization:     `Bearer ${API_KEY}`,
   'cal-api-version': '2024-06-14',
   'Content-Type':    'application/json',
 })
 
-/** Fetch all schedules and return the default one (first). */
+/** Fetch all schedules and return the default one. */
 export async function getDefaultSchedule() {
   if (!API_KEY) throw new Error('VITE_CALCOM_API_KEY is not set.')
-  const res = await fetch(`${BASE}/schedules`, { headers: headers() })
+  const res = await fetch(`${BASE}/schedules`, { headers: hdrs() })
   if (!res.ok) throw new Error(`Cal.com ${res.status}: ${await res.text()}`)
-  const { data } = await res.json()
-  if (!data?.length) throw new Error('No schedules found on this Cal.com account.')
-  // Prefer the schedule marked isDefault, fallback to first
-  return data.find(s => s.isDefault) ?? data[0]
+  const json = await res.json()
+  const data = json.data ?? json
+  const list = Array.isArray(data) ? data : data?.schedules ?? []
+  if (!list.length) throw new Error('No schedules found on this Cal.com account.')
+  return list.find(s => s.isDefault) ?? list[0]
 }
 
 /**
- * Block a date on Cal.com by patching the schedule's availability
- * with a date override that marks the slot unavailable.
- *
- * @param {string} scheduleId
- * @param {string} date        - 'YYYY-MM-DD'
- * @param {boolean} allDay
- * @param {string} startTime   - 'HH:MM' (ignored if allDay)
- * @param {string} endTime     - 'HH:MM' (ignored if allDay)
- * @param {object[]} existing  - current availability array from the schedule
+ * Fetch a single schedule by ID (gives us the full availability + dateOverrides).
  */
-export async function blockDate(scheduleId, date, allDay, startTime, endTime, existing = []) {
+async function getSchedule(scheduleId) {
+  const res = await fetch(`${BASE}/schedules/${scheduleId}`, { headers: hdrs() })
+  if (!res.ok) throw new Error(`Cal.com ${res.status}: ${await res.text()}`)
+  const json = await res.json()
+  return json.data ?? json
+}
+
+/**
+ * Normalise a weekly availability slot coming from GET into the shape
+ * that PATCH accepts:
+ *   { days: ["Monday", ...], startTime: "HH:MM", endTime: "HH:MM" }
+ */
+const DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
+
+function normaliseSlot(slot) {
+  // days may come as integers [0,1,2] or strings ["Monday"] — normalise to strings
+  const days = (slot.days ?? []).map(d =>
+    typeof d === 'number' ? DAY_NAMES[d] : d
+  )
+  // startTime / endTime may come as "HH:MM:SS" or full ISO — keep only "HH:MM"
+  const startTime = (slot.startTime ?? '').toString().slice(0, 5)
+  const endTime   = (slot.endTime   ?? '').toString().slice(0, 5)
+  return { days, startTime, endTime }
+}
+
+/**
+ * Block a date by adding a dateOverride with isUnavailable:true.
+ */
+export async function blockDate(scheduleId, date, allDay, startTime, endTime) {
   if (!API_KEY) throw new Error('VITE_CALCOM_API_KEY is not set.')
 
-  const start = allDay ? '00:00' : startTime
-  const end   = allDay ? '23:59' : endTime
+  const schedule = await getSchedule(scheduleId)
 
-  // Build the override: a "dateOverride" entry with isUnavailable = true
-  // We merge with existing overrides to not wipe them out
-  const existingOverrides = existing
-    .filter(a => a.date)  // only date-override entries have a .date field
+  // Weekly recurring slots (no .date field)
+  const weeklySlots = (schedule.availability ?? [])
+    .filter(a => !a.date)
+    .map(normaliseSlot)
 
-  // Avoid duplicate
-  const alreadyBlocked = existingOverrides.some(o => o.date === date)
-  if (alreadyBlocked) return { alreadyBlocked: true }
+  // Existing date overrides
+  const existingOverrides = (schedule.availability ?? [])
+    .filter(a => !!a.date)
+
+  // Also check schedule.dateOverrides if present (some API versions use this key)
+  const extraOverrides = Array.isArray(schedule.dateOverrides)
+    ? schedule.dateOverrides
+    : []
+
+  const allOverrides = [...existingOverrides, ...extraOverrides]
+
+  // Duplicate check
+  if (allOverrides.some(o => o.date === date)) return { alreadyBlocked: true }
+
+  const start = allDay ? '00:00' : startTime.slice(0, 5)
+  const end   = allDay ? '23:59' : endTime.slice(0, 5)
 
   const newOverride = {
     date,
@@ -56,15 +89,15 @@ export async function blockDate(scheduleId, date, allDay, startTime, endTime, ex
 
   const body = {
     availability: [
-      ...existing.filter(a => !a.date),  // keep weekly recurring slots
-      ...existingOverrides,               // keep existing date overrides
+      ...weeklySlots,
+      ...allOverrides,
       newOverride,
     ],
   }
 
   const res = await fetch(`${BASE}/schedules/${scheduleId}`, {
     method:  'PATCH',
-    headers: headers(),
+    headers: hdrs(),
     body:    JSON.stringify(body),
   })
   if (!res.ok) throw new Error(`Cal.com ${res.status}: ${await res.text()}`)
@@ -72,22 +105,35 @@ export async function blockDate(scheduleId, date, allDay, startTime, endTime, ex
 }
 
 /**
- * Unblock a date by removing its override from the schedule.
- *
- * @param {string} scheduleId
- * @param {string} date        - 'YYYY-MM-DD'
- * @param {object[]} existing  - current availability array from the schedule
+ * Unblock a date by removing its override.
  */
-export async function unblockDate(scheduleId, date, existing = []) {
+export async function unblockDate(scheduleId, date) {
   if (!API_KEY) throw new Error('VITE_CALCOM_API_KEY is not set.')
 
+  const schedule = await getSchedule(scheduleId)
+
+  const weeklySlots = (schedule.availability ?? [])
+    .filter(a => !a.date)
+    .map(normaliseSlot)
+
+  const remainingOverrides = (schedule.availability ?? [])
+    .filter(a => !!a.date && a.date !== date)
+
+  const extraOverrides = Array.isArray(schedule.dateOverrides)
+    ? schedule.dateOverrides.filter(o => o.date !== date)
+    : []
+
   const body = {
-    availability: existing.filter(a => a.date !== date),
+    availability: [
+      ...weeklySlots,
+      ...remainingOverrides,
+      ...extraOverrides,
+    ],
   }
 
   const res = await fetch(`${BASE}/schedules/${scheduleId}`, {
     method:  'PATCH',
-    headers: headers(),
+    headers: hdrs(),
     body:    JSON.stringify(body),
   })
   if (!res.ok) throw new Error(`Cal.com ${res.status}: ${await res.text()}`)
