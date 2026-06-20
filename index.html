@@ -3,7 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="preload" as="image" href="/assets/hero-section.webp" fetchpriority="high">
+
+    <!-- ── Hero image preload — file lives in /public so Vite never hashes it ── -->
+    <link rel="preload" as="image" href="/hero-section.webp" fetchpriority="high" type="image/webp">
+
     <!-- ── Favicon ─────────────────────────────────────────────────── -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
@@ -59,18 +62,26 @@
     <meta name="twitter:image"       content="https://thepreceptorglobal.com/og-image.webp" />
     <meta name="twitter:image:alt"   content="The Preceptor — For those who seek clarity." />
 
-    <!-- ── Google Fonts — preconnect first, then stylesheet ─────────────
-         Preconnect hints let the browser open the TCP/TLS connection
-         to Google Fonts in parallel with parsing this HTML, so fonts
-         are ready sooner. @import inside CSS is render-blocking and
-         delays font discovery until after CSS is fully parsed.
+    <!-- ── Google Fonts — preconnect + non-blocking load ────────────────
+         media=print trick: browser downloads the stylesheet without
+         blocking render. onload swaps it to media=all so fonts apply
+         once the stylesheet arrives. <noscript> fallback for no-JS.
+         preconnect hints open TCP/TLS to Google's servers in parallel.
     ──────────────────────────────────────────────────────── -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,400&family=Inter:wght@200;300;400;500;600&display=swap"
       rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
     />
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,400&family=Inter:wght@200;300;400;500;600&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
   </head>
   <body>
     <div id="root"></div>
