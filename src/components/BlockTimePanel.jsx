@@ -19,13 +19,17 @@ export default function BlockTimePanel() {
   })
 
   const [blocking,   setBlocking]   = useState(false)
-  const [removing,   setRemoving]   = useState(null)   // date string being removed
+  const [removing,   setRemoving]   = useState(null)
   const [actionErr,  setActionErr]  = useState(null)
   const [successMsg, setSuccessMsg] = useState(null)
 
-  // Derive the list of currently-blocked date overrides
-  const blockedDates = schedule?.availability
-    ? schedule.availability.filter(a => a.date && a.isUnavailable)
+  // Blocked dates live in schedule.overrides[] OR as .date entries in schedule.availability[]
+  // We check both to be safe regardless of Cal.com API version response shape
+  const blockedDates = schedule
+    ? [
+        ...(schedule.overrides ?? []),
+        ...(schedule.availability ?? []).filter(a => !!a.date),
+      ]
     : []
 
   const flash = (msg) => {
@@ -58,8 +62,7 @@ export default function BlockTimePanel() {
         form.date,
         form.allDay,
         form.startTime,
-        form.endTime,
-        schedule.availability ?? []
+        form.endTime
       )
       if (result?.alreadyBlocked) {
         setActionErr('This date is already blocked.')
@@ -80,7 +83,7 @@ export default function BlockTimePanel() {
     setRemoving(date)
     setActionErr(null)
     try {
-      await unblockDate(schedule.id, date, schedule.availability ?? [])
+      await unblockDate(schedule.id, date)
       await loadSchedule()
       flash(`${date} is now open for bookings ✓`)
     } catch (e) {
@@ -106,7 +109,6 @@ export default function BlockTimePanel() {
       transition={{ delay: 0.28, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
       className="glass-card rounded-2xl p-8 border border-gold/10 hover:border-gold/25 transition-colors duration-300 relative overflow-hidden"
     >
-      {/* Ambient glow */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,oklch(0.82_0.12_85_/_0.05),transparent_60%)] pointer-events-none" />
 
       <div className="relative z-10">
@@ -166,7 +168,7 @@ export default function BlockTimePanel() {
           )}
         </AnimatePresence>
 
-        {/* ── Currently Blocked ── */}
+        {/* Currently Blocked */}
         {loadingInit ? (
           <div className="flex items-center gap-2 text-xs text-muted-foreground mb-6">
             <Loader className="w-3.5 h-3.5 animate-spin" /> Loading schedule from Cal.com…
@@ -192,9 +194,9 @@ export default function BlockTimePanel() {
                     <div className="flex items-center gap-2">
                       <CalendarOff className="w-3.5 h-3.5 text-red-400 flex-shrink-0" />
                       <span className="font-medium">{fmt(b.date)}</span>
-                      {b.startTime && !b.isUnavailable && (
+                      {b.startTime && b.startTime !== '00:00' && (
                         <span className="text-xs text-muted-foreground">
-                          {b.startTime.slice(11,16)} – {b.endTime?.slice(11,16)}
+                          {b.startTime} – {b.endTime}
                         </span>
                       )}
                       <span className="text-xs text-red-400/70 ml-1">Blocked</span>
@@ -216,7 +218,7 @@ export default function BlockTimePanel() {
           </>
         )}
 
-        {/* ── Add Block Form ── */}
+        {/* Add Block Form */}
         <div className="pt-6 border-t border-border/50 space-y-4">
           <p className="text-xs text-muted-foreground uppercase tracking-widest mb-1">Add New Block</p>
 
@@ -225,15 +227,11 @@ export default function BlockTimePanel() {
             <div
               onClick={() => set('allDay', !form.allDay)}
               className={`relative w-10 h-5 rounded-full border transition-colors duration-200 ${
-                form.allDay
-                  ? 'bg-gold/30 border-gold/50'
-                  : 'bg-secondary/50 border-border'
+                form.allDay ? 'bg-gold/30 border-gold/50' : 'bg-secondary/50 border-border'
               }`}
             >
               <div className={`absolute top-0.5 w-4 h-4 rounded-full transition-all duration-200 ${
-                form.allDay
-                  ? 'left-5 bg-gold'
-                  : 'left-0.5 bg-muted-foreground'
+                form.allDay ? 'left-5 bg-gold' : 'left-0.5 bg-muted-foreground'
               }`} />
             </div>
             <span className="text-sm text-muted-foreground">
@@ -253,7 +251,7 @@ export default function BlockTimePanel() {
             />
           </div>
 
-          {/* Time range — only when not all-day */}
+          {/* Time range */}
           <AnimatePresence>
             {!form.allDay && (
               <motion.div
