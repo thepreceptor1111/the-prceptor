@@ -65,76 +65,22 @@
       />
     </noscript>
 
-    <!-- ── Premium pre-paint skeleton ─────────────────────────────────
-         WHY: The body background and #root skeleton are painted by the
-         browser’s HTML parser instantly — before ANY JavaScript runs.
-         This means the user sees a deep-space background with the hero
-         image already composited (via CSS background-image) from the
-         very first frame, with zero black flash.
-
-         HOW: We use background-image on the body itself so the hero is
-         visible as soon as the preloaded /hero-section.webp (requested
-         above) arrives from cache/network. Opacity 0.88 + mix-blend-mode
-         luminosity matches the React component’s own visual exactly, so
-         there is NO visible transition when React hydrates — it paints
-         on top of an identical frame.
-
-         The body background is removed once #root has children so
-         it doesn’t double-render under the real React tree.
-    ──────────────────────────────────────────────────────── -->
     <style>
       *,*::before,*::after{box-sizing:border-box}
       html{height:100%}
-
-      /* Deep-space base — exact match to --color-deep in styles.css */
+      /* Deep-space base — prevents white flash before React mounts */
       body {
         margin: 0;
         min-height: 100%;
         background-color: #0a0818;
-        /* Hero image composited as background so it’s visible before JS */
-        background-image: url('/hero-section.webp');
-        background-size: cover;
-        background-position: center top;
-        background-repeat: no-repeat;
-        /* luminosity blend matches the <img mix-blend-mode:luminosity> in React */
-        mix-blend-mode: normal;
-        /* Smooth crossfade: once React paints, we fade out the body bg */
-        transition: background-image 0.3s ease;
       }
-
-      /* The cosmic background overlay that styles.css adds via #cosmic-bg */
-      /* matches here so there’s no shift when CSS loads */
       #root {
         isolation: isolate;
-      }
-
-      /* Once React mounts and #root is populated, clear the body bg
-         so React’s own layers render correctly without double compositing */
-      #root:not(:empty) ~ * ,
-      body:has(#root:not(:empty)) {
-        /* we use the JS observer below for broader browser support */
       }
     </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
-    <!-- Remove the body background-image once React has mounted its own
-         hero, preventing double-compositing. Uses MutationObserver so
-         this is near-instant and never causes a flash. -->
-    <script>
-      (function(){
-        var root = document.getElementById('root');
-        if (!root) return;
-        var observer = new MutationObserver(function(){
-          if (root.firstChild) {
-            // React has mounted — remove body background-image (keep bg-color)
-            document.body.style.backgroundImage = 'none';
-            observer.disconnect();
-          }
-        });
-        observer.observe(root, { childList: true });
-      })();
-    </script>
   </body>
 </html>
