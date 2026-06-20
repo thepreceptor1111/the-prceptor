@@ -4,9 +4,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Lock, Eye, EyeOff, Shield, ExternalLink, Calendar, LayoutDashboard,
 } from "lucide-react";
-import BlockTimePanel from "@/components/BlockTimePanel";
+import BlockTimePanel    from "@/components/BlockTimePanel";
+import RestrictHoursPanel from "@/components/RestrictHoursPanel";
 
-// ── Auth ──────────────────────────────────────────────────────────────────────
+// ── Auth ────────────────────────────────────────────────────────────────────────────
 const SESSION_KEY  = "tp_admin_unlocked";
 const CORRECT_PASS = import.meta.env.VITE_ADMIN_PASS ?? "preceptor-admin-2024";
 
@@ -29,7 +30,7 @@ function useAdminAuth() {
   return { unlocked, unlock, lock };
 }
 
-// ── Lock Screen ───────────────────────────────────────────────────────────────
+// ── Lock Screen ─────────────────────────────────────────────────────────────────────
 function LockScreen({ onUnlock }) {
   const [pass, setPass]   = useState("");
   const [show, setShow]   = useState(false);
@@ -119,7 +120,7 @@ function LockScreen({ onUnlock }) {
   );
 }
 
-// ── Dashboard ─────────────────────────────────────────────────────────────────
+// ── Dashboard ─────────────────────────────────────────────────────────────────────
 const SANITY_URL = "https://thepreceptor.sanity.studio";
 const CAL_URL    = "https://app.cal.com/event-types";
 
@@ -172,7 +173,7 @@ function AdminDashboard({ onLock }) {
                   Edit services, testimonials, FAQs, hero copy, site stats — all CMS content lives here.
                 </p>
                 <p className="text-xs text-muted-foreground/60 italic mb-8">
-                  Opens in a new tab (iframe blocked by Sanity's security headers).
+                  Opens in a new tab (iframe blocked by Sanity’s security headers).
                 </p>
                 <a
                   href={SANITY_URL}
@@ -203,7 +204,7 @@ function AdminDashboard({ onLock }) {
                   View upcoming bookings, manage availability, reschedule, and edit event types.
                 </p>
                 <p className="text-xs text-muted-foreground/60 italic mb-8">
-                  Opens in a new tab (iframe blocked by Cal.com's security headers).
+                  Opens in a new tab (iframe blocked by Cal.com’s security headers).
                 </p>
                 <a
                   href={CAL_URL}
@@ -216,9 +217,17 @@ function AdminDashboard({ onLock }) {
               </div>
             </motion.div>
 
-            {/* ── Block Dates (full width on its own row) ── */}
+            {/* ── Availability Controls (full-width section header) ── */}
             <div className="sm:col-span-2">
-              <BlockTimePanel />
+              <p className="text-xs text-muted-foreground uppercase tracking-widest mb-4 flex items-center gap-2">
+                <Calendar className="w-3.5 h-3.5" /> Availability Controls
+              </p>
+              <div className="grid sm:grid-cols-2 gap-6">
+                {/* Full-day block */}
+                <BlockTimePanel />
+                {/* Custom hour restriction */}
+                <RestrictHoursPanel />
+              </div>
             </div>
           </div>
 
@@ -231,7 +240,7 @@ function AdminDashboard({ onLock }) {
           >
             <span className="text-xs text-muted-foreground uppercase tracking-widest mr-2">Quick Links</span>
             {[
-              { label: "Sanity Manage",   href: "https://www.sanity.io/manage" },
+              { label: "Sanity Manage",    href: "https://www.sanity.io/manage" },
               { label: "Cal.com Settings", href: "https://app.cal.com/settings" },
               { label: "Vercel Dashboard", href: "https://vercel.com/dashboard" },
               { label: "GitHub Repo",      href: "https://github.com/archijain23/the-preceptor" },
@@ -253,7 +262,7 @@ function AdminDashboard({ onLock }) {
   );
 }
 
-// ── Page export ───────────────────────────────────────────────────────────────
+// ── Page export ──────────────────────────────────────────────────────────────────────
 export default function AdminPage() {
   const { unlocked, unlock, lock } = useAdminAuth();
   return unlocked
