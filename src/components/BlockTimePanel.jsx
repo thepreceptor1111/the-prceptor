@@ -16,12 +16,24 @@ export default function BlockTimePanel() {
   const [actionErr,   setActionErr]   = useState(null)
   const [successMsg,  setSuccessMsg]  = useState(null)
 
-  // Cache the schedule ID so reloads after mutations use the single-schedule
-  // endpoint (full overrides[]) instead of the list endpoint (condensed shape).
+  // Cache schedule ID so reloads after mutations use the single-schedule endpoint.
   const scheduleIdRef = useRef(null)
 
-  // Derive blocked dates from the full schedule overrides.
-  // After Bug #4 fix in calcom.js, isBlocked correctly handles ISO timestamps.
+  /**
+   * Mutex ref — prevents concurrent PATCH calls from racing.
+   * Using a ref (not state) so toggling it never triggers a re-render.
+   *
+   * WHY THIS MATTERS:
+   *   blockDate() and unblockDate() both do:
+   *     1. GET /schedules/{id}  ← reads current overrides snapshot
+   *     2. PATCH /schedules/{id} ← writes snapshot + change
+   *   If two calls are in-flight simultaneously both GETs can resolve
+   *   before either PATCH fires, giving both the SAME stale snapshot.
+   *   The second PATCH then overwrites the first, silently losing a block.
+   */
+  const isMutating = useRef(false)
+
+  // Derive blocked dates from full schedule overrides.
   const blockedDates = schedule
     ? [
         ...(schedule.overrides   ?? []),
@@ -34,21 +46,14 @@ export default function BlockTimePanel() {
     setTimeout(() => setSuccessMsg(null), 3500)
   }
 
-  /**
-   * First call: getDefaultSchedule() to discover + cache the ID.
-   * Subsequent calls (after mutations): getSchedule(id) so we always
-   * receive the full object with the complete overrides[] array.
-   */
   const loadSchedule = useCallback(async () => {
     setLoadingInit(true)
     setInitError(null)
     try {
       let s
       if (scheduleIdRef.current) {
-        // Use single-schedule endpoint — guaranteed full overrides[]
         s = await getSchedule(scheduleIdRef.current)
       } else {
-        // First mount: discover via list, then immediately re-fetch full object
         const discovered = await getDefaultSchedule()
         scheduleIdRef.current = discovered.id
         s = await getSchedule(discovered.id)
@@ -64,7 +69,9 @@ export default function BlockTimePanel() {
   useEffect(() => { loadSchedule() }, [loadSchedule])
 
   const handleBlock = async () => {
-    if (!date || !schedule) return
+    // Guard: bail if any mutation is already in flight
+    if (!date || !schedule || isMutating.current) return
+    isMutating.current = true
     setBlocking(true)
     setActionErr(null)
     try {
@@ -79,12 +86,15 @@ export default function BlockTimePanel() {
     } catch (e) {
       setActionErr(e.message)
     } finally {
+      isMutating.current = false
       setBlocking(false)
     }
   }
 
   const handleUnblock = async (d) => {
-    if (!schedule) return
+    // Guard: bail if any mutation is already in flight
+    if (!schedule || isMutating.current) return
+    isMutating.current = true
     setRemoving(d)
     setActionErr(null)
     try {
@@ -94,6 +104,7 @@ export default function BlockTimePanel() {
     } catch (e) {
       setActionErr(e.message)
     } finally {
+      isMutating.current = false
       setRemoving(null)
     }
   }
@@ -104,6 +115,10 @@ export default function BlockTimePanel() {
     })
 
   const hasApiKey = !!import.meta.env.VITE_CALCOM_API_KEY
+
+  // Any mutation in-flight — used to disable ALL action buttons, not just
+  // the one that was clicked. Derived from state flags (readable by React).
+  const anyMutating = blocking || removing !== null
 
   return (
     <motion.div
@@ -130,8 +145,8 @@ export default function BlockTimePanel() {
           </div>
           <button
             onClick={loadSchedule}
-            disabled={loadingInit}
-            className="p-2 rounded-full border border-border text-muted-foreground hover:text-gold hover:border-gold/30 transition"
+            disabled={loadingInit || anyMutating}
+            className="p-2 rounded-full border border-border text-muted-foreground hover:text-gold hover:border-gold/30 transition disabled:opacity-40 disabled:cursor-not-allowed"
             title="Refresh"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loadingInit ? 'animate-spin' : ''}`} />
@@ -190,8 +205,8 @@ export default function BlockTimePanel() {
                     </div>
                     <button
                       onClick={() => handleUnblock(b.date)}
-                      disabled={removing === b.date}
-                      className="p-1.5 rounded-full text-muted-foreground hover:text-red-400 hover:bg-red-400/10 transition"
+                      disabled={anyMutating || loadingInit}
+                      className="p-1.5 rounded-full text-muted-foreground hover:text-red-400 hover:bg-red-400/10 transition disabled:opacity-40 disabled:cursor-not-allowed"
                       title="Remove block"
                     >
                       {removing === b.date
@@ -237,7 +252,7 @@ export default function BlockTimePanel() {
 
           <button
             onClick={handleBlock}
-            disabled={blocking || loadingInit || !date || !hasApiKey}
+            disabled={anyMutating || loadingInit || !date || !hasApiKey}
             className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-red-500/15 border border-red-400/35 text-red-300 text-sm hover:bg-red-500/25 hover:text-red-200 disabled:opacity-40 disabled:cursor-not-allowed transition"
           >
             {blocking
