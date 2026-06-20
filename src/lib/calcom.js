@@ -4,8 +4,9 @@
 // GROUND TRUTH from official Cal.com docs:
 //   overrides[] schema: { date: "YYYY-MM-DD", startTime: "HH:MM", endTime: "HH:MM" }
 //   There is NO isUnavailable field.
-//   To BLOCK a date: send override with startTime: "00:00", endTime: "00:00"
-//   A zero-length window = no slots available = date is effectively blocked.
+//   To BLOCK a date:    send override with startTime: "00:00", endTime: "00:00"
+//   To RESTRICT a date: send override with a real window e.g. "14:00"/"18:00"
+//   A zero-length window = no slots available = date is fully blocked.
 
 const API_KEY = import.meta.env.VITE_CALCOM_API_KEY
 const BASE    = 'https://api.cal.com/v2'
@@ -46,22 +47,16 @@ const DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','
 
 /**
  * Safely extract HH:MM from any time string Cal.com may return:
- *   - "HH:MM"              → direct prefix
- *   - "HH:MM:SS"           → slice first 5 chars
- *   - "2025-06-20T00:00:00.000Z" → extract after 'T'
- *
- * Previously this was just slice(0,5) which returned "2025-" for ISO
- * strings, breaking isBlocked() and causing blocked dates to be invisible.
+ *   - "HH:MM"                    → plain prefix
+ *   - "HH:MM:SS"                 → slice first 5 chars
+ *   - "2025-06-20T14:00:00.000Z" → extract after 'T'
  */
 const toHHMM = (t = '') => {
   const s = String(t)
-  // ISO timestamp: extract the time portion after 'T'
-  const isoMatch = s.match(/T(\d{2}:\d{2})/)
-  if (isoMatch) return isoMatch[1]
-  // Plain "HH:MM" or "HH:MM:SS"
+  const isoMatch   = s.match(/T(\d{2}:\d{2})/)
+  if (isoMatch)   return isoMatch[1]
   const plainMatch = s.match(/^(\d{2}:\d{2})/)
   if (plainMatch) return plainMatch[1]
-  // Unexpected format — return as-is (will fail isBlocked gracefully)
   return s
 }
 
@@ -77,7 +72,7 @@ function normaliseWeeklySlot(slot) {
   }
 }
 
-/** Normalise a date override for PATCH. Only date/startTime/endTime — no other fields. */
+/** Normalise a date override for PATCH. Only date/startTime/endTime — no extra fields. */
 function normaliseDateOverride(o) {
   return {
     date:      o.date,
@@ -87,13 +82,25 @@ function normaliseDateOverride(o) {
 }
 
 /**
- * A blocked date is one where startTime === endTime === '00:00'
- * (zero-length window = no bookable slots).
+ * A BLOCKED date: startTime === endTime === '00:00' (zero-length window).
+ * Cal.com shows no available slots for this date.
  */
 export function isBlocked(o) {
   const st = toHHMM(o.startTime)
   const et = toHHMM(o.endTime)
   return st === '00:00' && et === '00:00'
+}
+
+/**
+ * A RESTRICTED date: has a real time window (startTime !== endTime)
+ * AND is not the default zero-window block.
+ * Cal.com shows slots ONLY within this window for this date.
+ */
+export function isRestricted(o) {
+  const st = toHHMM(o.startTime)
+  const et = toHHMM(o.endTime)
+  // Must have a real window and not be a full block
+  return st !== et && !(st === '00:00' && et === '00:00')
 }
 
 /** Collect overrides from schedule response (handles both response shapes). */
@@ -111,33 +118,9 @@ function collectWeeklySlots(schedule) {
     .map(normaliseWeeklySlot)
 }
 
-/**
- * Block a date by adding an override with startTime=endTime="00:00".
- * Zero-length window = Cal.com shows no slots for that date.
- */
-export async function blockDate(scheduleId, date) {
-  if (!API_KEY) throw new Error('VITE_CALCOM_API_KEY is not set.')
+// ─── Helpers shared by write functions ───────────────────────────────────────
 
-  const schedule          = await getSchedule(scheduleId)
-  const weekly            = collectWeeklySlots(schedule)
-  const existingOverrides = collectOverrides(schedule)
-
-  // Already has a zero-window block for this date
-  if (existingOverrides.some(o => o.date === date && isBlocked(o))) {
-    return { alreadyBlocked: true }
-  }
-
-  // Remove any existing override for this date (e.g. a previous partial block)
-  const filtered = existingOverrides.filter(o => o.date !== date)
-
-  const body = {
-    availability: weekly,
-    overrides: [
-      ...filtered,
-      { date, startTime: '00:00', endTime: '00:00' },  // zero window = blocked
-    ],
-  }
-
+async function patchSchedule(scheduleId, body) {
   const res = await fetch(`${BASE}/schedules/${scheduleId}`, {
     method:  'PATCH',
     headers: hdrs(),
@@ -147,8 +130,36 @@ export async function blockDate(scheduleId, date) {
   return res.json()
 }
 
+// ─── Full-day Block ───────────────────────────────────────────────────────────
+
 /**
- * Unblock a date by removing its override entirely.
+ * Block an entire day: override with startTime=endTime="00:00".
+ * Zero-length window = Cal.com shows NO slots for that date.
+ */
+export async function blockDate(scheduleId, date) {
+  if (!API_KEY) throw new Error('VITE_CALCOM_API_KEY is not set.')
+
+  const schedule          = await getSchedule(scheduleId)
+  const weekly            = collectWeeklySlots(schedule)
+  const existingOverrides = collectOverrides(schedule)
+
+  if (existingOverrides.some(o => o.date === date && isBlocked(o))) {
+    return { alreadyBlocked: true }
+  }
+
+  const filtered = existingOverrides.filter(o => o.date !== date)
+
+  return patchSchedule(scheduleId, {
+    availability: weekly,
+    overrides: [
+      ...filtered,
+      { date, startTime: '00:00', endTime: '00:00' },
+    ],
+  })
+}
+
+/**
+ * Remove a full-day block (or any override) for a date.
  */
 export async function unblockDate(scheduleId, date) {
   if (!API_KEY) throw new Error('VITE_CALCOM_API_KEY is not set.')
@@ -157,16 +168,49 @@ export async function unblockDate(scheduleId, date) {
   const weekly    = collectWeeklySlots(schedule)
   const remaining = collectOverrides(schedule).filter(o => o.date !== date)
 
-  const body = {
+  return patchSchedule(scheduleId, {
     availability: weekly,
     overrides:    remaining,
-  }
-
-  const res = await fetch(`${BASE}/schedules/${scheduleId}`, {
-    method:  'PATCH',
-    headers: hdrs(),
-    body:    JSON.stringify(body),
   })
-  if (!res.ok) throw new Error(`Cal.com ${res.status}: ${await res.text()}`)
-  return res.json()
+}
+
+// ─── Custom Hour Restriction ──────────────────────────────────────────────────
+
+/**
+ * Restrict a date to a specific time window.
+ * e.g. setDateHours(id, '2025-06-25', '14:00', '18:00')
+ *   → Cal.com will only show slots between 2pm–6pm on that date.
+ *
+ * Replaces any existing override for the same date (block or prior restriction).
+ * Validates that startTime < endTime before calling the API.
+ */
+export async function setDateHours(scheduleId, date, startTime, endTime) {
+  if (!API_KEY) throw new Error('VITE_CALCOM_API_KEY is not set.')
+
+  // Validate window
+  if (!startTime || !endTime) throw new Error('Both start time and end time are required.')
+  if (startTime >= endTime)   throw new Error('Start time must be before end time.')
+
+  const schedule          = await getSchedule(scheduleId)
+  const weekly            = collectWeeklySlots(schedule)
+  const existingOverrides = collectOverrides(schedule)
+
+  // Remove any existing override for this date (block or prior restriction)
+  const filtered = existingOverrides.filter(o => o.date !== date)
+
+  return patchSchedule(scheduleId, {
+    availability: weekly,
+    overrides: [
+      ...filtered,
+      { date, startTime, endTime },
+    ],
+  })
+}
+
+/**
+ * Remove a custom hour restriction for a date (same as unblockDate —
+ * both remove the override entirely, restoring the default weekly schedule).
+ */
+export async function removeRestriction(scheduleId, date) {
+  return unblockDate(scheduleId, date)
 }
