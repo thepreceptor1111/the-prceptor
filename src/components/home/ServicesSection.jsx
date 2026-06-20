@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Star, Briefcase, Heart, Moon, Sparkles, BookOpen,
   Compass, ArrowRight, Clock, Loader2, Zap, Layers, Search,
@@ -23,31 +24,11 @@ const ICON_MAP = {
   Moon, Sparkles,
 };
 
-const TIERS = [
-  {
-    key: 'quick',
-    label: 'Quick Guidance',
-    subtitle: 'Short Session',
-    icon: Zap,
-    color: 'text-amber-400',
-    border: 'border-amber-400/20',
-  },
-  {
-    key: 'mid',
-    label: 'Mid Level Guidance',
-    subtitle: 'Balanced Depth',
-    icon: Layers,
-    color: 'text-gold',
-    border: 'border-gold/20',
-  },
-  {
-    key: 'indepth',
-    label: 'In-depth Guidance',
-    subtitle: 'Comprehensive',
-    icon: Search,
-    color: 'text-violet-400',
-    border: 'border-violet-400/20',
-  },
+const TABS = [
+  { key: 'all',     label: 'All',           icon: null },
+  { key: 'quick',   label: 'Quick Guidance', icon: Zap },
+  { key: 'mid',     label: 'Mid Level',      icon: Layers },
+  { key: 'indepth', label: 'In-depth',       icon: Search },
 ];
 
 function normalise(s) {
@@ -69,7 +50,14 @@ function normalise(s) {
 function ServiceCard({ s, i }) {
   const Icon = ICON_MAP[s.icon] || Star;
   return (
-    <Reveal delay={i * 0.07}>
+    <motion.div
+      key={s.slug}
+      layout
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 8 }}
+      transition={{ duration: 0.35, delay: i * 0.05, ease: [0.22, 1, 0.36, 1] }}
+    >
       <motion.div
         whileHover={{ y: -6 }}
         transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
@@ -81,52 +69,46 @@ function ServiceCard({ s, i }) {
             <Icon className="w-5 h-5" />
           </div>
           {s.isPopular && (
-            <span className="inline-block self-start text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border border-gold/30 text-gold bg-gold/5">
-              Popular
-            </span>
+            <span className="inline-block self-start text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border border-gold/30 text-gold bg-gold/5">Popular</span>
           )}
           {s.badge && !s.isPopular && (
-            <span className="inline-block self-start text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border border-gold/20 text-gold">
-              {s.badge}
-            </span>
+            <span className="inline-block self-start text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border border-gold/20 text-gold">{s.badge}</span>
           )}
           {s.isSoldOut && (
-            <span className="inline-block self-start text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border border-red-400/30 text-red-400">
-              Sold Out
-            </span>
+            <span className="inline-block self-start text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border border-red-400/30 text-red-400">Sold Out</span>
           )}
           <h3 className="text-xl leading-snug">{s.title}</h3>
           <p className="text-muted-foreground text-sm leading-relaxed line-clamp-3 flex-1">{s.desc}</p>
           <div className="mt-2 flex items-center justify-between border-t border-gold/10 pt-3">
             <span className="flex items-center gap-1 text-xs text-gold">
-              <Clock className="w-3 h-3" />
-              {s.duration}
+              <Clock className="w-3 h-3" />{s.duration}
             </span>
             <div className="flex items-baseline gap-2">
-              {s.originalPrice && (
-                <span className="text-xs text-muted-foreground line-through">{s.originalPrice}</span>
-              )}
+              {s.originalPrice && <span className="text-xs text-muted-foreground line-through">{s.originalPrice}</span>}
               <span className="font-semibold text-gold text-lg">{s.price}</span>
             </div>
           </div>
         </div>
       </motion.div>
-    </Reveal>
+    </motion.div>
   );
 }
 
 export function ServicesSection() {
   const { data: allServices, loading } = useSanity(SERVICES_QUERY, null);
   const { settings } = useSiteSettings();
+  const [activeTab, setActiveTab] = useState('all');
 
   const sectionLabel    = settings?.servicesSectionLabel    ?? "Services";
   const sectionHeading  = settings?.servicesSectionHeading  ?? "Consultations crafted with intention.";
   const sectionSubtitle = settings?.servicesSectionSubtitle ?? null;
 
-  // If no sessionTier data yet (Sanity not updated), fall back to flat grid
   const hasTiers = allServices?.some(s => s.sessionTier);
-
   const services = allServices ? allServices.map(normalise) : HOME_SERVICES;
+
+  const filtered = activeTab === 'all'
+    ? services
+    : services.filter(s => s.sessionTier === activeTab);
 
   return (
     <section id="services" className="py-32 relative bg-cosmic-deep overflow-hidden">
@@ -138,63 +120,74 @@ export function ServicesSection() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 lg:px-10 relative z-10">
-        {/* Section header */}
+        {/* Header */}
         <Reveal className="text-center max-w-2xl mx-auto">
           <span className="text-xs uppercase tracking-[0.3em] text-gold">{sectionLabel}</span>
           <h2 className="mt-4 text-4xl md:text-5xl">{sectionHeading}</h2>
-          {sectionSubtitle && (
-            <p className="mt-5 text-muted-foreground">{sectionSubtitle}</p>
-          )}
+          {sectionSubtitle && <p className="mt-5 text-muted-foreground">{sectionSubtitle}</p>}
         </Reveal>
 
         <Reveal className="mt-10">
           <OfferTimer />
         </Reveal>
 
+        {/* Filter tabs — only show when tiers exist */}
+        {!loading && hasTiers && (
+          <Reveal className="mt-10">
+            <div className="flex flex-wrap justify-center gap-2">
+              {TABS.map(tab => {
+                const TabIcon = tab.icon;
+                const isActive = activeTab === tab.key;
+                return (
+                  <button
+                    key={tab.key}
+                    onClick={() => setActiveTab(tab.key)}
+                    className={`inline-flex items-center gap-2 px-5 py-2 rounded-full text-sm font-medium border transition-all duration-200 ${
+                      isActive
+                        ? 'bg-gold/15 border-gold/50 text-gold'
+                        : 'border-gold/15 text-muted-foreground hover:border-gold/30 hover:text-gold'
+                    }`}
+                  >
+                    {TabIcon && <TabIcon className="w-3.5 h-3.5" />}
+                    {tab.label}
+                    {isActive && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-gold inline-block" />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </Reveal>
+        )}
+
+        {/* Loading */}
         {loading && (
           <div className="flex justify-center items-center py-20">
             <Loader2 className="w-6 h-6 text-gold animate-spin" />
           </div>
         )}
 
-        {!loading && hasTiers && (
-          // ── 3-TIER GROUPED LAYOUT ───────────────────────────────────
-          <div className="mt-16 space-y-20">
-            {TIERS.map((tier) => {
-              const tierServices = services.filter(s => s.sessionTier === tier.key);
-              if (tierServices.length === 0) return null;
-              const TierIcon = tier.icon;
-              return (
-                <div key={tier.key}>
-                  {/* Tier heading */}
-                  <Reveal>
-                    <div className={`flex items-center gap-3 mb-8 pb-4 border-b ${tier.border}`}>
-                      <TierIcon className={`w-5 h-5 ${tier.color}`} />
-                      <div>
-                        <h3 className={`text-lg font-medium ${tier.color}`}>{tier.label}</h3>
-                        <p className="text-xs text-muted-foreground uppercase tracking-widest">{tier.subtitle}</p>
-                      </div>
-                    </div>
-                  </Reveal>
-                  {/* Cards */}
-                  <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-6">
-                    {tierServices.map((s, i) => (
-                      <ServiceCard key={s.slug} s={s} i={i} />
-                    ))}
-                  </div>
+        {/* Cards */}
+        {!loading && (
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              className="mt-10 grid sm:grid-cols-2 xl:grid-cols-3 gap-6"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              {filtered.map((s, i) => (
+                <ServiceCard key={s.slug} s={s} i={i} />
+              ))}
+              {filtered.length === 0 && (
+                <div className="col-span-full text-center py-16 text-muted-foreground">
+                  No services in this category yet.
                 </div>
-              );
-            })}
-          </div>
-        )}
-
-        {!loading && !hasTiers && (
-          // ── FLAT GRID FALLBACK (no tiers set in Sanity yet) ──────────
-          <div className="mt-16 grid sm:grid-cols-2 xl:grid-cols-4 gap-6">
-            {services.slice(0, 4).map((s, i) => (
-              <ServiceCard key={s.slug} s={s} i={i} />
-            ))}
-          </div>
+              )}
+            </motion.div>
+          </AnimatePresence>
         )}
 
         <Reveal className="mt-12 text-center">

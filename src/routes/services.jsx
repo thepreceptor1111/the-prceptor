@@ -1,10 +1,11 @@
 import SEO from "@/components/site/SEO";
 import { PAGE_SEO } from "@/content/seo";
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowRight, Star, Briefcase, Heart, Moon, Sparkles,
-  BookOpen, Compass, CheckCircle, Clock,
+  BookOpen, Compass, CheckCircle, Clock, Zap, Layers, Search,
 } from "lucide-react";
 import { Reveal } from "@/components/site/Reveal";
 import { OfferTimer } from "@/components/site/OfferTimer";
@@ -33,32 +34,41 @@ const INCLUDES = [
   "Timezone-aware scheduling",
 ];
 
-/**
- * Normalise a Sanity service doc into the shape the card expects.
- */
+const TABS = [
+  { key: 'all',     label: 'All Sessions',   icon: null },
+  { key: 'quick',   label: 'Quick Guidance',  icon: Zap },
+  { key: 'mid',     label: 'Mid Level',       icon: Layers },
+  { key: 'indepth', label: 'In-depth',        icon: Search },
+];
+
 function normaliseService(s) {
   return {
     slug:          s.slug?.current ?? s.slug ?? s._id,
     title:         s.title ?? "",
-    badge:         s.tagline ?? "",
-    desc:          s.description ?? "",
-    duration:      s.sessionDuration ? `${s.sessionDuration} min` : "60 min",
-    price:         s.price ? `${s.currency ?? "$"}${s.price}` : "",
-    originalPrice: s.originalPrice ? `${s.currency ?? "$"}${s.originalPrice}` : "",
-    icon:          "Star",
+    badge:         s.tagline ?? s.badge ?? "",
+    desc:          s.description ?? s.desc ?? "",
+    duration:      s.sessionDuration ?? "60 min",
+    price:         s.price ? `$${s.price}` : "",
+    originalPrice: s.originalPrice ? `$${s.originalPrice}` : "",
+    icon:          s.icon ?? "Star",
     isSoldOut:     s.isSoldOut ?? false,
     isPopular:     s.isPopular ?? false,
+    sessionTier:   s.sessionTier ?? null,
   };
 }
 
 export default function ServicesPage() {
   const { data: cmsServices, loading } = useSanity(SERVICES_QUERY, null);
   const { settings } = useSiteSettings();
+  const [activeTab, setActiveTab] = useState('all');
 
-  // Use CMS data when available; fall back to constants
-  const services = cmsServices && cmsServices.length > 0
-    ? cmsServices.map(normaliseService)
-    : SERVICES;
+  const raw = cmsServices && cmsServices.length > 0 ? cmsServices : SERVICES;
+  const services = raw.map(normaliseService);
+  const hasTiers = services.some(s => s.sessionTier);
+
+  const filtered = activeTab === 'all'
+    ? services
+    : services.filter(s => s.sessionTier === activeTab);
 
   const email = settings?.email ?? SITE?.email;
 
@@ -106,15 +116,43 @@ export default function ServicesPage() {
           </div>
         </section>
 
-        {/* All service cards */}
+        {/* Services */}
         <section className="py-20 bg-cosmic-deep relative overflow-hidden">
           <div className="absolute inset-0 pointer-events-none section-glow-services" aria-hidden />
           <div className="max-w-7xl mx-auto px-6 lg:px-10 relative z-10">
 
-            <Reveal className="mb-4">
+            <Reveal className="mb-8">
               <OfferTimer />
             </Reveal>
 
+            {/* Filter tabs */}
+            {!loading && hasTiers && (
+              <Reveal className="mb-10">
+                <div className="flex flex-wrap justify-center gap-2">
+                  {TABS.map(tab => {
+                    const TabIcon = tab.icon;
+                    const isActive = activeTab === tab.key;
+                    return (
+                      <button
+                        key={tab.key}
+                        onClick={() => setActiveTab(tab.key)}
+                        className={`inline-flex items-center gap-2 px-5 py-2 rounded-full text-sm font-medium border transition-all duration-200 ${
+                          isActive
+                            ? 'bg-gold/15 border-gold/50 text-gold'
+                            : 'border-gold/15 text-muted-foreground hover:border-gold/30 hover:text-gold'
+                        }`}
+                      >
+                        {TabIcon && <TabIcon className="w-3.5 h-3.5" />}
+                        {tab.label}
+                        {isActive && <span className="w-1.5 h-1.5 rounded-full bg-gold inline-block" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              </Reveal>
+            )}
+
+            {/* Cards */}
             {loading ? (
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 {Array.from({ length: 6 }).map((_, i) => (
@@ -122,67 +160,76 @@ export default function ServicesPage() {
                 ))}
               </div>
             ) : (
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                {services.map((s, i) => {
-                  const Icon = ICON_MAP[s.icon] || Star;
-                  return (
-                    <Reveal key={s.slug} delay={i * 0.06}>
-                      <motion.div
-                        whileHover={{ y: -6 }}
-                        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                        className="glass-card rounded-2xl p-8 flex flex-col gap-3 group hover:border-primary/40 relative overflow-hidden"
-                      >
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,oklch(0.82_0.12_85_/_0.06),transparent_40%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                        <div className="relative z-10 flex flex-col gap-3 h-full">
-                          <div className="w-12 h-12 rounded-full bg-primary/10 text-gold flex items-center justify-center">
-                            <Icon className="w-5 h-5" />
-                          </div>
-
-                          {s.badge && (
-                            <span className="inline-block self-start text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border border-gold/20 text-gold">
-                              {s.badge}
-                            </span>
-                          )}
-
-                          <div className="flex-1">
-                            <h2 className="text-2xl font-serif leading-snug">{s.title}</h2>
-                            <p className="mt-3 text-muted-foreground text-sm leading-relaxed">{s.desc}</p>
-                          </div>
-
-                          <div className="flex items-center justify-between pt-4 border-t border-gold/10">
-                            <span className="flex items-center gap-1 text-xs text-gold">
-                              <Clock className="w-3 h-3" />
-                              {s.duration}
-                            </span>
-                            <div className="flex items-baseline gap-2">
-                              {s.originalPrice && (
-                                <span className="text-sm text-muted-foreground line-through">
-                                  {s.originalPrice}
-                                </span>
-                              )}
-                              <span className="font-serif text-xl text-gold">{s.price}</span>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeTab}
+                  className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8"
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.25 }}
+                >
+                  {filtered.map((s, i) => {
+                    const Icon = ICON_MAP[s.icon] || Star;
+                    return (
+                      <Reveal key={s.slug} delay={i * 0.06}>
+                        <motion.div
+                          whileHover={{ y: -6 }}
+                          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                          className="glass-card rounded-2xl p-8 flex flex-col gap-3 group hover:border-primary/40 relative overflow-hidden"
+                        >
+                          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,oklch(0.82_0.12_85_/_0.06),transparent_40%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                          <div className="relative z-10 flex flex-col gap-3 h-full">
+                            <div className="w-12 h-12 rounded-full bg-primary/10 text-gold flex items-center justify-center">
+                              <Icon className="w-5 h-5" />
                             </div>
+                            {s.isPopular && (
+                              <span className="inline-block self-start text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border border-gold/30 text-gold bg-gold/5">Popular</span>
+                            )}
+                            {s.badge && !s.isPopular && (
+                              <span className="inline-block self-start text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border border-gold/20 text-gold">{s.badge}</span>
+                            )}
+                            {s.isSoldOut && (
+                              <span className="inline-block self-start text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border border-red-400/30 text-red-400">Sold Out</span>
+                            )}
+                            <div className="flex-1">
+                              <h2 className="text-2xl font-serif leading-snug">{s.title}</h2>
+                              <p className="mt-3 text-muted-foreground text-sm leading-relaxed">{s.desc}</p>
+                            </div>
+                            <div className="flex items-center justify-between pt-4 border-t border-gold/10">
+                              <span className="flex items-center gap-1 text-xs text-gold">
+                                <Clock className="w-3 h-3" />{s.duration}
+                              </span>
+                              <div className="flex items-baseline gap-2">
+                                {s.originalPrice && (
+                                  <span className="text-sm text-muted-foreground line-through">{s.originalPrice}</span>
+                                )}
+                                <span className="font-serif text-xl text-gold">{s.price}</span>
+                              </div>
+                            </div>
+                            {s.isSoldOut ? (
+                              <span className="mt-1 inline-flex items-center gap-2 text-sm font-medium text-muted-foreground cursor-not-allowed">Sold Out</span>
+                            ) : (
+                              <Link
+                                to="/book"
+                                className="mt-1 inline-flex items-center gap-2 text-sm font-medium text-gold hover:text-foreground transition group/link"
+                              >
+                                Book this session
+                                <ArrowRight className="w-3.5 h-3.5 group-hover/link:translate-x-1 transition-transform" />
+                              </Link>
+                            )}
                           </div>
-
-                          {s.isSoldOut ? (
-                            <span className="mt-1 inline-flex items-center gap-2 text-sm font-medium text-muted-foreground cursor-not-allowed">
-                              Sold Out
-                            </span>
-                          ) : (
-                            <Link
-                              to="/book"
-                              className="mt-1 inline-flex items-center gap-2 text-sm font-medium text-gold hover:text-foreground transition group/link"
-                            >
-                              Book this session
-                              <ArrowRight className="w-3.5 h-3.5 group-hover/link:translate-x-1 transition-transform" />
-                            </Link>
-                          )}
-                        </div>
-                      </motion.div>
-                    </Reveal>
-                  );
-                })}
-              </div>
+                        </motion.div>
+                      </Reveal>
+                    );
+                  })}
+                  {filtered.length === 0 && (
+                    <div className="col-span-full text-center py-20 text-muted-foreground">
+                      No services in this category yet.
+                    </div>
+                  )}
+                </motion.div>
+              </AnimatePresence>
             )}
           </div>
         </section>
@@ -192,7 +239,7 @@ export default function ServicesPage() {
           <div className="max-w-4xl mx-auto px-6 lg:px-10 text-center">
             <Reveal>
               <span className="text-xs uppercase tracking-[0.3em] text-gold">Every Session</span>
-              <h2 className="mt-4 text-3xl md:text-4xl">What's always included.</h2>
+              <h2 className="mt-4 text-3xl md:text-4xl">What’s always included.</h2>
             </Reveal>
             <Reveal delay={0.08}>
               <ul className="mt-10 grid sm:grid-cols-2 gap-4 text-left max-w-2xl mx-auto">
@@ -220,9 +267,7 @@ export default function ServicesPage() {
                   Reserve a Session <ArrowRight className="w-4 h-4" />
                 </Link>
                 {email && (
-                  <a href={`mailto:${email}`} className="btn-secondary">
-                    Have a question?
-                  </a>
+                  <a href={`mailto:${email}`} className="btn-secondary">Have a question?</a>
                 )}
               </div>
             </Reveal>
