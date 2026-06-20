@@ -30,7 +30,9 @@ export default function Footer() {
         </div>
 
         <div className="md:col-span-3">
-          <h4 className="text-xs uppercase tracking-[0.3em] text-gold mb-6">Explore</h4>
+          {/* FIX 10: h4 → p to fix non-sequential heading order (Lighthouse a11y).
+              Visual appearance is identical — styling comes from className only. */}
+          <p className="text-xs uppercase tracking-[0.3em] text-gold mb-6">Explore</p>
           <ul className="space-y-4 text-sm text-muted-foreground">
             {footerLinks.explore.map((l) => (
               <li key={l.to}>
@@ -41,7 +43,8 @@ export default function Footer() {
         </div>
 
         <div className="md:col-span-4">
-          <h4 className="text-xs uppercase tracking-[0.3em] text-gold mb-6">Contact</h4>
+          {/* FIX 10: Same treatment for the Contact label */}
+          <p className="text-xs uppercase tracking-[0.3em] text-gold mb-6">Contact</p>
           <ul className="space-y-4 text-sm text-muted-foreground">
             <li className="flex items-start gap-3">
               <Mail className="w-4 h-4 mt-0.5 text-gold/70 shrink-0" />
