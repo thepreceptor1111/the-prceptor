@@ -2,8 +2,8 @@
  * useSanity — generic React hook for fetching from Sanity.
  *
  * Features:
- *  - Module-level in-memory cache: same query is NEVER re-fetched within
- *    the same browser session. Instant on back-navigation.
+ *  - 5-minute TTL cache: same query is not re-fetched within 5 min,
+ *    but WILL re-fetch after that so fresh Sanity publishes always show up.
  *  - Never throws — always falls back to `fallback` on error
  *  - Shows `loading: true` only on first fetch (avoids layout shift on refetch)
  *  - Exposes `fromCMS: boolean` so components can show a subtle indicator
@@ -14,22 +14,32 @@
 import { useState, useEffect } from 'react';
 import { safeFetch } from './sanityClient';
 
-// Module-level cache — survives re-renders and page navigations within the SPA.
-// Key: query string  Value: { data, fromCMS }
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
+// Module-level cache — { data, fromCMS, fetchedAt }
 const QUERY_CACHE = new Map();
 
+function getCached(query) {
+  const entry = QUERY_CACHE.get(query);
+  if (!entry) return null;
+  const isStale = Date.now() - entry.fetchedAt > CACHE_TTL_MS;
+  if (isStale) {
+    QUERY_CACHE.delete(query);
+    return null;
+  }
+  return entry;
+}
+
 export function useSanity(query, fallback) {
-  // Seed state from cache immediately so there is ZERO loading flash on
-  // back-navigation or when the same query is used on multiple pages.
-  const cached = QUERY_CACHE.get(query);
+  const cached = getCached(query);
 
   const [data, setData]       = useState(cached?.data ?? fallback);
-  const [loading, setLoading] = useState(!cached);   // already cached → no loading
+  const [loading, setLoading] = useState(!cached);
   const [fromCMS, setFromCMS] = useState(cached?.fromCMS ?? false);
 
   useEffect(() => {
-    // Already have a cached result — skip the network entirely.
-    if (QUERY_CACHE.has(query)) return;
+    // Valid non-stale cache — skip the network.
+    if (getCached(query)) return;
 
     let cancelled = false;
 
@@ -38,7 +48,7 @@ export function useSanity(query, fallback) {
       const result = await safeFetch(query, fallback);
       if (!cancelled) {
         const isCMS = result !== fallback;
-        QUERY_CACHE.set(query, { data: result, fromCMS: isCMS });
+        QUERY_CACHE.set(query, { data: result, fromCMS: isCMS, fetchedAt: Date.now() });
         setData(result);
         setFromCMS(isCMS);
         setLoading(false);
