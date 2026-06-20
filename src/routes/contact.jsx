@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Mail, MapPin, Send, Instagram, Youtube, Linkedin, Clock, Globe2, ShieldCheck, Sparkles, ChevronDown, ArrowRight } from "lucide-react";
 import { Reveal } from "@/components/site/Reveal";
 import { siteConfig } from "@/content/site";
+import contactHeroImg from "@/assets/contact-hero.jpg";
 
 export default function ContactPageWrapper() {
   return (
@@ -45,103 +46,6 @@ const faqs = [
   { q: "Are conversations confidential?", a: "Always. Every exchange is treated with the discretion of a private practice. Recordings are shared only with you." },
   { q: "Do you accept international clients?", a: "Yes — we serve seekers across 47 countries with white-glove scheduling and timezone-aware sessions." },
 ];
-
-/* ─── Animated Celestial Illustration ─────────────────────────────────────── */
-function CelestialIllustration() {
-  return (
-    <Reveal delay={0.25}>
-      <div className="relative w-full flex items-center justify-center select-none pointer-events-none" aria-hidden="true">
-        {/* Outer slow-rotating orbit ring */}
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 38, repeat: Infinity, ease: "linear" }}
-          className="absolute w-64 h-64 rounded-full border border-gold/20"
-          style={{ borderStyle: "dashed" }}
-        />
-        {/* Middle orbit ring with planet dot */}
-        <motion.div
-          animate={{ rotate: -360 }}
-          transition={{ duration: 22, repeat: Infinity, ease: "linear" }}
-          className="absolute w-44 h-44 rounded-full border border-gold/15"
-        >
-          {/* Orbiting planet */}
-          <span className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-gold/60 shadow-[0_0_12px_4px_oklch(0.82_0.12_85_/_0.45)]" />
-        </motion.div>
-        {/* Inner ring */}
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 14, repeat: Infinity, ease: "linear" }}
-          className="absolute w-28 h-28 rounded-full border border-gold/25"
-        >
-          {/* Small orbiting dot */}
-          <span className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-amber-300/70 shadow-[0_0_8px_2px_oklch(0.88_0.15_85_/_0.5)]" />
-        </motion.div>
-
-        {/* Central glowing SVG — celestial eye / astrology symbol */}
-        <motion.div
-          animate={{ scale: [1, 1.06, 1], opacity: [0.85, 1, 0.85] }}
-          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-          className="relative z-10 w-20 h-20 rounded-full flex items-center justify-center glass-card shadow-[0_0_32px_8px_oklch(0.82_0.12_85_/_0.22)]"
-        >
-          {/* Astrological SVG — simplified celestial compass / mandala */}
-          <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-14 h-14">
-            {/* Outer circle */}
-            <circle cx="40" cy="40" r="36" stroke="oklch(0.82 0.12 85)" strokeWidth="0.8" strokeDasharray="4 3" />
-            {/* Cross axes */}
-            <line x1="40" y1="4" x2="40" y2="76" stroke="oklch(0.82 0.12 85 / 0.35)" strokeWidth="0.6" />
-            <line x1="4" y1="40" x2="76" y2="40" stroke="oklch(0.82 0.12 85 / 0.35)" strokeWidth="0.6" />
-            {/* Diagonal axes */}
-            <line x1="14.6" y1="14.6" x2="65.4" y2="65.4" stroke="oklch(0.82 0.12 85 / 0.2)" strokeWidth="0.5" />
-            <line x1="65.4" y1="14.6" x2="14.6" y2="65.4" stroke="oklch(0.82 0.12 85 / 0.2)" strokeWidth="0.5" />
-            {/* Middle circle */}
-            <circle cx="40" cy="40" r="18" stroke="oklch(0.82 0.12 85 / 0.6)" strokeWidth="0.8" />
-            {/* Inner star polygon */}
-            <polygon
-              points="40,22 43.5,36.5 58,36.5 46.5,45.5 50,60 40,51 30,60 33.5,45.5 22,36.5 36.5,36.5"
-              fill="oklch(0.82 0.12 85 / 0.15)"
-              stroke="oklch(0.82 0.12 85 / 0.7)"
-              strokeWidth="0.7"
-              strokeLinejoin="round"
-            />
-            {/* Centre dot */}
-            <circle cx="40" cy="40" r="3.5" fill="oklch(0.82 0.12 85)" />
-            {/* Cardinal tick marks */}
-            {[0, 90, 180, 270].map((deg) => (
-              <line
-                key={deg}
-                x1="40" y1="6" x2="40" y2="12"
-                stroke="oklch(0.82 0.12 85 / 0.8)"
-                strokeWidth="1.2"
-                transform={`rotate(${deg} 40 40)`}
-              />
-            ))}
-          </svg>
-        </motion.div>
-
-        {/* Floating sparkle particles */}
-        {[
-          { top: "10%",  left: "18%",  size: "w-1.5 h-1.5", delay: 0 },
-          { top: "20%",  left: "75%",  size: "w-1 h-1",     delay: 1.2 },
-          { top: "72%",  left: "22%",  size: "w-1 h-1",     delay: 0.7 },
-          { top: "78%",  left: "70%",  size: "w-1.5 h-1.5", delay: 1.8 },
-          { top: "48%",  left: "88%",  size: "w-1 h-1",     delay: 2.4 },
-          { top: "38%",  left: "8%",   size: "w-1.5 h-1.5", delay: 0.4 },
-        ].map((p, i) => (
-          <motion.span
-            key={i}
-            className={`absolute ${p.size} rounded-full bg-gold/70`}
-            style={{ top: p.top, left: p.left }}
-            animate={{ opacity: [0, 1, 0], scale: [0.5, 1.4, 0.5] }}
-            transition={{ duration: 3.5, repeat: Infinity, delay: p.delay, ease: "easeInOut" }}
-          />
-        ))}
-
-        {/* Subtle glow backdrop */}
-        <div className="absolute w-48 h-48 rounded-full bg-[radial-gradient(circle,oklch(0.82_0.12_85_/_0.08),transparent_70%)] blur-2xl" />
-      </div>
-    </Reveal>
-  );
-}
 
 function ContactPage() {
   const [data, setData] = useState(initial);
@@ -207,6 +111,17 @@ function ContactPage() {
               <span className="inline-flex items-center gap-2"><ShieldCheck className="w-3.5 h-3.5 text-gold" /> Strictly confidential</span>
             </div>
           </Reveal>
+
+          {/* ── Contact Hero Image ── */}
+          <Reveal delay={0.4}>
+            <div className="mt-12 mx-auto max-w-2xl rounded-2xl overflow-hidden ring-1 ring-gold/20">
+              <img
+                src={contactHeroImg}
+                alt="The Preceptor — Private Consultation"
+                className="w-full h-auto object-cover"
+              />
+            </div>
+          </Reveal>
         </div>
       </section>
 
@@ -222,11 +137,6 @@ function ContactPage() {
                 Whether you're booking a session, planning a partnership, or seeking press — the inbox below reaches us personally.
               </p>
             </Reveal>
-
-            {/* ── Celestial Illustration ── */}
-            <div className="py-4">
-              <CelestialIllustration />
-            </div>
 
             <Reveal delay={0.1}>
               <ul className="space-y-6">
