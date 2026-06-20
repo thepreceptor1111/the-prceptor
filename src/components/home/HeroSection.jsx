@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { ArrowRight, Star, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useSiteSettings } from "@/lib/useSiteSettings";
@@ -97,6 +97,7 @@ function StaggeredHeading({ line1, line2Gold, delay = 0 }) {
 
 export function HeroSection() {
   const { settings } = useSiteSettings();
+  const [imgReady, setImgReady] = useState(false);
 
   const badgeText    = settings?.heroBadgeText    ?? "Premium Astrology";
   const heading1     = settings?.heroHeading1     ?? "Modern guidance,";
@@ -108,14 +109,12 @@ export function HeroSection() {
   const clientLabel  = settings?.stat2?.label     ?? "clients";
   const countryCount = settings?.stat3?.value     ?? "47";
 
-  // 6 particles instead of 18 — reduces RAF loops by 67% on mount
   const particles = useMemo(
     () => Array.from({ length: 6 }, (_, idx) => ({
       id: idx,
       x: ((idx * 37 + 11) % 90) + 5,
       y: ((idx * 53 + 17) % 80) + 10,
       size: (idx % 3) + 1.5,
-      // All particles delayed 2s+ so they don't fire during initial paint
       delay: 2 + idx * 0.6,
       duration: 5 + (idx % 5),
       drift: ((idx * 17 + 7) % 41) - 20,
@@ -166,7 +165,7 @@ export function HeroSection() {
         style={{ background: "radial-gradient(ellipse at center, oklch(0.38 0.10 38 / 0.22), transparent 60%)" }}
       />
 
-      {/* Hero figure — starts visible, only animates position/scale (no opacity fade-in) */}
+      {/* Hero figure */}
       <motion.div
         initial={{ opacity: 0.88, y: 18, scale: 1.04 }}
         animate={{ opacity: 0.88, y: 0, scale: 1 }}
@@ -200,7 +199,11 @@ export function HeroSection() {
             decoding="async"
             width={900}
             height={1200}
-            className="absolute inset-0 w-full h-full object-cover object-center lg:scale-[1.18] mix-blend-luminosity opacity-[0.88]"
+            onLoad={() => setImgReady(true)}
+            style={{ transition: "opacity 0.6s ease" }}
+            className={`absolute inset-0 w-full h-full object-cover object-center lg:scale-[1.18] mix-blend-luminosity ${
+              imgReady ? "opacity-[0.88]" : "opacity-0"
+            }`}
           />
         </motion.div>
         <div className="absolute inset-0" style={{ background: "linear-gradient(to right, oklch(0.10 0.025 270) 0%, oklch(0.10 0.025 270 / 0.55) 22%, transparent 55%)" }} />
