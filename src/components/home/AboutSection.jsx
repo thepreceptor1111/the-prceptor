@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { Reveal } from "@/components/site/Reveal";
 import { useSiteSettings } from "@/lib/useSiteSettings";
 import aboutImg from "@/assets/about-section.webp";
@@ -8,21 +7,21 @@ export function AboutSection() {
 
   const heading1     = settings?.aboutHeading1     ?? "A modern astrologer";
   const heading2Gold = settings?.aboutHeading2Gold ?? "for a modern world.";
-  const paragraph1   = settings?.aboutParagraph1   ?? "For over twelve years, The Preceptor has guided executives, artists, and seekers through life's most pivotal chapters — translating classical Vedic and Western astrology into language that is grounded, modern, and quietly powerful.";
-  const paragraph2   = settings?.aboutParagraph2   ?? "Our philosophy is simple: the stars do not predict your fate — they reveal your design. We help you read it.";
-  const stat1        = settings?.stat1 ?? { value: "12+",  label: "Years of practice" };
-  const stat4        = settings?.stat4 ?? { value: "4.98★", label: "Average rating" };
+  const paragraph1   = settings?.aboutParagraph1   ?? "For over twelve years, The Preceptor has guided executives, artists, and seekers through life\u2019s most pivotal chapters \u2014 translating classical Vedic and Western astrology into language that is grounded, modern, and quietly powerful.";
+  const paragraph2   = settings?.aboutParagraph2   ?? "Our philosophy is simple: the stars do not predict your fate \u2014 they reveal your design. We help you read it.";
+  const stat1        = settings?.stat1 ?? { value: "12+",   label: "Years of practice" };
+  const stat4        = settings?.stat4 ?? { value: "4.98\u2605", label: "Average rating" };
 
   // CMS image overrides local asset when available
   const imageSrc = settings?.aboutImage?.asset?.url ?? aboutImg;
-  const imageAlt = settings?.aboutImage?.alt ?? "The Preceptor — astrologer portrait";
+  const imageAlt = settings?.aboutImage?.alt ?? "The Preceptor \u2014 astrologer portrait";
 
   return (
     <section className="py-24 lg:py-32 relative">
       <div className="max-w-7xl mx-auto px-6 lg:px-10">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
 
-          {/* ── Left: text ── */}
+          {/* Left: text */}
           <Reveal>
             <h2
               className="text-4xl md:text-5xl leading-[1.08]"
@@ -46,12 +45,15 @@ export function AboutSection() {
             </div>
           </Reveal>
 
-          {/* ── Right: image ── */}
+          {/* Right: image — CSS hover replaces framer-motion whileHover */}
           <Reveal delay={0.15}>
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            <div
               className="relative rounded-3xl overflow-hidden"
+              style={{
+                transition: "transform 0.5s cubic-bezier(0.22,1,0.36,1)",
+              }}
+              onMouseEnter={e => e.currentTarget.style.transform = "scale(1.02)"}
+              onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
             >
               {/* Subtle gold border glow */}
               <div className="absolute inset-0 rounded-3xl ring-1 ring-gold/20 pointer-events-none z-10" />
@@ -67,9 +69,9 @@ export function AboutSection() {
                 style={{ maxHeight: "600px" }}
               />
 
-              {/* Bottom fade so image blends into section background */}
+              {/* Bottom fade */}
               <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background/80 to-transparent pointer-events-none z-10" />
-            </motion.div>
+            </div>
           </Reveal>
 
         </div>
