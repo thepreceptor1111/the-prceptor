@@ -166,11 +166,11 @@ export function HeroSection() {
         style={{ background: "radial-gradient(ellipse at center, oklch(0.38 0.10 38 / 0.22), transparent 60%)" }}
       />
 
-      {/* Hero figure */}
+      {/* Hero figure — starts visible, only animates position/scale (no opacity fade-in) */}
       <motion.div
-        initial={{ opacity: 0, y: 48, scale: 1.06 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 2.6, ease: [0.22, 1, 0.36, 1] }}
+        initial={{ opacity: 0.88, y: 18, scale: 1.04 }}
+        animate={{ opacity: 0.88, y: 0, scale: 1 }}
+        transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
         className="absolute inset-y-0 right-0 w-full lg:w-[68%] xl:w-[62%] pointer-events-none"
         style={{
           WebkitMaskImage: [
