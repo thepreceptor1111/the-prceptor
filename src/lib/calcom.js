@@ -1,11 +1,10 @@
 // src/lib/calcom.js
 // Cal.com API v2 — schedule & date-override helpers
 //
-// KEY INSIGHT from Cal.com docs:
-//   PATCH /v2/schedules/{id} accepts TWO separate top-level keys:
-//     availability[] → weekly recurring slots ONLY  { days[], startTime "HH:MM", endTime "HH:MM" }
-//     overrides[]    → date overrides ONLY          { date, startTime "HH:MM", endTime "HH:MM" }
-//   Mixing date overrides inside availability[] causes 400 every time.
+// PATCH /v2/schedules/{id} shape:
+//   availability[] → weekly recurring slots { days:string[], startTime:"HH:MM", endTime:"HH:MM" }
+//   overrides[]    → date overrides         { date, startTime:"HH:MM", endTime:"HH:MM", isUnavailable:true }
+//   Without isUnavailable:true Cal.com treats the override as extra AVAILABLE hours.
 
 const API_KEY = import.meta.env.VITE_CALCOM_API_KEY
 const BASE    = 'https://api.cal.com/v2'
@@ -48,34 +47,44 @@ function normaliseWeeklySlot(slot) {
   }
 }
 
-/** Normalise a date override → { date, startTime: "HH:MM", endTime: "HH:MM" } */
+/**
+ * Normalise a date override for round-tripping through PATCH.
+ * CRITICAL: isUnavailable:true must be preserved — without it Cal.com
+ * treats the entry as extra available hours, not a block.
+ */
 function normaliseDateOverride(o) {
   return {
-    date:      o.date,
-    startTime: toHHMM(o.startTime),
-    endTime:   toHHMM(o.endTime),
+    date:          o.date,
+    startTime:     toHHMM(o.startTime),
+    endTime:       toHHMM(o.endTime),
+    isUnavailable: o.isUnavailable ?? false,  // preserve existing value
   }
 }
 
+/** Collect all overrides from both possible response locations. */
+function collectOverrides(schedule) {
+  return [
+    ...(schedule.overrides   ?? []),
+    ...(schedule.availability ?? []).filter(a => !!a.date),
+  ].map(normaliseDateOverride)
+}
+
+/** Collect and normalise weekly slots only. */
+function collectWeeklySlots(schedule) {
+  return (schedule.availability ?? [])
+    .filter(a => !a.date)
+    .map(normaliseWeeklySlot)
+}
+
 /**
- * Block a date.
- * Sends weekly slots in `availability[]` and date blocks in `overrides[]` — separate keys.
+ * Block a date — adds an override with isUnavailable:true.
  */
 export async function blockDate(scheduleId, date, allDay, startTime, endTime) {
   if (!API_KEY) throw new Error('VITE_CALCOM_API_KEY is not set.')
 
-  const schedule = await getSchedule(scheduleId)
-
-  // Weekly slots only (no .date field)
-  const weekly = (schedule.availability ?? [])
-    .filter(a => !a.date)
-    .map(normaliseWeeklySlot)
-
-  // Existing overrides — may live in schedule.overrides OR as .date entries in schedule.availability
-  const existingOverrides = [
-    ...(schedule.overrides ?? []),
-    ...(schedule.availability ?? []).filter(a => !!a.date),
-  ].map(normaliseDateOverride)
+  const schedule         = await getSchedule(scheduleId)
+  const weekly           = collectWeeklySlots(schedule)
+  const existingOverrides = collectOverrides(schedule)
 
   if (existingOverrides.some(o => o.date === date)) return { alreadyBlocked: true }
 
@@ -86,7 +95,12 @@ export async function blockDate(scheduleId, date, allDay, startTime, endTime) {
     availability: weekly,
     overrides: [
       ...existingOverrides,
-      { date, startTime: start, endTime: end },
+      {
+        date,
+        startTime:     start,
+        endTime:       end,
+        isUnavailable: true,   // ← THIS is what actually blocks the date
+      },
     ],
   }
 
@@ -100,28 +114,18 @@ export async function blockDate(scheduleId, date, allDay, startTime, endTime) {
 }
 
 /**
- * Unblock a date.
- * Removes the override from `overrides[]`, keeps weekly slots intact.
+ * Unblock a date — removes the override entirely.
  */
 export async function unblockDate(scheduleId, date) {
   if (!API_KEY) throw new Error('VITE_CALCOM_API_KEY is not set.')
 
   const schedule = await getSchedule(scheduleId)
-
-  const weekly = (schedule.availability ?? [])
-    .filter(a => !a.date)
-    .map(normaliseWeeklySlot)
-
-  const remainingOverrides = [
-    ...(schedule.overrides ?? []),
-    ...(schedule.availability ?? []).filter(a => !!a.date),
-  ]
-    .map(normaliseDateOverride)
-    .filter(o => o.date !== date)
+  const weekly   = collectWeeklySlots(schedule)
+  const remaining = collectOverrides(schedule).filter(o => o.date !== date)
 
   const body = {
     availability: weekly,
-    overrides:    remainingOverrides,
+    overrides:    remaining,
   }
 
   const res = await fetch(`${BASE}/schedules/${scheduleId}`, {
