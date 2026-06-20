@@ -6,10 +6,11 @@ const statField = (name, title, defaultValue, defaultLabel) =>
     name,
     title,
     type: 'object',
+    group: 'achievements',
     fields: [
-      defineField({ name: 'value',  title: 'Value',  type: 'string', description: `e.g. "${defaultValue}"` }),
-      defineField({ name: 'label',  title: 'Label',  type: 'string', description: `e.g. "${defaultLabel}"` }),
-      defineField({ name: 'status', title: 'Status Badge (optional)', type: 'string', description: 'e.g. "Verified", "Live", "New" — leave blank to hide' }),
+      defineField({ name: 'value',  title: 'Value',                          type: 'string', description: `e.g. "${defaultValue}"` }),
+      defineField({ name: 'label',  title: 'Label',                          type: 'string', description: `e.g. "${defaultLabel}"` }),
+      defineField({ name: 'status', title: 'Status Badge (optional)',        type: 'string', description: 'e.g. "Verified", "Live", "New" — leave blank to hide' }),
     ],
   });
 
@@ -21,7 +22,6 @@ export const siteSettingsSchema = defineType({
     { name: 'general',      title: '⚙️  General' },
     { name: 'hero',         title: '🌟  Hero' },
     { name: 'about',        title: '👤  About' },
-    { name: 'stats',        title: '📊  Stats (site-wide)' },
     { name: 'services',     title: '🔮  Services Section' },
     { name: 'achievements', title: '🏆  Achievements Section' },
     { name: 'testimonials', title: '💬  Testimonials Section' },
@@ -61,20 +61,18 @@ export const siteSettingsSchema = defineType({
     defineField({ name: 'aboutParagraph1',   title: 'Paragraph 1',            type: 'text',   group: 'about', rows: 4 }),
     defineField({ name: 'aboutParagraph2',   title: 'Paragraph 2',            type: 'text',   group: 'about', rows: 3 }),
 
-    // ── STATS (used across Hero, About & Achievements) ────────────────────────────────────
+    // ── SERVICES SECTION HEADER ────────────────────────────────────────────────────
+    defineField({ name: 'servicesSectionLabel',    title: 'Section Label',   type: 'string', group: 'services', description: 'e.g. "Services"' }),
+    defineField({ name: 'servicesSectionHeading',  title: 'Section Heading', type: 'string', group: 'services', description: 'e.g. "Consultations crafted with intention."' }),
+    defineField({ name: 'servicesSectionSubtitle', title: 'Section Subtitle (leave blank to hide)', type: 'string', group: 'services' }),
+
+    // ── ACHIEVEMENTS SECTION HEADER + STATS ─────────────────────────────────────────────
+    defineField({ name: 'achievementsSectionLabel',   title: 'Section Label',   type: 'string', group: 'achievements', description: 'e.g. "Recognition"' }),
+    defineField({ name: 'achievementsSectionHeading', title: 'Section Heading', type: 'string', group: 'achievements', description: 'e.g. "A practice built on trust."' }),
     statField('stat1', 'Stat 1 — Years',     '12+',   'Years of Practice'),
     statField('stat2', 'Stat 2 — Sessions',  '2,000', 'Sessions Delivered'),
     statField('stat3', 'Stat 3 — Countries', '47',    'Countries Served'),
     statField('stat4', 'Stat 4 — Rating',    '4.98',  'Average Rating'),
-
-    // ── SERVICES SECTION HEADER ────────────────────────────────────────────────────
-    defineField({ name: 'servicesSectionLabel',   title: 'Section Label',   type: 'string', group: 'services', description: 'e.g. "Services"' }),
-    defineField({ name: 'servicesSectionHeading', title: 'Section Heading', type: 'string', group: 'services', description: 'e.g. "Consultations crafted with intention."' }),
-    defineField({ name: 'servicesSectionSubtitle',title: 'Section Subtitle (leave blank to hide)', type: 'string', group: 'services' }),
-
-    // ── ACHIEVEMENTS SECTION HEADER ───────────────────────────────────────────────────
-    defineField({ name: 'achievementsSectionLabel',   title: 'Section Label',   type: 'string', group: 'achievements', description: 'e.g. "Recognition"' }),
-    defineField({ name: 'achievementsSectionHeading', title: 'Section Heading', type: 'string', group: 'achievements', description: 'e.g. "A practice built on trust."' }),
 
     // ── TESTIMONIALS SECTION HEADER ───────────────────────────────────────────────────
     defineField({ name: 'testimonialsSectionLabel',   title: 'Section Label',   type: 'string', group: 'testimonials', description: 'e.g. "Testimonials"' }),
@@ -122,6 +120,14 @@ export const siteSettingsSchema = defineType({
     defineField({ name: 'faqSectionHeading', title: 'Section Heading', type: 'string', group: 'faq', description: 'e.g. "Common questions."' }),
 
     // ── OFFER TIMER ──────────────────────────────────────────────────────────────────────────
+    defineField({
+      name: 'offerLabel',
+      title: 'Offer Timer Label',
+      type: 'string',
+      group: 'offer',
+      description: 'Text shown above the countdown. e.g. "Introductory offer ends in" — leave blank to use default.',
+      placeholder: 'Introductory offer ends in',
+    }),
     defineField({
       name: 'offerDeadline',
       title: 'Offer Deadline',
