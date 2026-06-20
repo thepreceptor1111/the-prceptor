@@ -1,7 +1,6 @@
 import React, { lazy, Suspense } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { motion } from "framer-motion";
 import ErrorBoundary from "./components/site/ErrorBoundary";
 import Nav from "./components/site/Nav";
 import Footer from "./components/site/Footer";
@@ -10,6 +9,7 @@ import ScrollToTop from "./components/site/ScrollToTop";
 import AdminPortal from "./components/site/AdminPortal";
 import { SITE } from "./content/seo";
 import { useLenis } from "./hooks/useLenis";
+import { SiteSettingsProvider } from "./lib/SiteSettingsContext";
 
 // Home is imported eagerly — entry page, must never flash on first visit
 import Home from "./routes/index";
@@ -26,6 +26,7 @@ const Terms        = lazy(() => import("./routes/terms"));
 const NotFound     = lazy(() => import("./routes/not-found"));
 const Admin        = lazy(() => import("./routes/admin"));
 
+// Pure CSS loader — no framer-motion in the critical path
 function CosmicLoader() {
   return (
     <div
@@ -40,14 +41,16 @@ function CosmicLoader() {
       }}
       aria-label="Loading page"
     >
-      <motion.span
-        animate={{ opacity: [0.3, 1, 0.3], scale: [0.9, 1.1, 0.9] }}
-        transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-        style={{ fontSize: "2rem" }}
+      <span
         aria-hidden="true"
+        style={{
+          fontSize: "2rem",
+          display: "inline-block",
+          animation: "cosmicPulse 1.8s ease-in-out infinite",
+        }}
       >
         ✦
-      </motion.span>
+      </span>
       <span
         style={{
           fontSize: "0.75rem",
@@ -58,6 +61,12 @@ function CosmicLoader() {
       >
         Loading
       </span>
+      <style>{`
+        @keyframes cosmicPulse {
+          0%, 100% { opacity: 0.3; transform: scale(0.9); }
+          50%       { opacity: 1;   transform: scale(1.1); }
+        }
+      `}</style>
     </div>
   );
 }
@@ -95,50 +104,49 @@ export default function App() {
   const location = useLocation();
   const isAdmin  = location.pathname.startsWith("/command-center");
 
-  // Initialise Lenis smooth scroll — replaces CSS scroll-behavior: smooth
   useLenis();
 
   return (
     <ErrorBoundary>
-      <div className="min-h-screen flex flex-col">
-        <Helmet>
-          <script type="application/ld+json">
-            {JSON.stringify(orgSchema)}
-          </script>
-        </Helmet>
+      <SiteSettingsProvider>
+        <div className="min-h-screen flex flex-col">
+          <Helmet>
+            <script type="application/ld+json">
+              {JSON.stringify(orgSchema)}
+            </script>
+          </Helmet>
 
-        <div id="cosmic-bg"    aria-hidden="true" />
-        <div id="cosmic-grain" aria-hidden="true" />
+          <div id="cosmic-bg"    aria-hidden="true" />
+          <div id="cosmic-grain" aria-hidden="true" />
 
-        <TorchCursor />
-        <ScrollToTop />
+          <TorchCursor />
+          <ScrollToTop />
 
-        {/* Secret keyboard shortcut portal — Shift+Shift+P — invisible until triggered */}
-        {!isAdmin && <AdminPortal />}
+          {!isAdmin && <AdminPortal />}
+          {!isAdmin && <Nav />}
 
-        {!isAdmin && <Nav />}
+          <main className={isAdmin ? "flex-1" : "flex-1 pt-20"}>
+            <Suspense fallback={<CosmicLoader />}>
+              <Routes>
+                <Route path="/"               element={<Home />} />
+                <Route path="/about"          element={<About />} />
+                <Route path="/book"           element={<Book />} />
+                <Route path="/contact"        element={<Contact />} />
+                <Route path="/services"       element={<Services />} />
+                <Route path="/testimonials"   element={<Testimonials />} />
+                <Route path="/shop"           element={<Shop />} />
+                <Route path="/qna"            element={<QnA />} />
+                <Route path="/privacy"        element={<Privacy />} />
+                <Route path="/terms"          element={<Terms />} />
+                <Route path="/command-center" element={<Admin />} />
+                <Route path="*"               element={<NotFound />} />
+              </Routes>
+            </Suspense>
+          </main>
 
-        <main className={isAdmin ? "flex-1" : "flex-1 pt-20"}>
-          <Suspense fallback={<CosmicLoader />}>
-            <Routes>
-              <Route path="/"               element={<Home />} />
-              <Route path="/about"          element={<About />} />
-              <Route path="/book"           element={<Book />} />
-              <Route path="/contact"        element={<Contact />} />
-              <Route path="/services"       element={<Services />} />
-              <Route path="/testimonials"   element={<Testimonials />} />
-              <Route path="/shop"           element={<Shop />} />
-              <Route path="/qna"            element={<QnA />} />
-              <Route path="/privacy"        element={<Privacy />} />
-              <Route path="/terms"          element={<Terms />} />
-              <Route path="/command-center" element={<Admin />} />
-              <Route path="*"               element={<NotFound />} />
-            </Routes>
-          </Suspense>
-        </main>
-
-        {!isAdmin && <Footer />}
-      </div>
+          {!isAdmin && <Footer />}
+        </div>
+      </SiteSettingsProvider>
     </ErrorBoundary>
   );
 }

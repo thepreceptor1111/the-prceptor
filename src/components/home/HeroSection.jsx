@@ -7,7 +7,7 @@ import { useSiteSettings } from "@/lib/useSiteSettings";
 // Hero image lives in /public — no Vite hash, matches the <link rel="preload"> in index.html exactly.
 const heroImg = "/hero-section.webp";
 
-// ── Ambient drifting gold particle ────────────────────────────────────────────
+// Reduced to 6 particles (was 18) — fewer RAF loops on mount
 function Particle({ x, y, size, delay, duration, drift }) {
   return (
     <motion.span
@@ -40,7 +40,7 @@ function Particle({ x, y, size, delay, duration, drift }) {
   );
 }
 
-// ── Word-by-word staggered heading ───────────────────────────────────────────
+// Word-by-word staggered heading
 function StaggeredHeading({ line1, line2Gold, delay = 0 }) {
   const words1 = line1.split(" ");
   const words2 = line2Gold.split(" ");
@@ -98,24 +98,25 @@ function StaggeredHeading({ line1, line2Gold, delay = 0 }) {
 export function HeroSection() {
   const { settings } = useSiteSettings();
 
-  // CMS values with hardcoded fallbacks
   const badgeText    = settings?.heroBadgeText    ?? "Premium Astrology";
   const heading1     = settings?.heroHeading1     ?? "Modern guidance,";
   const heading2Gold = settings?.heroHeading2Gold ?? "written in the stars.";
-  const bodyCopy     = settings?.heroBodyCopy     ?? "Cinematic, deeply personal astrology consultations for high-intention seekers — designed for clarity in love, career, and life’s defining chapters.";
+  const bodyCopy     = settings?.heroBodyCopy     ?? "Cinematic, deeply personal astrology consultations for high-intention seekers — designed for clarity in love, career, and life's defining chapters.";
   const cta1Label    = settings?.heroCta1Label    ?? "Book a Session";
   const cta2Label    = settings?.heroCta2Label    ?? "Explore Services";
   const clientCount  = settings?.stat2?.value     ?? "8,400+";
   const clientLabel  = settings?.stat2?.label     ?? "clients";
   const countryCount = settings?.stat3?.value     ?? "47";
 
+  // 6 particles instead of 18 — reduces RAF loops by 67% on mount
   const particles = useMemo(
-    () => Array.from({ length: 18 }, (_, idx) => ({
+    () => Array.from({ length: 6 }, (_, idx) => ({
       id: idx,
       x: ((idx * 37 + 11) % 90) + 5,
       y: ((idx * 53 + 17) % 80) + 10,
       size: (idx % 3) + 1.5,
-      delay: idx * 0.45,
+      // All particles delayed 2s+ so they don't fire during initial paint
+      delay: 2 + idx * 0.6,
       duration: 5 + (idx % 5),
       drift: ((idx * 17 + 7) % 41) - 20,
     })),
@@ -125,7 +126,7 @@ export function HeroSection() {
   return (
     <section className="relative overflow-hidden min-h-[100svh] flex items-center">
 
-      {/* Nebula gradient */}
+      {/* Nebula gradient — static, no animation */}
       <div
         className="absolute inset-0"
         style={{
@@ -140,27 +141,27 @@ export function HeroSection() {
       {/* Starfield */}
       <div className="absolute inset-0 starfield starfield-glow" aria-hidden />
 
-      {/* Particles */}
+      {/* Particles — delayed 2s so hero paints first */}
       <div className="absolute inset-0 pointer-events-none" aria-hidden>
         {particles.map((p) => <Particle key={p.id} {...p} />)}
       </div>
 
-      {/* Purple nebula fog */}
+      {/* Purple nebula fog — deferred, starts after 3s */}
       <motion.div
         aria-hidden
         initial={{ opacity: 0 }}
         animate={{ x: [0, 38, 0], opacity: [0.28, 0.5, 0.28] }}
-        transition={{ duration: 24, repeat: Infinity, ease: "easeInOut", delay: 1.6 }}
+        transition={{ duration: 24, repeat: Infinity, ease: "easeInOut", delay: 3 }}
         className="absolute -top-24 -left-24 w-[65%] h-[85%] pointer-events-none blur-3xl"
         style={{ background: "radial-gradient(ellipse at center, oklch(0.52 0.09 295 / 0.30), transparent 62%)" }}
       />
 
-      {/* Amber nebula fog */}
+      {/* Amber nebula fog — deferred, starts after 3.5s */}
       <motion.div
         aria-hidden
         initial={{ opacity: 0 }}
         animate={{ x: [0, -28, 0], opacity: [0.2, 0.38, 0.2] }}
-        transition={{ duration: 28, repeat: Infinity, ease: "easeInOut", delay: 2.2 }}
+        transition={{ duration: 28, repeat: Infinity, ease: "easeInOut", delay: 3.5 }}
         className="absolute bottom-0 right-0 w-[58%] h-[65%] pointer-events-none blur-3xl"
         style={{ background: "radial-gradient(ellipse at center, oklch(0.38 0.10 38 / 0.22), transparent 60%)" }}
       />
@@ -186,10 +187,11 @@ export function HeroSection() {
           maskComposite: "intersect, intersect",
         }}
       >
+        {/* Hero float animation deferred to after paint */}
         <motion.div
           className="absolute inset-0"
           animate={{ y: [0, -16, 0] }}
-          transition={{ duration: 13, repeat: Infinity, ease: "easeInOut", delay: 2.6 }}
+          transition={{ duration: 13, repeat: Infinity, ease: "easeInOut", delay: 3 }}
         >
           <img
             src={heroImg}

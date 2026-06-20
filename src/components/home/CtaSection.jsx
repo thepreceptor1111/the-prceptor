@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { Sun, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Reveal } from "@/components/site/Reveal";
@@ -16,10 +15,18 @@ export function CtaSection() {
             <div className="absolute inset-0 bg-hero opacity-60" />
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,oklch(0.82_0.12_85_/_0.15),transparent_40%)]" />
             <div className="relative z-10">
-              <motion.div animate={{ rotate: [0, 15, -10, 0], scale: [1, 1.12, 1] }}
-                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 }}>
-                <Sun className="w-10 h-10 text-gold mx-auto" />
-              </motion.div>
+              {/* Pure CSS rotation — no framer-motion needed for a simple spin */}
+              <Sun
+                className="w-10 h-10 text-gold mx-auto"
+                style={{ animation: "ctaSunSpin 6s ease-in-out infinite" }}
+              />
+              <style>{`
+                @keyframes ctaSunSpin {
+                  0%, 100% { transform: rotate(0deg) scale(1); }
+                  33%       { transform: rotate(15deg) scale(1.12); }
+                  66%       { transform: rotate(-10deg) scale(1); }
+                }
+              `}</style>
               <h2 className="mt-6 text-4xl md:text-5xl">Begin your reading.</h2>
               <p className="mt-5 text-muted-foreground max-w-xl mx-auto">
                 A single conversation can shift the trajectory of a decade. Reserve your private session today.
