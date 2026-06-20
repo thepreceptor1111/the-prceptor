@@ -36,6 +36,7 @@ export const SERVICES_QUERY = groq`
     isPopular,
     isSoldOut,
     features,
+    sessionTier,
     order
   }
 `;
