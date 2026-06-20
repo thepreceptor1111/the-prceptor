@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Mail, MapPin, Send, Instagram, Youtube, Linkedin, Clock, Globe2, ShieldCheck, Sparkles, ChevronDown, ArrowRight } from "lucide-react";
 import { Reveal } from "@/components/site/Reveal";
 import { siteConfig } from "@/content/site";
-import contactHeroImg from "@/assets/contact-hero.jpg";
+import contactHeroImg from "@/assets/contact-hero.png";
 
 export default function ContactPageWrapper() {
   return (
