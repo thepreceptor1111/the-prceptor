@@ -3,6 +3,9 @@ import { test, expect } from '@playwright/test';
 
 const BASE_URL = process.env.TEST_URL || 'https://www.thepreceptorglobal.com';
 
+// Default title baked into index.html — helmet replaces this after hydration
+const DEFAULT_TITLE = 'the preceptor — vedic astrology readings & spiritual consultations online';
+
 const PAGES = [
   { path: '/',             title: 'the preceptor',  description: 'vedic astrology' },
   { path: '/services',     title: 'services',        description: 'astrology' },
@@ -37,18 +40,33 @@ for (const pg of PAGES) {
 // ── SEO: title + meta description + canonical ──────────────────────────────
 for (const pg of PAGES) {
   test(`[seo] ${pg.path} has title, meta description and canonical`, async ({ page }) => {
-    await page.goto(`${BASE_URL}${pg.path}`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE_URL}${pg.path}`, { waitUntil: 'networkidle' });
 
+    // Wait for react-helmet-async to replace the default index.html title
+    await page.waitForFunction(
+      (defaultTitle) => document.title.toLowerCase() !== defaultTitle,
+      DEFAULT_TITLE,
+      { timeout: 10_000 }
+    );
+
+    // Title check
     const title = await page.title();
     expect(title.length).toBeGreaterThan(10);
     expect(title.toLowerCase()).toContain(pg.title.toLowerCase());
 
-    const metaDesc = await page.locator('meta[name="description"]').getAttribute('content');
+    // Target helmet-managed meta description (data-rh="true") to avoid
+    // conflict with the static one baked into index.html
+    const metaDesc = await page
+      .locator('meta[data-rh="true"][name="description"]')
+      .getAttribute('content');
     expect(metaDesc).not.toBeNull();
     expect(metaDesc.length).toBeGreaterThan(50);
     expect(metaDesc.toLowerCase()).toContain(pg.description.toLowerCase());
 
-    const canonical = await page.locator('link[rel="canonical"]').getAttribute('href');
+    // Target helmet-managed canonical
+    const canonical = await page
+      .locator('link[data-rh="true"][rel="canonical"]')
+      .getAttribute('href');
     expect(canonical).toMatch(/^https:\/\//);
   });
 }
@@ -71,7 +89,7 @@ test('[seo] robots.txt is reachable', async ({ request }) => {
 
 // ── JSON-LD on homepage ───────────────────────────────────────────────────────────
 test('[seo] homepage has JSON-LD structured data', async ({ page }) => {
-  await page.goto(`${BASE_URL}/`, { waitUntil: 'domcontentloaded' });
+  await page.goto(`${BASE_URL}/`, { waitUntil: 'networkidle' });
   const count = await page.locator('script[type="application/ld+json"]').count();
   expect(count).toBeGreaterThan(0);
 });
