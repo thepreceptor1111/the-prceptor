@@ -73,8 +73,6 @@ function ScreenshotCard({ r, cardH, stripH, isActive = false, showControls = fal
           <img
             src={r.screenshotUrl}
             alt={r.screenshotAlt}
-            // Active (visible) slide: eager + high priority
-            // Grid thumbnails: lazy (below fold)
             loading={isActive ? "eager" : "lazy"}
             fetchpriority={isActive ? "high" : "low"}
             decoding="async"
@@ -227,6 +225,7 @@ export default function TestimonialsPage() {
         <meta name="description" content="Real stories from clients across the United States and the world after their consultations with The Preceptor." />
         <meta property="og:title" content="Client Stories — The Preceptor" />
         <meta property="og:description" content="Trusted by clients across 47 countries." />
+        <link rel="canonical" href="https://www.thepreceptorglobal.com/testimonials" />
       </Helmet>
 
       <div className="bg-hero starfield min-h-screen">
