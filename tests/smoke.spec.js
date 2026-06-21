@@ -10,13 +10,13 @@ const PAGES = [
   { path: '/',             title: 'the preceptor',  description: 'vedic astrology' },
   { path: '/services',     title: 'services',        description: 'astrology' },
   { path: '/about',        title: 'about',           description: 'astrologer' },
-  { path: '/book',         title: 'book',            description: 'consultation' },
+  { path: '/book',         title: 'book',            description: 'reading' },
   { path: '/contact',      title: 'contact',         description: 'the preceptor' },
-  { path: '/testimonials', title: 'testimonials',    description: 'reviews' },
+  { path: '/testimonials', title: 'testimonials',    description: 'stories' },
   { path: '/qna',          title: 'q',               description: 'astrology' },
 ];
 
-// ── Smoke: every page loads with 200 ───────────────────────────────────────────
+// ── Smoke: every page loads with 200 ───────────────────────────────────────
 for (const pg of PAGES) {
   test(`[smoke] ${pg.path} loads without error`, async ({ page }) => {
     const res = await page.goto(`${BASE_URL}${pg.path}`, { waitUntil: 'domcontentloaded' });
@@ -71,7 +71,7 @@ for (const pg of PAGES) {
   });
 }
 
-// ── Sitemap + Robots ────────────────────────────────────────────────────────────
+// ── Sitemap + Robots ────────────────────────────────────────────────────────
 test('[seo] sitemap.xml is reachable and valid XML', async ({ request }) => {
   const res = await request.get(`${BASE_URL}/sitemap.xml`);
   expect(res.status()).toBe(200);
@@ -87,7 +87,7 @@ test('[seo] robots.txt is reachable', async ({ request }) => {
   expect(body).toContain('Sitemap');
 });
 
-// ── JSON-LD on homepage ───────────────────────────────────────────────────────────
+// ── JSON-LD on homepage ─────────────────────────────────────────────────────
 test('[seo] homepage has JSON-LD structured data', async ({ page }) => {
   await page.goto(`${BASE_URL}/`, { waitUntil: 'networkidle' });
   const count = await page.locator('script[type="application/ld+json"]').count();
