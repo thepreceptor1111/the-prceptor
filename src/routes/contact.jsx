@@ -14,6 +14,7 @@ export default function ContactPageWrapper() {
         <meta name="description" content="Reach The Preceptor for premium private astrology consultations. White-glove onboarding for clients in the US and worldwide." />
         <meta property="og:title" content="Contact The Preceptor" />
         <meta property="og:description" content="Begin your journey toward clarity with a private spiritual consultation." />
+        <link rel="canonical" href="https://www.thepreceptorglobal.com/contact" />
       </Helmet>
       <ContactPage />
     </>
