@@ -1,104 +1,59 @@
 // tests/smoke.spec.js
-// Smoke + SEO tests for The Preceptor
-// Verifies every page loads + has correct meta tags
-
 import { test, expect } from '@playwright/test';
 
 const BASE_URL = process.env.TEST_URL || 'https://www.thepreceptorglobal.com';
 
 const PAGES = [
-  {
-    path: '/',
-    title: 'The Preceptor',
-    description: 'Vedic astrology',
-  },
-  {
-    path: '/services',
-    title: 'Services',
-    description: 'astrology services',
-  },
-  {
-    path: '/about',
-    title: 'About',
-    description: 'astrologer',
-  },
-  {
-    path: '/book',
-    title: 'Book',
-    description: 'consultation',
-  },
-  {
-    path: '/contact',
-    title: 'Contact',
-    description: 'The Preceptor',
-  },
-  {
-    path: '/testimonials',
-    title: 'Testimonials',
-    description: 'reviews',
-  },
-  {
-    path: '/qna',
-    title: 'Q',
-    description: 'astrology',
-  },
+  { path: '/',             title: 'the preceptor',  description: 'vedic astrology' },
+  { path: '/services',     title: 'services',        description: 'astrology' },
+  { path: '/about',        title: 'about',           description: 'astrologer' },
+  { path: '/book',         title: 'book',            description: 'consultation' },
+  { path: '/contact',      title: 'contact',         description: 'the preceptor' },
+  { path: '/testimonials', title: 'testimonials',    description: 'reviews' },
+  { path: '/qna',          title: 'q',               description: 'astrology' },
 ];
 
-// ── Smoke Tests: every page must load with 200 ──────────────────────────────
-for (const page of PAGES) {
-  test(`[smoke] ${page.path} loads without error`, async ({ page: p }) => {
-    const res = await p.goto(`${BASE_URL}${page.path}`, {
-      waitUntil: 'domcontentloaded',
-    });
-    // Must return 200
+// ── Smoke: every page loads with 200 ───────────────────────────────────────────
+for (const pg of PAGES) {
+  test(`[smoke] ${pg.path} loads without error`, async ({ page }) => {
+    const res = await page.goto(`${BASE_URL}${pg.path}`, { waitUntil: 'domcontentloaded' });
     expect(res?.status()).toBe(200);
-    // Must not show Vercel 404 screen
-    const bodyText = await p.locator('body').innerText();
-    expect(bodyText).not.toContain('NOT_FOUND');
-    expect(bodyText).not.toContain('404');
+    const body = await page.locator('body').innerText();
+    expect(body).not.toContain('NOT_FOUND');
+    expect(body).not.toContain('404: NOT_FOUND');
   });
 }
 
-// ── Reload Test: SPA routes must survive hard reload ────────────────────────
-for (const page of PAGES) {
-  test(`[reload] ${page.path} survives direct navigation`, async ({ page: p }) => {
-    // Navigate directly (simulates reload / typing URL in address bar)
-    const res = await p.goto(`${BASE_URL}${page.path}`, {
-      waitUntil: 'networkidle',
-    });
+// ── Reload: direct navigation must not 404 ─────────────────────────────────
+for (const pg of PAGES) {
+  test(`[reload] ${pg.path} survives direct navigation`, async ({ page }) => {
+    const res = await page.goto(`${BASE_URL}${pg.path}`, { waitUntil: 'networkidle' });
     expect(res?.status()).toBe(200);
-    const bodyText = await p.locator('body').innerText();
-    expect(bodyText).not.toContain('NOT_FOUND');
+    const body = await page.locator('body').innerText();
+    expect(body).not.toContain('NOT_FOUND');
   });
 }
 
-// ── SEO Tests: every page must have title + meta description ────────────────
-for (const page of PAGES) {
-  test(`[seo] ${page.path} has correct title and meta description`, async ({ page: p }) => {
-    await p.goto(`${BASE_URL}${page.path}`, { waitUntil: 'domcontentloaded' });
+// ── SEO: title + meta description + canonical ──────────────────────────────
+for (const pg of PAGES) {
+  test(`[seo] ${pg.path} has title, meta description and canonical`, async ({ page }) => {
+    await page.goto(`${BASE_URL}${pg.path}`, { waitUntil: 'domcontentloaded' });
 
-    // Title must exist and contain expected keyword
-    const title = await p.title();
+    const title = await page.title();
     expect(title.length).toBeGreaterThan(10);
-    expect(title.toLowerCase()).toContain(page.title.toLowerCase());
+    expect(title.toLowerCase()).toContain(pg.title.toLowerCase());
 
-    // Meta description must exist and contain expected keyword
-    const metaDesc = await p
-      .locator('meta[name="description"]')
-      .getAttribute('content');
+    const metaDesc = await page.locator('meta[name="description"]').getAttribute('content');
     expect(metaDesc).not.toBeNull();
-    expect(metaDesc!.length).toBeGreaterThan(50);
-    expect(metaDesc!.toLowerCase()).toContain(page.description.toLowerCase());
+    expect(metaDesc.length).toBeGreaterThan(50);
+    expect(metaDesc.toLowerCase()).toContain(pg.description.toLowerCase());
 
-    // Canonical must exist and be absolute URL
-    const canonical = await p
-      .locator('link[rel="canonical"]')
-      .getAttribute('href');
+    const canonical = await page.locator('link[rel="canonical"]').getAttribute('href');
     expect(canonical).toMatch(/^https:\/\//);
   });
 }
 
-// ── Sitemap + Robots reachable ───────────────────────────────────────────────
+// ── Sitemap + Robots ────────────────────────────────────────────────────────────
 test('[seo] sitemap.xml is reachable and valid XML', async ({ request }) => {
   const res = await request.get(`${BASE_URL}/sitemap.xml`);
   expect(res.status()).toBe(200);
@@ -114,9 +69,9 @@ test('[seo] robots.txt is reachable', async ({ request }) => {
   expect(body).toContain('Sitemap');
 });
 
-// ── JSON-LD structured data present on homepage ─────────────────────────────
-test('[seo] homepage has JSON-LD structured data', async ({ page: p }) => {
-  await p.goto(`${BASE_URL}/`, { waitUntil: 'domcontentloaded' });
-  const jsonLd = await p.locator('script[type="application/ld+json"]').count();
-  expect(jsonLd).toBeGreaterThan(0);
+// ── JSON-LD on homepage ───────────────────────────────────────────────────────────
+test('[seo] homepage has JSON-LD structured data', async ({ page }) => {
+  await page.goto(`${BASE_URL}/`, { waitUntil: 'domcontentloaded' });
+  const count = await page.locator('script[type="application/ld+json"]').count();
+  expect(count).toBeGreaterThan(0);
 });
