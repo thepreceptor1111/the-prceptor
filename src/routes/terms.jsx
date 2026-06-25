@@ -17,16 +17,21 @@ export default function TermsPage() {
       </Helmet>
 
       <div className="relative min-h-screen">
-        {/* Hero */}
-        <section className="relative overflow-hidden pt-40 pb-20 md:pt-52 md:pb-28">
+        {/* Hero — NO overflow-hidden on section; Lenis needs full scroll height visible */}
+        <section className="relative pt-40 pb-20 md:pt-52 md:pb-28">
           <div className="absolute inset-0 bg-hero" />
           <div className="absolute inset-0 starfield" />
-          <motion.div
-            animate={{ opacity: [0.25, 0.50, 0.25] }}
-            transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[55%] aspect-square rounded-full
-                       bg-[radial-gradient(circle,oklch(0.82_0.12_85_/_0.14),transparent_65%)] blur-3xl pointer-events-none"
-          />
+
+          {/* Decorative orb — overflow-hidden scoped only to this wrapper */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <motion.div
+              animate={{ opacity: [0.25, 0.50, 0.25] }}
+              transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[55%] aspect-square rounded-full
+                         bg-[radial-gradient(circle,oklch(0.82_0.12_85_/_0.14),transparent_65%)] blur-3xl"
+            />
+          </div>
+
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background pointer-events-none" />
 
           <div className="relative max-w-3xl mx-auto px-6 lg:px-10 text-center">
@@ -71,7 +76,7 @@ export default function TermsPage() {
             </TermsSection>
 
             <TermsSection icon={CreditCard} title="3. Booking & Payment" delay={0.08}>
-              <p>Sessions are booked through our integrated scheduling platform (Cal.com). By completing a booking you agree to Cal.com's Terms of Service in addition to these terms.</p>
+              <p>Sessions are booked through our integrated scheduling platform (Cal.com). By completing a booking you agree to Cal.com’s Terms of Service in addition to these terms.</p>
               <TermsList items={[
                 "Payment is due at the time of booking unless otherwise agreed in writing.",
                 "Session fees are displayed on the booking page and are subject to change. Any fee change will not apply to sessions already confirmed.",
