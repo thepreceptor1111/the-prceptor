@@ -1,7 +1,7 @@
 import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
-import { ArrowLeft, ArrowRight, Star, Quote, PlayCircle } from "lucide-react";
+import { ArrowLeft, ArrowRight, Star, Quote } from "lucide-react";
 import { Reveal } from "@/components/site/Reveal";
 import { TESTIMONIALS } from "@/utils/constants";
 import { useSanity } from "@/lib/useSanity";
@@ -311,23 +311,6 @@ export default function TestimonialsPage() {
               </div>
             </div>
           )}
-
-          {/* ── Video testimonials placeholder ── */}
-          <Reveal>
-            <div className="mt-24 text-center">
-              <span className="text-xs uppercase tracking-[0.3em] text-gold">Video Stories</span>
-              <h2 className="mt-4 text-4xl md:text-5xl">Hear it in their words.</h2>
-            </div>
-          </Reveal>
-          <div className="mt-12 grid md:grid-cols-3 gap-6">
-            {[1, 2, 3].map((n) => (
-              <Reveal key={n} delay={n * 0.05}>
-                <div className="aspect-video glass-card rounded-3xl flex items-center justify-center hover:shadow-gold transition cursor-pointer group">
-                  <PlayCircle className="w-14 h-14 text-gold group-hover:scale-110 transition" />
-                </div>
-              </Reveal>
-            ))}
-          </div>
 
         </section>
       </div>

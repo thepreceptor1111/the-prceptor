@@ -9,8 +9,7 @@ export const siteConfig = {
   email: "thepreceptor1111@gmail.com",
   social: {
     instagram: "https://instagram.com/thepreceptor",
-    youtube: "https://youtube.com/@thepreceptor",
-    linkedin: "https://linkedin.com/company/thepreceptor",
+    reddit:    "https://reddit.com/u/thepreceptor",
   },
 };
 
