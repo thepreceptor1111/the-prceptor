@@ -2,9 +2,9 @@ import { useEffect, useRef } from "react";
 
 export default function TorchCursor() {
   const overlayRef = useRef(null);
-  const posRef = useRef({ x: -9999, y: -9999 });
-  const rafRef = useRef(null);
-  const activeRef = useRef(false);
+  const posRef     = useRef({ x: -9999, y: -9999 });
+  const rafRef     = useRef(null);
+  const activeRef  = useRef(false);
 
   useEffect(() => {
     const el = overlayRef.current;
@@ -38,6 +38,8 @@ export default function TorchCursor() {
       posRef.current = { x: e.clientX, y: e.clientY };
       if (!activeRef.current) {
         activeRef.current = true;
+        // Instant show — no CSS transition so the glow snaps to cursor
+        // immediately instead of smearing across a 600ms fade window.
         el.style.opacity = "1";
       }
       schedule();
@@ -59,8 +61,8 @@ export default function TorchCursor() {
       el.style.opacity = "0";
     }
 
-    window.addEventListener("mousemove", onMouseMove, { passive: true });
-    window.addEventListener("touchmove", onTouchMove, { passive: true });
+    window.addEventListener("mousemove",  onMouseMove,  { passive: true });
+    window.addEventListener("touchmove",  onTouchMove,  { passive: true });
     document.documentElement.addEventListener("mouseleave", onMouseLeave);
 
     return () => {
@@ -76,14 +78,14 @@ export default function TorchCursor() {
       ref={overlayRef}
       aria-hidden="true"
       style={{
-        position: "fixed",
-        inset: 0,
-        zIndex: 9999,
-        pointerEvents: "none",
-        opacity: 0,
-        transition: "opacity 0.6s ease",
-        mixBlendMode: "screen",
-        willChange: "background",
+        position:       "fixed",
+        inset:          0,
+        zIndex:         9999,
+        pointerEvents:  "none",
+        opacity:        0,
+        // transition removed — was causing 600ms re-composite lag on every mousemove
+        mixBlendMode:   "screen",
+        willChange:     "background",
       }}
     />
   );

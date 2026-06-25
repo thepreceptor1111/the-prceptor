@@ -4,6 +4,14 @@ import Lenis from "lenis";
 /**
  * Initialises Lenis smooth scroll on mount and tears it down on unmount.
  *
+ * Bug fix: the previous implementation only cancelled the outer rafId.
+ * The inner requestAnimationFrame call inside raf() was never cancelled,
+ * so every remount (React strict mode, hot reload) spawned an orphaned
+ * RAF loop that fought the new one — causing scroll stutter and bounce.
+ *
+ * Fix: track innerRafId and cancel it in the cleanup function alongside
+ * the outer rafId and lenis.destroy().
+ *
  * Tuning guide:
  *   lerp            — interpolation factor each rAF tick.
  *                     0.05 = very slow/floaty (Awwwards-style)
@@ -24,15 +32,19 @@ export function useLenis() {
       infinite: false,
     });
 
+    let innerRafId = null;
+
     function raf(time) {
       lenis.raf(time);
-      requestAnimationFrame(raf);
+      innerRafId = requestAnimationFrame(raf);
     }
 
-    const rafId = requestAnimationFrame(raf);
+    innerRafId = requestAnimationFrame(raf);
 
     return () => {
-      cancelAnimationFrame(rafId);
+      // Cancel both the current scheduled frame AND the lenis instance.
+      // Without cancelling innerRafId the loop keeps running after unmount.
+      if (innerRafId) cancelAnimationFrame(innerRafId);
       lenis.destroy();
     };
   }, []);

@@ -103,6 +103,7 @@ const orgSchema = {
 export default function App() {
   const location = useLocation();
   const isAdmin  = location.pathname.startsWith("/command-center");
+  const isHome   = location.pathname === "/";
 
   useLenis();
 
@@ -125,7 +126,14 @@ export default function App() {
           {!isAdmin && <AdminPortal />}
           {!isAdmin && <Nav />}
 
-          <main className={isAdmin ? "flex-1" : "flex-1 pt-20"}>
+          {/*
+            pt-20 = nav height offset for all pages EXCEPT:
+            - /command-center (admin, no nav)
+            - / (home — HeroSection is full-bleed behind nav, manages its
+              own top padding internally with pt-28 sm:pt-32 lg:py-40)
+            Without this fix the hero was pushed down by pt-20 + pt-28 = ~11rem.
+          */}
+          <main className={isAdmin ? "flex-1" : isHome ? "flex-1" : "flex-1 pt-20"}>
             <Suspense fallback={<CosmicLoader />}>
               <Routes>
                 <Route path="/"               element={<Home />} />
