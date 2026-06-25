@@ -29,7 +29,8 @@ const ICON_MAP = {
 // Updated "Always Included" copy per client request
 const INCLUDES = [
   "Private 1-on-1 video session",
-  "Written summary of key themes",
+  "A brief preliminary discussion before the session",
+  "Verbal revision of key themes",
   "Follow-up Q&A via email (48h window)",
   "Timezone-aware scheduling",
 ];
@@ -42,12 +43,9 @@ const TABS = [
 ];
 
 function normaliseService(s) {
-  // Fix: only prepend $ if the value is a raw number (Sanity).
-  // Constants already carry the $ prefix, so we must not double it.
   const fmtPrice = (v) => {
     if (v === null || v === undefined || v === "") return "";
     if (typeof v === "number") return `$${v}`;
-    // Already has $ prefix (constants fallback)
     return String(v).startsWith("$") ? String(v) : `$${v}`;
   };
 
@@ -86,10 +84,17 @@ export default function ServicesPage() {
       <SEO {...PAGE_SEO.services} />
 
       <main className="min-h-screen">
-        {/* Hero */}
-        <section className="relative py-36 overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,oklch(0.28_0.10_255_/_0.45),transparent_65%)]" />
-          <div className="absolute inset-0 starfield" aria-hidden />
+
+        {/*
+          HERO — overflow-hidden removed from section root.
+          Was causing Lenis to miscalculate document scroll height.
+          Decorative gradient div is self-contained and does not overflow.
+        */}
+        <section className="relative py-36">
+          <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden>
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,oklch(0.28_0.10_255_/_0.45),transparent_65%)]" />
+            <div className="absolute inset-0 starfield" />
+          </div>
           <div className="relative max-w-4xl mx-auto px-6 lg:px-10 text-center z-10">
             <motion.span
               initial={{ opacity: 0, y: 12 }}
@@ -125,9 +130,14 @@ export default function ServicesPage() {
           </div>
         </section>
 
-        {/* Services */}
-        <section className="py-20 bg-cosmic-deep relative overflow-hidden">
-          <div className="absolute inset-0 pointer-events-none section-glow-services" aria-hidden />
+        {/*
+          CARDS SECTION — overflow-hidden removed from section root.
+          Inner orb/glow div carries the clip instead.
+        */}
+        <section className="py-20 bg-cosmic-deep relative">
+          <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden>
+            <div className="absolute inset-0 section-glow-services" />
+          </div>
           <div className="max-w-7xl mx-auto px-6 lg:px-10 relative z-10">
 
             <Reveal className="mb-8">
@@ -192,11 +202,6 @@ export default function ServicesPage() {
                             <div className="w-12 h-12 rounded-full bg-primary/10 text-gold flex items-center justify-center">
                               <Icon className="w-5 h-5" />
                             </div>
-
-                            {/*
-                              Fix: Popular pill and badge pill now render TOGETHER.
-                              Previously badge was suppressed when isPopular was true.
-                            */}
                             <div className="flex flex-wrap gap-1.5">
                               {s.isPopular && (
                                 <span className="inline-block text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border border-gold/30 text-gold bg-gold/5">Popular</span>
@@ -208,7 +213,6 @@ export default function ServicesPage() {
                                 <span className="inline-block text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border border-red-400/30 text-red-400">Sold Out</span>
                               )}
                             </div>
-
                             <div className="flex-1">
                               <h2 className="text-2xl font-serif leading-snug">{s.title}</h2>
                               <p className="mt-3 text-muted-foreground text-sm leading-relaxed">{s.desc}</p>
@@ -251,8 +255,13 @@ export default function ServicesPage() {
           </div>
         </section>
 
-        {/* What's always included */}
-        <section className="py-24 relative overflow-hidden">
+        {/*
+          ALWAYS INCLUDED — overflow-hidden removed from section root.
+          Section has no decorative overflow so this was a no-op visually
+          but still affected Lenis height calculation.
+          Also: updated INCLUDES copy per client plan (points 2 & 3).
+        */}
+        <section className="py-24 relative">
           <div className="max-w-4xl mx-auto px-6 lg:px-10 text-center">
             <Reveal>
               <span className="text-xs uppercase tracking-[0.3em] text-gold">Every Session</span>
@@ -283,12 +292,12 @@ export default function ServicesPage() {
                 <Link to="/book" className="btn-primary">
                   Reserve a Session <ArrowRight className="w-4 h-4" />
                 </Link>
-                {/* Changed from mailto: to /qna page per client request */}
                 <Link to="/qna" className="btn-secondary">Have a question?</Link>
               </div>
             </Reveal>
           </div>
         </section>
+
       </main>
     </>
   );

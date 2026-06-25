@@ -135,21 +135,20 @@
     --transition-smooth: cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  /* ── Anchor offset for fixed nav ──────────────────────────────────────
-     scroll-padding-top: 5rem → offsets the 80px (h-20) fixed header so
-     targeted sections are never hidden behind the nav bar.
-     NOTE: scroll-behavior: smooth has been removed — Lenis handles all
-     smooth scrolling via JS (src/hooks/useLenis.js) for full control over
-     speed (lerp), easing, and wheel sensitivity.
-  ──────────────────────────────────────────────────────────────────── */
+  /* ── Single html block — scroll-padding for fixed nav anchor offset.
+     scroll-behavior: smooth intentionally absent — Lenis handles all
+     smooth scrolling via JS. scrollbar styles merged here too.
+  ── */
   html {
-    scroll-padding-top: 5rem; /* matches the h-20 (80px) fixed nav height */
+    scroll-padding-top: 5rem;
+    scrollbar-color: oklch(0.82 0.12 85 / 0.55) transparent;
+    scrollbar-width: thin;
   }
 
   * { border-color: var(--color-border); }
 
   body {
-    background-color: oklch(0.12 0.022 272); /* matches --background token; tells Chrome the document is dark so scrollbar track transparent renders correctly */
+    background-color: oklch(0.12 0.022 272);
     color: var(--foreground);
     font-family: var(--font-sans);
     font-feature-settings: "ss01", "cv11";
@@ -198,6 +197,11 @@
 
 /* ════════════════════════════════════════════════════════════════
    COSMIC BACKGROUND LAYER
+   transform: translateZ(0) + will-change: transform promote these
+   fixed layers to their own GPU compositing layer. This removes them
+   from the scroll repaint path — critical for iOS Safari where
+   backdrop-filter glass cards sharing a compositing layer with fixed
+   backgrounds causes mid-page scroll freeze.
 ════════════════════════════════════════════════════════════════ */
 #cosmic-bg {
   position: fixed;
@@ -208,6 +212,8 @@
   background-image: var(--gradient-page);
   background-size: cover;
   background-position: center;
+  transform: translateZ(0);
+  will-change: transform;
 }
 
 #cosmic-grain {
@@ -219,6 +225,8 @@
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
   background-repeat: repeat;
   background-size: 200px 200px;
+  transform: translateZ(0);
+  will-change: transform;
 }
 
 /* ════════════════════════════════════════════════════════════════
@@ -610,11 +618,6 @@
 /* ════════════════════════════════════════════════════════════════
    COSMIC SCROLLBAR
 ════════════════════════════════════════════════════════════════ */
-html {
-  scrollbar-color: oklch(0.82 0.12 85 / 0.55) transparent;
-  scrollbar-width: thin;
-}
-
 ::-webkit-scrollbar {
   width: 5px;
   height: 5px;

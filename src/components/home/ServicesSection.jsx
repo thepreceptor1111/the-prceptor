@@ -58,7 +58,6 @@ function ServiceCard({ s, i }) {
       exit={{ opacity: 0, y: 8 }}
       transition={{ duration: 0.35, delay: i * 0.05, ease: [0.22, 1, 0.36, 1] }}
     >
-      {/* Entire card is now a link to /book */}
       <Link to="/book" className="block h-full">
         <motion.div
           whileHover={{ y: -6 }}
@@ -70,13 +69,6 @@ function ServiceCard({ s, i }) {
             <div className="w-12 h-12 rounded-full bg-primary/10 text-gold flex items-center justify-center group-hover:bg-primary/20 transition">
               <Icon className="w-5 h-5" />
             </div>
-
-            {/*
-              Fix: Popular tag and Badge title now appear TOGETHER when both are set.
-              Previously badge was hidden when isPopular was true.
-              Now: Popular pill always shows if isPopular, badge pill always shows if badge exists.
-              Badge text is NOT truncated — white-space normal, no line-clamp.
-            */}
             <div className="flex flex-wrap gap-1.5">
               {s.isPopular && (
                 <span className="inline-block text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border border-gold/30 text-gold bg-gold/5">Popular</span>
@@ -88,7 +80,6 @@ function ServiceCard({ s, i }) {
                 <span className="inline-block text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border border-red-400/30 text-red-400">Sold Out</span>
               )}
             </div>
-
             <h3 className="text-xl leading-snug">{s.title}</h3>
             <p className="text-muted-foreground text-sm leading-relaxed line-clamp-3 flex-1">{s.desc}</p>
             <div className="mt-2 flex items-center justify-between border-t border-gold/10 pt-3">
@@ -124,13 +115,21 @@ export function ServicesSection() {
     : services.filter(s => s.sessionTier === activeTab);
 
   return (
-    <section id="services" className="py-32 relative bg-cosmic-deep overflow-hidden">
-      <div className="absolute inset-0 pointer-events-none section-glow-services" aria-hidden />
-      <div className="cosmic-stars absolute inset-0 pointer-events-none" aria-hidden />
-      <div className="absolute inset-0 pointer-events-none">
+    /*
+     * overflow-hidden REMOVED from section root.
+     * Previously this clipped the Lenis scroll height calculation —
+     * Lenis reported a shorter document height than what was rendered,
+     * causing scroll to stop early. Orb decorations now clipped inside
+     * their own absolute wrapper below.
+     */
+    <section id="services" className="py-32 relative bg-cosmic-deep">
+      {/* Orb decorations — overflow-hidden scoped HERE only, not on section */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden>
+        <div className="absolute inset-0 section-glow-services" />
         <div className="absolute top-0 right-0 w-[50%] h-[60%] bg-[radial-gradient(ellipse_at_top_right,oklch(0.55_0.08_310_/_0.15),transparent_65%)] blur-3xl" />
         <div className="absolute bottom-0 left-0 w-[40%] h-[50%] bg-[radial-gradient(ellipse_at_bottom_left,oklch(0.82_0.12_85_/_0.08),transparent_65%)] blur-3xl" />
       </div>
+      <div className="cosmic-stars absolute inset-0 pointer-events-none" aria-hidden />
 
       <div className="max-w-7xl mx-auto px-6 lg:px-10 relative z-10">
         {/* Header */}
