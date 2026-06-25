@@ -21,8 +21,38 @@ import Reveal from "@/components/site/Reveal";
 const CAL_NAMESPACE = "astrology-session";
 const CAL_LINK     = "preceptor/astrology-session";
 const CAL_ORIGIN   = "https://app.cal.com";
+const EMBED_ID     = "cal-embed-astrology";
 
-// ─── Book Page ────────────────────────────────────────────────────────────────
+/**
+ * CAL.COM EMBED — OFFICIAL QUEUE PATTERN
+ *
+ * The only reliable approach (per Cal docs) is:
+ *
+ *  1. Write the stub IIFE synchronously to window.Cal via script.innerHTML.
+ *     This creates the queue BEFORE embed.js loads.
+ *
+ *  2. Queue Cal("init"), Cal.ns[ns]("inline"), Cal.ns[ns]("ui")
+ *     synchronously right after the stub — they go into the queue,
+ *     not executed yet.
+ *
+ *  3. Inject <script src="embed.js"> separately. It loads async,
+ *     finds the pre-built queue, replays every call in order.
+ *
+ *  4. NEVER delete window.Cal on unmount. Cal registers <cal-modal-box>
+ *     as a custom element once per page session. CustomElementRegistry
+ *     is permanent — re-registering throws NotSupportedError.
+ *     On unmount: clear the container innerHTML only.
+ *
+ *  5. Guard re-mount with window.Cal?.loaded so we never call
+ *     inline() twice on an already-running embed.
+ *
+ *  6. Always pass a stable CSS selector string to elementOrSelector,
+ *     never a raw DOM ref (fragile if ref is null at call time).
+ */
+
+let calStubInjected  = false; // stub IIFE written to window
+let calSrcInjected   = false; // embed.js <script src> appended
+
 export default function BookPage() {
   const [step, setStep]             = useState(0);
   const [bookedData, setBookedData] = useState(null);
@@ -76,7 +106,7 @@ function StepWrap({ children }) {
   );
 }
 
-// ─── Intro ────────────────────────────────────────────────────────────────────
+// ─── Intro ───────────────────────────────────────────────────────────────────
 function IntroStep({ onStart }) {
   return (
     <div className="text-center max-w-3xl mx-auto pt-8">
@@ -158,105 +188,120 @@ function IntroStep({ onStart }) {
   );
 }
 
-// ─── Cal embed ────────────────────────────────────────────────────────────────
-/**
- * STRATEGY — clean <script src> approach:
- *
- * 1. On mount, inject ONE <script src="embed.js"> into document.head.
- *    A module-level `embedScriptEl` ref tracks it so we never double-inject.
- *
- * 2. Once embed.js loads (onload), call the three Cal APIs:
- *    - Cal("init", namespace, { origin })
- *    - Cal.ns[namespace]("inline", { elementOrSelector, calLink, config })
- *    - Cal.ns[namespace]("ui", { theme, cssVarsPerTheme })
- *
- * 3. Attach the bookingSuccessful listener immediately after inline().
- *
- * 4. On unmount: remove the script tag, delete window.Cal so the next
- *    mount gets a completely clean state (no stale namespace queue).
- *
- * WHY NO overflow-hidden on wrapper:
- *    Cal renders an <iframe> that expands to its own height. Clipping
- *    it with overflow-hidden on the parent causes the spinner to show
- *    forever because the iframe body never becomes visible.
- */
-
-let embedScriptEl = null;
-
+// ─── Cal embed ───────────────────────────────────────────────────────────────
 function CalStep({ onBack, onBooked }) {
-  const embedRef = useRef(null);
-
   useEffect(() => {
-    function bootCal() {
-      const Cal = window.Cal;
-      if (!Cal) return;
+    // ── Step 1: Write stub IIFE once per page session ──────────────────────
+    // This must exist on window BEFORE embed.js loads so it can queue calls.
+    if (!calStubInjected) {
+      const stub = document.createElement("script");
+      stub.innerHTML = `
+        (function (C, A, L) {
+          let p = function (a, ar) { a.q.push(ar); };
+          let d = C.document;
+          C.Cal = C.Cal || function () {
+            let cal = C.Cal;
+            let ar = arguments;
+            if (!cal.loaded) {
+              cal.ns  = {};
+              cal.q   = cal.q || [];
+              cal.loaded = false;
+            }
+            if (ar[0] === L) {
+              const api = function () { p(api, arguments); };
+              const ns  = ar[1];
+              api.q = api.q || [];
+              if (typeof ns === "string") {
+                cal.ns[ns] = cal.ns[ns] || api;
+                p(cal.ns[ns], ar);
+                p(cal, ["initNamespace", ns]);
+              } else { p(cal, ar); }
+              return;
+            }
+            p(cal, ar);
+          };
+        })(window, "https://app.cal.com/embed/embed.js", "init");
+      `;
+      document.head.appendChild(stub);
+      calStubInjected = true;
+    }
 
-      Cal("init", CAL_NAMESPACE, { origin: CAL_ORIGIN });
+    // ── Step 2: Queue all Cal calls synchronously ────────────────────────
+    // Guard: if Cal is already fully loaded and the embed already rendered,
+    // skip re-init entirely — just re-attach the booking listener.
+    if (window.Cal?.loaded) {
+      // Re-mount after navigating away and back. Embed is still live
+      // in the container (CalStep re-renders into the same DOM node).
+      // Only re-attach the listener; never call inline() again.
+      try {
+        window.Cal.ns[CAL_NAMESPACE]("on", {
+          action:   "bookingSuccessful",
+          callback: (e) => onBooked(e.detail?.data ?? {}),
+        });
+      } catch (_) {}
+      return;
+    }
 
-      Cal.ns[CAL_NAMESPACE]("inline", {
-        elementOrSelector: embedRef.current,
-        calLink: CAL_LINK,
-        config: { layout: "month_view", useSlotsViewOnSmallScreen: "true" },
-      });
+    // First mount — queue the three Cal calls into the stub queue.
+    window.Cal("init", CAL_NAMESPACE, { origin: CAL_ORIGIN });
 
-      Cal.ns[CAL_NAMESPACE]("ui", {
-        hideEventTypeDetails: false,
-        layout: "month_view",
-        theme: "dark",
-        cssVarsPerTheme: {
-          dark: {
-            "cal-bg":             "#14121e",
-            "cal-bg-emphasis":    "#1c192d",
-            "cal-bg-subtle":      "#1f1c30",
-            "cal-bg-muted":       "#18162a",
-            "cal-bg-inverted":    "#f5f0e8",
-            "cal-text":           "#f0ede6",
-            "cal-text-emphasis":  "#faf8f3",
-            "cal-text-subtle":    "#9b97a8",
-            "cal-text-muted":     "#6b6778",
-            "cal-text-inverted":  "#14121e",
-            "cal-brand":          "#d4a84b",
-            "cal-brand-emphasis": "#e8c068",
-            "cal-brand-subtle":   "#2a2318",
-            "cal-brand-text":     "#14121e",
-            "cal-border":         "rgba(255,255,255,0.08)",
-            "cal-border-subtle":  "rgba(255,255,255,0.05)",
-            "cal-border-booker":  "rgba(255,255,255,0.07)",
-            "cal-border-default": "rgba(255,255,255,0.08)",
-          },
+    window.Cal.ns[CAL_NAMESPACE]("inline", {
+      elementOrSelector: `#${EMBED_ID}`,   // stable CSS selector string
+      calLink:           CAL_LINK,
+      config:            { layout: "month_view", useSlotsViewOnSmallScreen: "true" },
+    });
+
+    window.Cal.ns[CAL_NAMESPACE]("ui", {
+      hideEventTypeDetails: false,
+      layout: "month_view",
+      theme:  "dark",
+      cssVarsPerTheme: {
+        dark: {
+          "cal-bg":             "#14121e",
+          "cal-bg-emphasis":    "#1c192d",
+          "cal-bg-subtle":      "#1f1c30",
+          "cal-bg-muted":       "#18162a",
+          "cal-bg-inverted":    "#f5f0e8",
+          "cal-text":           "#f0ede6",
+          "cal-text-emphasis":  "#faf8f3",
+          "cal-text-subtle":    "#9b97a8",
+          "cal-text-muted":     "#6b6778",
+          "cal-text-inverted":  "#14121e",
+          "cal-brand":          "#d4a84b",
+          "cal-brand-emphasis": "#e8c068",
+          "cal-brand-subtle":   "#2a2318",
+          "cal-brand-text":     "#14121e",
+          "cal-border":         "rgba(255,255,255,0.08)",
+          "cal-border-subtle":  "rgba(255,255,255,0.05)",
+          "cal-border-booker":  "rgba(255,255,255,0.07)",
+          "cal-border-default": "rgba(255,255,255,0.08)",
         },
-      });
+      },
+    });
 
-      Cal.ns[CAL_NAMESPACE]("on", {
-        action: "bookingSuccessful",
-        callback: (e) => onBooked(e.detail?.data ?? {}),
-      });
+    window.Cal.ns[CAL_NAMESPACE]("on", {
+      action:   "bookingSuccessful",
+      callback: (e) => onBooked(e.detail?.data ?? {}),
+    });
+
+    // ── Step 3: Inject embed.js src once per page session ───────────────
+    // embed.js loads async, finds window.Cal queue, replays all calls.
+    if (!calSrcInjected) {
+      const src = document.createElement("script");
+      src.src   = "https://app.cal.com/embed/embed.js";
+      src.async = true;
+      document.head.appendChild(src);
+      calSrcInjected = true;
     }
 
-    if (embedScriptEl) {
-      // Script already in DOM — Cal may or may not have initialised yet.
-      // If window.Cal exists, boot immediately; otherwise wait for onload.
-      if (window.Cal) {
-        bootCal();
-      } else {
-        embedScriptEl.addEventListener("load", bootCal, { once: true });
-      }
-    } else {
-      const script = document.createElement("script");
-      script.src   = "https://app.cal.com/embed/embed.js";
-      script.async = true;
-      script.addEventListener("load", bootCal, { once: true });
-      document.head.appendChild(script);
-      embedScriptEl = script;
-    }
-
+    // ── Step 4: Unmount ──────────────────────────────────────────────────
+    // NEVER remove window.Cal or the src script — custom element
+    // registration is permanent for the page session.
+    // Only clear the container so it is empty for the next inline() call
+    // if the user somehow triggers a full re-init.
     return () => {
-      // Full teardown so next mount starts clean
-      if (embedScriptEl && document.head.contains(embedScriptEl)) {
-        document.head.removeChild(embedScriptEl);
-      }
-      embedScriptEl = null;
-      try { delete window.Cal; } catch (_) {}
+      const container = document.getElementById(EMBED_ID);
+      if (container) container.innerHTML = "";
     };
   }, [onBooked]);
 
@@ -285,9 +330,10 @@ function CalStep({ onBack, onBooked }) {
       </div>
 
       {/*
-        IMPORTANT: No overflow-hidden on this wrapper.
-        Cal's iframe grows to its own height — clipping it causes the
-        eternal spinner. Border-radius is applied via border-radius CSS only.
+        NO overflow-hidden on this wrapper.
+        Cal renders an iframe that grows to its own height.
+        Clipping with overflow-hidden causes the eternal spinner.
+        Border-radius still applied via style prop below.
       */}
       <div
         className="mt-8 rounded-3xl shadow-elegant"
@@ -297,12 +343,10 @@ function CalStep({ onBack, onBooked }) {
           backdropFilter: "blur(16px)",
         }}
       >
+        {/* Stable id used as CSS selector by Cal inline() */}
         <div
-          ref={embedRef}
-          style={{
-            width:     "100%",
-            minHeight: "clamp(520px, 80vh, 760px)",
-          }}
+          id={EMBED_ID}
+          style={{ width: "100%", minHeight: "clamp(520px, 80vh, 760px)" }}
         />
       </div>
 
@@ -318,7 +362,7 @@ function CalStep({ onBack, onBooked }) {
   );
 }
 
-// ─── Confirmed ────────────────────────────────────────────────────────────────
+// ─── Confirmed ───────────────────────────────────────────────────────────────
 function ConfirmedStep({ bookedData }) {
   const name      = bookedData?.attendees?.[0]?.name  || "";
   const email     = bookedData?.attendees?.[0]?.email || "";
