@@ -26,9 +26,9 @@ const ICON_MAP = {
   Moon, Sparkles,
 };
 
+// Updated "Always Included" copy per client request
 const INCLUDES = [
   "Private 1-on-1 video session",
-  "Full session recording delivered within 24h",
   "Written summary of key themes",
   "Follow-up Q&A via email (48h window)",
   "Timezone-aware scheduling",
@@ -42,14 +42,23 @@ const TABS = [
 ];
 
 function normaliseService(s) {
+  // Fix: only prepend $ if the value is a raw number (Sanity).
+  // Constants already carry the $ prefix, so we must not double it.
+  const fmtPrice = (v) => {
+    if (v === null || v === undefined || v === "") return "";
+    if (typeof v === "number") return `$${v}`;
+    // Already has $ prefix (constants fallback)
+    return String(v).startsWith("$") ? String(v) : `$${v}`;
+  };
+
   return {
     slug:          s.slug?.current ?? s.slug ?? s._id,
     title:         s.title ?? "",
     badge:         s.tagline ?? s.badge ?? "",
     desc:          s.description ?? s.desc ?? "",
-    duration:      s.sessionDuration ?? "60 min",
-    price:         s.price ? `$${s.price}` : "",
-    originalPrice: s.originalPrice ? `$${s.originalPrice}` : "",
+    duration:      s.sessionDuration ?? s.duration ?? "60 min",
+    price:         fmtPrice(s.price),
+    originalPrice: fmtPrice(s.originalPrice),
     icon:          s.icon ?? "Star",
     isSoldOut:     s.isSoldOut ?? false,
     isPopular:     s.isPopular ?? false,
@@ -88,7 +97,7 @@ export default function ServicesPage() {
               transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
               className="text-xs uppercase tracking-[0.3em] text-gold"
             >
-              {settings?.servicesSectionLabel ?? "— What We Offer"}
+              {settings?.servicesSectionLabel ?? "What We Offer"}
             </motion.span>
             <motion.h1
               initial={{ opacity: 0, y: 18 }}
@@ -111,7 +120,7 @@ export default function ServicesPage() {
               className="mt-6 text-lg text-muted-foreground max-w-2xl mx-auto"
             >
               {settings?.servicesSectionSubtitle ??
-                "Every consultation is a private, one-on-one experience — unhurried, deeply personal, and focused entirely on your questions."}
+                "Every consultation is a private, one-on-one experience. Unhurried, deeply personal, and focused entirely on your questions."}
             </motion.p>
           </div>
         </section>
@@ -183,15 +192,23 @@ export default function ServicesPage() {
                             <div className="w-12 h-12 rounded-full bg-primary/10 text-gold flex items-center justify-center">
                               <Icon className="w-5 h-5" />
                             </div>
-                            {s.isPopular && (
-                              <span className="inline-block self-start text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border border-gold/30 text-gold bg-gold/5">Popular</span>
-                            )}
-                            {s.badge && !s.isPopular && (
-                              <span className="inline-block self-start text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border border-gold/20 text-gold">{s.badge}</span>
-                            )}
-                            {s.isSoldOut && (
-                              <span className="inline-block self-start text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border border-red-400/30 text-red-400">Sold Out</span>
-                            )}
+
+                            {/*
+                              Fix: Popular pill and badge pill now render TOGETHER.
+                              Previously badge was suppressed when isPopular was true.
+                            */}
+                            <div className="flex flex-wrap gap-1.5">
+                              {s.isPopular && (
+                                <span className="inline-block text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border border-gold/30 text-gold bg-gold/5">Popular</span>
+                              )}
+                              {s.badge && (
+                                <span className="inline-block text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border border-gold/20 text-gold break-words">{s.badge}</span>
+                              )}
+                              {s.isSoldOut && (
+                                <span className="inline-block text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border border-red-400/30 text-red-400">Sold Out</span>
+                              )}
+                            </div>
+
                             <div className="flex-1">
                               <h2 className="text-2xl font-serif leading-snug">{s.title}</h2>
                               <p className="mt-3 text-muted-foreground text-sm leading-relaxed">{s.desc}</p>
@@ -234,12 +251,12 @@ export default function ServicesPage() {
           </div>
         </section>
 
-        {/* What's included */}
+        {/* What's always included */}
         <section className="py-24 relative overflow-hidden">
           <div className="max-w-4xl mx-auto px-6 lg:px-10 text-center">
             <Reveal>
               <span className="text-xs uppercase tracking-[0.3em] text-gold">Every Session</span>
-              <h2 className="mt-4 text-3xl md:text-4xl">What’s always included.</h2>
+              <h2 className="mt-4 text-3xl md:text-4xl">What&apos;s always included.</h2>
             </Reveal>
             <Reveal delay={0.08}>
               <ul className="mt-10 grid sm:grid-cols-2 gap-4 text-left max-w-2xl mx-auto">
@@ -260,15 +277,14 @@ export default function ServicesPage() {
             <Reveal>
               <h2 className="text-3xl md:text-4xl">Ready to book?</h2>
               <p className="mt-4 text-muted-foreground">
-                Choose your session and reserve your private time. Slots fill up — early scheduling is recommended.
+                Choose your session and reserve your private time. Slots fill up, so early scheduling is recommended.
               </p>
               <div className="mt-8 flex flex-wrap gap-4 justify-center">
                 <Link to="/book" className="btn-primary">
                   Reserve a Session <ArrowRight className="w-4 h-4" />
                 </Link>
-                {email && (
-                  <a href={`mailto:${email}`} className="btn-secondary">Have a question?</a>
-                )}
+                {/* Changed from mailto: to /qna page per client request */}
+                <Link to="/qna" className="btn-secondary">Have a question?</Link>
               </div>
             </Reveal>
           </div>
