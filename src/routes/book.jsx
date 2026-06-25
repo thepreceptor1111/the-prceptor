@@ -15,8 +15,11 @@ import {
   CalendarDays,
   Star,
   User,
+  AlertTriangle,
+  X,
 } from "lucide-react";
 import Reveal from "@/components/site/Reveal";
+import { siteConfig } from "@/content/site";
 
 const CAL_NAMESPACE = "astrology-session";
 const CAL_LINK     = "preceptor/astrology-session";
@@ -50,8 +53,8 @@ const EMBED_ID     = "cal-embed-astrology";
  *     never a raw DOM ref (fragile if ref is null at call time).
  */
 
-let calStubInjected  = false; // stub IIFE written to window
-let calSrcInjected   = false; // embed.js <script src> appended
+let calStubInjected  = false;
+let calSrcInjected   = false;
 
 export default function BookPage() {
   const [step, setStep]             = useState(0);
@@ -106,7 +109,7 @@ function StepWrap({ children }) {
   );
 }
 
-// ─── Intro ───────────────────────────────────────────────────────────────────
+// ─── Intro ─────────────────────────────────────────────────────────────────────────────
 function IntroStep({ onStart }) {
   return (
     <div className="text-center max-w-3xl mx-auto pt-8">
@@ -188,11 +191,69 @@ function IntroStep({ onStart }) {
   );
 }
 
-// ─── Cal embed ───────────────────────────────────────────────────────────────
+// ─── Booking Failed Banner ────────────────────────────────────────────────────────────
+function BookingFailedBanner({ onDismiss }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -12 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -12 }}
+      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+      className="relative mb-6 rounded-2xl overflow-hidden"
+      style={{
+        background: "linear-gradient(135deg, oklch(0.18 0.025 270 / 0.95), oklch(0.14 0.022 270 / 0.95))",
+        border: "1px solid oklch(0.82 0.12 85 / 0.35)",
+        boxShadow: "0 0 32px -8px oklch(0.82 0.12 85 / 0.18)",
+      }}
+    >
+      {/* Gold top accent line */}
+      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-gold to-transparent opacity-60" />
+
+      <div className="p-5 flex items-start gap-4">
+        {/* Icon */}
+        <div className="shrink-0 w-9 h-9 rounded-full flex items-center justify-center"
+          style={{ background: "oklch(0.82 0.12 85 / 0.12)", border: "1px solid oklch(0.82 0.12 85 / 0.30)" }}
+        >
+          <AlertTriangle className="w-4 h-4 text-gold" />
+        </div>
+
+        {/* Message */}
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-medium text-foreground leading-snug">
+            We couldn’t complete your booking.
+          </p>
+          <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">
+            This usually happens when the selected time slot doesn’t align with your timezone.
+            Please <strong className="text-foreground font-medium">try a different time slot</strong>,
+            or reach us directly and we’ll schedule your session manually.
+          </p>
+          <a
+            href={`mailto:${siteConfig.email}?subject=Session%20Booking%20Help`}
+            className="inline-flex items-center gap-1.5 mt-3 text-xs text-gold hover:text-gold/80 transition-colors"
+          >
+            <Mail className="w-3.5 h-3.5" />
+            {siteConfig.email}
+          </a>
+        </div>
+
+        {/* Dismiss */}
+        <button
+          onClick={onDismiss}
+          aria-label="Dismiss"
+          className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-white/10 transition-all"
+        >
+          <X className="w-3.5 h-3.5" />
+        </button>
+      </div>
+    </motion.div>
+  );
+}
+
+// ─── Cal embed ─────────────────────────────────────────────────────────────────────────────
 function CalStep({ onBack, onBooked }) {
+  const [bookingFailed, setBookingFailed] = useState(false);
+
   useEffect(() => {
-    // ── Step 1: Write stub IIFE once per page session ──────────────────────
-    // This must exist on window BEFORE embed.js loads so it can queue calls.
     if (!calStubInjected) {
       const stub = document.createElement("script");
       stub.innerHTML = `
@@ -226,27 +287,24 @@ function CalStep({ onBack, onBooked }) {
       calStubInjected = true;
     }
 
-    // ── Step 2: Queue all Cal calls synchronously ────────────────────────
-    // Guard: if Cal is already fully loaded and the embed already rendered,
-    // skip re-init entirely — just re-attach the booking listener.
     if (window.Cal?.loaded) {
-      // Re-mount after navigating away and back. Embed is still live
-      // in the container (CalStep re-renders into the same DOM node).
-      // Only re-attach the listener; never call inline() again.
       try {
         window.Cal.ns[CAL_NAMESPACE]("on", {
           action:   "bookingSuccessful",
           callback: (e) => onBooked(e.detail?.data ?? {}),
         });
+        window.Cal.ns[CAL_NAMESPACE]("on", {
+          action:   "bookingFailed",
+          callback: () => setBookingFailed(true),
+        });
       } catch (_) {}
       return;
     }
 
-    // First mount — queue the three Cal calls into the stub queue.
     window.Cal("init", CAL_NAMESPACE, { origin: CAL_ORIGIN });
 
     window.Cal.ns[CAL_NAMESPACE]("inline", {
-      elementOrSelector: `#${EMBED_ID}`,   // stable CSS selector string
+      elementOrSelector: `#${EMBED_ID}`,
       calLink:           CAL_LINK,
       config:            { layout: "month_view", useSlotsViewOnSmallScreen: "true" },
     });
@@ -284,8 +342,12 @@ function CalStep({ onBack, onBooked }) {
       callback: (e) => onBooked(e.detail?.data ?? {}),
     });
 
-    // ── Step 3: Inject embed.js src once per page session ───────────────
-    // embed.js loads async, finds window.Cal queue, replays all calls.
+    // ── bookingFailed: show branded error banner with timezone guidance
+    window.Cal.ns[CAL_NAMESPACE]("on", {
+      action:   "bookingFailed",
+      callback: () => setBookingFailed(true),
+    });
+
     if (!calSrcInjected) {
       const src = document.createElement("script");
       src.src   = "https://app.cal.com/embed/embed.js";
@@ -294,11 +356,6 @@ function CalStep({ onBack, onBooked }) {
       calSrcInjected = true;
     }
 
-    // ── Step 4: Unmount ──────────────────────────────────────────────────
-    // NEVER remove window.Cal or the src script — custom element
-    // registration is permanent for the page session.
-    // Only clear the container so it is empty for the next inline() call
-    // if the user somehow triggers a full re-init.
     return () => {
       const container = document.getElementById(EMBED_ID);
       if (container) container.innerHTML = "";
@@ -329,12 +386,15 @@ function CalStep({ onBack, onBooked }) {
         ))}
       </div>
 
-      {/*
-        NO overflow-hidden on this wrapper.
-        Cal renders an iframe that grows to its own height.
-        Clipping with overflow-hidden causes the eternal spinner.
-        Border-radius still applied via style prop below.
-      */}
+      {/* ── Booking failed banner ── */}
+      <AnimatePresence>
+        {bookingFailed && (
+          <div className="mt-6">
+            <BookingFailedBanner onDismiss={() => setBookingFailed(false)} />
+          </div>
+        )}
+      </AnimatePresence>
+
       <div
         className="mt-8 rounded-3xl shadow-elegant"
         style={{
@@ -343,7 +403,6 @@ function CalStep({ onBack, onBooked }) {
           backdropFilter: "blur(16px)",
         }}
       >
-        {/* Stable id used as CSS selector by Cal inline() */}
         <div
           id={EMBED_ID}
           style={{ width: "100%", minHeight: "clamp(520px, 80vh, 760px)" }}
@@ -362,7 +421,7 @@ function CalStep({ onBack, onBooked }) {
   );
 }
 
-// ─── Confirmed ───────────────────────────────────────────────────────────────
+// ─── Confirmed ─────────────────────────────────────────────────────────────────────────────
 function ConfirmedStep({ bookedData }) {
   const name      = bookedData?.attendees?.[0]?.name  || "";
   const email     = bookedData?.attendees?.[0]?.email || "";
