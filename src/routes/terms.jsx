@@ -1,254 +1,187 @@
-import SEO from "@/components/site/SEO";
-import { PAGE_SEO, SITE } from "@/content/seo";
+import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
-import { ScrollText, ArrowLeft, Mail } from "lucide-react";
+import { ScrollText, Star, CreditCard, RefreshCw, AlertTriangle, Globe2, Mail, Shield, FileText, Scale } from "lucide-react";
+import Reveal from "@/components/site/Reveal";
+import { siteConfig } from "@/content/site";
 
-// Last updated date — update whenever terms content changes.
-const LAST_UPDATED = "June 16, 2026";
-
-const SECTIONS = [
-  {
-    id: "acceptance",
-    heading: "Acceptance of Terms",
-    body: [
-      "By accessing thepreceptorglobal.com or booking a consultation with The Preceptor, you agree to be bound by these Terms & Conditions. If you do not agree to these terms, please do not use our website or services.",
-      "These terms apply to all visitors, clients, and users of The Preceptor website and consultation services.",
-    ],
-  },
-  {
-    id: "services",
-    heading: "Nature of Services",
-    body: [
-      "The Preceptor offers private astrology consultation services including, but not limited to: Vedic birth chart readings, Western astrology readings, relationship synastry, career guidance, Kundli analysis, tarot readings, and spiritual consultations.",
-      "All consultations are provided for entertainment, personal insight, and spiritual guidance purposes only. Astrology readings do not constitute medical, legal, financial, or psychological advice. You should not make life decisions based solely on the content of a reading.",
-      "The Preceptor does not guarantee any specific outcome, result, or change in circumstances as a result of a consultation.",
-    ],
-  },
-  {
-    id: "booking",
-    heading: "Booking & Scheduling",
-    body: [
-      "Consultations are booked through the online scheduling system (Cal.com). A booking is confirmed only once you have received a written confirmation email.",
-      "You are responsible for providing accurate birth information (date, time, and place of birth) at the time of booking. Inaccurate birth data may affect the quality of your reading; The Preceptor is not liable for readings based on incorrect information provided by the client.",
-      "By booking a session, you confirm that you are 18 years of age or older, or that you have obtained parental or guardian consent.",
-    ],
-  },
-  {
-    id: "rescheduling",
-    heading: "Rescheduling & Cancellations",
-    body: [
-      "You may reschedule your appointment up to 24 hours before the scheduled session time at no charge, using the link provided in your confirmation email.",
-      "Cancellations made less than 24 hours before the session may not be eligible for a refund. Cancellations made more than 24 hours in advance will be refunded in full.",
-      "If The Preceptor needs to cancel or reschedule a session, you will be notified as soon as possible and offered a full refund or alternative time slot.",
-      "No-shows (failing to attend without prior notice) are not eligible for refunds or rescheduling.",
-    ],
-  },
-  {
-    id: "payments",
-    heading: "Payments & Refunds",
-    body: [
-      "All consultation fees are stated clearly at the time of booking. Prices are in USD unless otherwise specified. We accept payment in USD, GBP, EUR, and INR via our payment processor.",
-      "Payment is required in full at the time of booking to secure your appointment slot.",
-      "Refunds are issued for cancellations made more than 24 hours before the session. Refunds are not available after a session has been delivered, except in cases of demonstrable technical failure on our part that prevented the session from taking place.",
-      "All payment processing is handled by third-party processors. The Preceptor does not store your payment card information.",
-    ],
-  },
-  {
-    id: "confidentiality",
-    heading: "Confidentiality",
-    body: [
-      "All information shared during a consultation — including personal circumstances, relationships, and birth data — is treated as strictly confidential.",
-      "Session recordings (if provided) are shared exclusively with the client. We will never share, publish, or use session content for marketing purposes without your explicit written consent.",
-      "Client testimonials shared on the website are done so with the client's express consent.",
-    ],
-  },
-  {
-    id: "intellectual-property",
-    heading: "Intellectual Property",
-    body: [
-      "All content on thepreceptorglobal.com — including text, design, graphics, the brand name \u201cThe Preceptor\u201d, and all written interpretations provided in consultations — is the intellectual property of The Preceptor and is protected by applicable copyright law.",
-      "You may not reproduce, republish, redistribute, or sell any content from this website or from your private consultation without prior written permission.",
-      "Personal use of your own reading content (sharing insights privately, keeping notes for yourself) is encouraged and permitted.",
-    ],
-  },
-  {
-    id: "disclaimer",
-    heading: "Disclaimer of Warranties",
-    body: [
-      "The Preceptor website and services are provided on an \u201cas is\u201d basis. We make no warranties, express or implied, regarding the accuracy, completeness, or fitness for a particular purpose of our services.",
-      "Astrology is an interpretive and symbolic discipline. Readings reflect the practitioner's interpretation of celestial patterns and their potential correlations with human experience. They are not predictions of fixed future events.",
-      "The Preceptor is not responsible for any decisions made by clients based on the content of their readings.",
-    ],
-  },
-  {
-    id: "liability",
-    heading: "Limitation of Liability",
-    body: [
-      "To the fullest extent permitted by applicable law, The Preceptor shall not be liable for any indirect, incidental, consequential, or punitive damages arising from the use of our website or services, including but not limited to loss of income, loss of opportunity, or emotional distress.",
-      "Our total liability in connection with any consultation shall not exceed the amount paid for that specific consultation.",
-    ],
-  },
-  {
-    id: "links",
-    heading: "Third-Party Links",
-    body: [
-      "Our website may contain links to third-party websites (such as Instagram, Reddit, or Cal.com). These links are provided for convenience only. The Preceptor is not responsible for the content or privacy practices of external websites.",
-    ],
-  },
-  {
-    id: "governing-law",
-    heading: "Governing Law",
-    body: [
-      "These Terms & Conditions shall be governed by and construed in accordance with applicable law. Any disputes arising under these terms shall be subject to the exclusive jurisdiction of the appropriate courts.",
-      "If any provision of these terms is found to be unenforceable, the remaining provisions shall continue to apply in full.",
-    ],
-  },
-  {
-    id: "changes",
-    heading: "Changes to These Terms",
-    body: [
-      `We reserve the right to modify these Terms & Conditions at any time. Changes become effective upon posting to this page. The "Last Updated" date at the top of this page will reflect the most recent revision. Continued use of our services after changes are posted constitutes your acceptance of the updated terms.`,
-    ],
-  },
-  {
-    id: "contact",
-    heading: "Contact",
-    body: [
-      `Questions about these Terms & Conditions may be directed to ${SITE.email}. We will respond within 5 business days.`,
-    ],
-  },
-];
+const EFFECTIVE_DATE = "June 1, 2025";
+const SITE_URL       = "https://www.thepreceptorglobal.com";
 
 export default function TermsPage() {
   return (
     <>
-      <SEO {...PAGE_SEO.terms} />
+      <Helmet>
+        <title>Terms & Conditions — The Preceptor</title>
+        <meta name="description" content="Terms and conditions governing use of The Preceptor's website and astrological consultation services." />
+        <link rel="canonical" href={`${SITE_URL}/terms`} />
+      </Helmet>
 
       <div className="relative min-h-screen">
-        {/* Hero band */}
-        <section className="relative overflow-hidden pt-36 pb-20 md:pt-48 md:pb-28">
+        {/* Hero */}
+        <section className="relative overflow-hidden pt-40 pb-20 md:pt-52 md:pb-28">
           <div className="absolute inset-0 bg-hero" />
           <div className="absolute inset-0 starfield" />
-          <div
-            className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2
-                       w-[70%] h-[500px] opacity-20 blur-3xl"
-            style={{
-              background:
-                "radial-gradient(ellipse at center, oklch(0.55 0.10 265 / 0.5) 0%, transparent 65%)",
-            }}
+          <motion.div
+            animate={{ opacity: [0.25, 0.50, 0.25] }}
+            transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[55%] aspect-square rounded-full
+                       bg-[radial-gradient(circle,oklch(0.82_0.12_85_/_0.14),transparent_65%)] blur-3xl pointer-events-none"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background pointer-events-none" />
 
           <div className="relative max-w-3xl mx-auto px-6 lg:px-10 text-center">
-            <motion.span
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-card
-                         text-xs uppercase tracking-[0.25em] text-gold"
-            >
-              <ScrollText className="w-3.5 h-3.5" /> Legal
-            </motion.span>
-
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-              className="mt-8 text-4xl md:text-6xl leading-tight"
-              style={{ fontFamily: "var(--font-serif)" }}
-            >
-              Terms &amp; Conditions
-            </motion.h1>
-
-            <motion.p
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-              className="mt-6 text-muted-foreground"
-            >
-              Last updated: {LAST_UPDATED}
-            </motion.p>
+            <Reveal>
+              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-card
+                               text-xs uppercase tracking-[0.25em] text-gold">
+                <ScrollText className="w-3 h-3" /> Terms & Conditions
+              </span>
+            </Reveal>
+            <Reveal delay={0.1}>
+              <h1 className="mt-8 text-balance">
+                Clear terms,
+                <span className="display-italic text-gold"> honestly stated.</span>
+              </h1>
+            </Reveal>
+            <Reveal delay={0.2}>
+              <p className="mt-6 lead mx-auto">
+                These terms govern your use of this website and the purchase of astrological
+                consultation services from The Preceptor.
+              </p>
+            </Reveal>
+            <Reveal delay={0.3}>
+              <p className="mt-4 text-xs text-muted-foreground tracking-wide">
+                Effective {EFFECTIVE_DATE} · Last reviewed June 2025
+              </p>
+            </Reveal>
           </div>
         </section>
 
-        {/* Body */}
+        {/* Content */}
         <section className="relative py-16 md:py-24">
-          <div className="max-w-3xl mx-auto px-6 lg:px-10">
+          <div className="max-w-3xl mx-auto px-6 lg:px-10 space-y-14">
 
-            {/* Intro card */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-              className="glass-card rounded-2xl p-6 md:p-8 mb-14 border border-gold/20"
-            >
-              <p className="text-muted-foreground leading-relaxed">
-                These Terms &amp; Conditions govern your use of{" "}
-                <strong className="text-foreground">thepreceptorglobal.com</strong> and all
-                consultation services offered by The Preceptor. Please read them
-                carefully. By booking a session or browsing the website, you agree
-                to be bound by these terms.
-              </p>
-            </motion.div>
+            <TermsSection icon={FileText} title="1. Acceptance of Terms" delay={0}>
+              <p>By accessing or using this website or booking a consultation, you agree to be bound by these Terms & Conditions. If you do not agree, please do not use the site or our services. These terms apply to all visitors, clients, and others who access or use our services.</p>
+            </TermsSection>
 
-            {/* Sections */}
-            <div className="space-y-12">
-              {SECTIONS.map((section, i) => (
-                <motion.div
-                  key={section.id}
-                  id={section.id}
-                  initial={{ opacity: 0, y: 16 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-60px" }}
-                  transition={{
-                    delay: i * 0.04,
-                    duration: 0.6,
-                    ease: [0.22, 1, 0.36, 1],
-                  }}
-                >
-                  <h2
-                    className="text-xl md:text-2xl mb-5 text-foreground"
-                    style={{ fontFamily: "var(--font-serif)" }}
-                  >
-                    {i + 1}. {section.heading}
-                  </h2>
-                  {section.body.map((para, j) => (
-                    <p key={j} className="text-muted-foreground leading-relaxed mb-4 last:mb-0">
-                      {para}
-                    </p>
-                  ))}
-                  <div className="mt-8 h-px bg-gradient-to-r from-gold/20 via-transparent to-transparent" />
-                </motion.div>
-              ))}
-            </div>
+            <TermsSection icon={Star} title="2. Nature of Services" delay={0.04}>
+              <p>The Preceptor offers private Vedic and Western astrological consultation services. All consultations are provided for <strong className="text-foreground font-medium">informational, spiritual, and personal guidance purposes only</strong>.</p>
+              <p>Astrological readings are not a substitute for professional advice in the fields of medicine, law, finance, psychology, or any other regulated profession. You should not make major life decisions based solely on astrological guidance.</p>
+              <p>By booking a session, you acknowledge that you are engaging with astrology as a form of personal reflection and spiritual inquiry, and that outcomes or interpretations are subject to your own free will and judgment.</p>
+            </TermsSection>
 
-            {/* Footer nav */}
-            <div className="mt-20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pt-8 border-t border-border/60">
-              <Link
-                to="/"
-                className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-gold transition-colors"
+            <TermsSection icon={CreditCard} title="3. Booking & Payment" delay={0.08}>
+              <p>Sessions are booked through our integrated scheduling platform (Cal.com). By completing a booking you agree to Cal.com's Terms of Service in addition to these terms.</p>
+              <TermsList items={[
+                "Payment is due at the time of booking unless otherwise agreed in writing.",
+                "Session fees are displayed on the booking page and are subject to change. Any fee change will not apply to sessions already confirmed.",
+                "Accepted payment methods are those available through our booking platform at the time of booking.",
+                "All prices are listed in USD unless otherwise stated.",
+              ]} />
+            </TermsSection>
+
+            <TermsSection icon={RefreshCw} title="4. Rescheduling & Cancellations" delay={0.12}>
+              <p>We understand that life is unpredictable. Our policy is designed to be fair to both parties:</p>
+              <TermsList items={[
+                "Rescheduling is permitted up to 24 hours before your session at no charge.",
+                "Cancellations made more than 24 hours before the session are eligible for a full refund.",
+                "Cancellations made within 24 hours of the session are non-refundable.",
+                "No-shows (failure to attend without notice) are non-refundable.",
+                "If The Preceptor needs to cancel or reschedule, you will receive a full refund or a priority rebooking slot, at your preference.",
+              ]} />
+              <p>To reschedule or cancel, use the link in your booking confirmation email or contact us directly.</p>
+            </TermsSection>
+
+            <TermsSection icon={Shield} title="5. Confidentiality" delay={0.16}>
+              <p>The Preceptor treats all client information — including birth details, personal circumstances, and consultation content — with strict confidence. This information will never be shared, published, or discussed with any third party without your explicit written consent.</p>
+              <p>We ask that clients extend the same courtesy. Session recordings, transcripts, or summaries shared for your personal reference are for your private use only and may not be published or redistributed without our prior written permission.</p>
+            </TermsSection>
+
+            <TermsSection icon={AlertTriangle} title="6. Disclaimer of Liability" delay={0.20}>
+              <p>To the fullest extent permitted by applicable law, The Preceptor shall not be liable for any direct, indirect, incidental, or consequential damages arising from:</p>
+              <TermsList items={[
+                "Decisions made in reliance on astrological guidance received during a session",
+                "Technical issues with third-party scheduling or communication platforms",
+                "Any inaccuracies arising from incorrect birth information provided by the client",
+                "Force majeure events beyond our reasonable control",
+              ]} />
+              <p>Our total liability to you for any claim arising from these terms or a session shall not exceed the fee paid for that session.</p>
+            </TermsSection>
+
+            <TermsSection icon={Globe2} title="7. Intellectual Property" delay={0.24}>
+              <p>All content on this website — including text, design, imagery, session frameworks, and written materials — is the intellectual property of The Preceptor and is protected by copyright. You may not reproduce, distribute, or create derivative works from any content without prior written permission.</p>
+              <p>Session recordings or notes provided to you after a consultation are licensed for your personal, non-commercial use only.</p>
+            </TermsSection>
+
+            <TermsSection icon={Globe2} title="8. Governing Law" delay={0.28}>
+              <p>These Terms & Conditions are governed by and construed in accordance with applicable law. Any disputes arising from or related to these terms or our services shall first be attempted to be resolved through good-faith communication. If unresolved, disputes will be submitted to the jurisdiction of the relevant courts.</p>
+            </TermsSection>
+
+            <TermsSection icon={Scale} title="9. Modifications" delay={0.32}>
+              <p>We reserve the right to update these Terms & Conditions at any time. Changes will be posted on this page with an updated “Last reviewed” date. Your continued use of the website or services after any changes constitutes acceptance of the revised terms. We recommend reviewing this page periodically.</p>
+            </TermsSection>
+
+            <TermsSection icon={Mail} title="10. Contact" delay={0.36}>
+              <p>For any questions about these terms or our services, please contact us:</p>
+              <a
+                href={`mailto:${siteConfig.email}?subject=Terms%20Inquiry`}
+                className="inline-flex items-center gap-2 mt-3 text-gold hover:text-gold/80 transition-colors text-sm"
               >
-                <ArrowLeft className="w-4 h-4" /> Back to Home
-              </Link>
-              <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
-                <Link to="/privacy" className="hover:text-gold transition-colors">
-                  Privacy Policy
-                </Link>
-                <Link to="/contact" className="hover:text-gold transition-colors">
-                  Contact Us
-                </Link>
-                <a
-                  href={`mailto:${SITE.email}`}
-                  className="inline-flex items-center gap-1.5 hover:text-gold transition-colors"
-                >
-                  <Mail className="w-3.5 h-3.5" /> {SITE.email}
-                </a>
+                <Mail className="w-4 h-4" /> {siteConfig.email}
+              </a>
+            </TermsSection>
+
+            {/* Bottom CTA */}
+            <Reveal delay={0.40}>
+              <div className="glass-card rounded-3xl p-8 text-center">
+                <ScrollText className="w-8 h-8 text-gold mx-auto" />
+                <h3 className="mt-4 text-xl">Ready to begin?</h3>
+                <p className="mt-3 text-muted-foreground text-sm max-w-md mx-auto">
+                  Book a private consultation and experience astrology as a tool for genuine clarity.
+                </p>
+                <div className="mt-6 flex items-center justify-center gap-4 flex-wrap">
+                  <a href="/book" className="btn-primary">Book a Session</a>
+                  <a href="/contact" className="btn-secondary">Ask a Question</a>
+                </div>
               </div>
-            </div>
+            </Reveal>
+
           </div>
         </section>
       </div>
     </>
+  );
+}
+
+function TermsSection({ icon: Icon, title, delay, children }) {
+  return (
+    <Reveal delay={delay}>
+      <div className="glass-card rounded-2xl p-7 md:p-9">
+        <div className="flex items-center gap-3 mb-6">
+          <span className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
+            style={{ background: "oklch(0.82 0.12 85 / 0.12)", border: "1px solid oklch(0.82 0.12 85 / 0.25)" }}
+          >
+            <Icon className="w-4 h-4 text-gold" />
+          </span>
+          <h2 className="text-xl md:text-2xl" style={{ fontSize: "clamp(1.1rem, 2vw, 1.5rem)" }}>{title}</h2>
+        </div>
+        <div className="space-y-4 text-sm text-muted-foreground leading-relaxed">
+          {children}
+        </div>
+      </div>
+    </Reveal>
+  );
+}
+
+function TermsList({ items }) {
+  return (
+    <ul className="space-y-2 my-4">
+      {items.map((item) => (
+        <li key={item} className="flex items-start gap-3">
+          <span className="mt-1.5 w-1 h-1 rounded-full bg-gold shrink-0" />
+          <span>{item}</span>
+        </li>
+      ))}
+    </ul>
   );
 }
