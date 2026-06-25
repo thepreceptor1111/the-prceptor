@@ -1,6 +1,5 @@
 import SEO from "@/components/site/SEO";
 import { PAGE_SEO } from "@/content/seo";
-import { SITE } from "@/content/seo";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -21,9 +20,9 @@ import Reveal from "@/components/site/Reveal";
 
 const CAL_NAMESPACE = "astrology-session";
 const CAL_LINK     = "preceptor/astrology-session";
+const CAL_ORIGIN   = "https://app.cal.com";
 
-let calScriptInjected = false;
-
+// ─── Book Page ────────────────────────────────────────────────────────────────
 export default function BookPage() {
   const [step, setStep]             = useState(0);
   const [bookedData, setBookedData] = useState(null);
@@ -31,14 +30,12 @@ export default function BookPage() {
   return (
     <>
       <SEO {...PAGE_SEO.book} />
-
       <div className="bg-hero starfield min-h-screen relative overflow-hidden">
         <div
           className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2
                      w-[800px] h-[800px] rounded-full opacity-30 blur-3xl"
           style={{ background: "radial-gradient(circle, var(--gold) 0%, transparent 60%)" }}
         />
-
         <section className="relative max-w-6xl mx-auto px-6 lg:px-10 py-16 lg:py-24">
           <AnimatePresence mode="wait">
             {step === 0 && (
@@ -79,6 +76,7 @@ function StepWrap({ children }) {
   );
 }
 
+// ─── Intro ────────────────────────────────────────────────────────────────────
 function IntroStep({ onStart }) {
   return (
     <div className="text-center max-w-3xl mx-auto pt-8">
@@ -106,8 +104,8 @@ function IntroStep({ onStart }) {
 
       <div className="mt-12 grid sm:grid-cols-3 gap-4 max-w-2xl mx-auto">
         {[
-          { icon: Clock, label: "60 minute session" },
-          { icon: Video, label: "Online, private 1:1" },
+          { icon: Clock,  label: "60 minute session" },
+          { icon: Video,  label: "Online, private 1:1" },
           { icon: Globe2, label: "Your local timezone" },
         ].map((item, i) => (
           <motion.div
@@ -130,8 +128,8 @@ function IntroStep({ onStart }) {
         <div className="space-y-4">
           {[
             { icon: CalendarDays, step: "01", text: "Choose your date & time slot" },
-            { icon: User, step: "02", text: "Fill your details & birth info" },
-            { icon: Star, step: "03", text: "Get instant confirmation by email" },
+            { icon: User,         step: "02", text: "Fill your details & birth info" },
+            { icon: Star,         step: "03", text: "Get instant confirmation by email" },
           ].map((row) => (
             <div key={row.step} className="flex items-center gap-4">
               <span className="text-[10px] font-mono text-gold/60 w-6 shrink-0">{row.step}</span>
@@ -160,90 +158,48 @@ function IntroStep({ onStart }) {
   );
 }
 
+// ─── Cal embed ────────────────────────────────────────────────────────────────
+/**
+ * STRATEGY — clean <script src> approach:
+ *
+ * 1. On mount, inject ONE <script src="embed.js"> into document.head.
+ *    A module-level `embedScriptEl` ref tracks it so we never double-inject.
+ *
+ * 2. Once embed.js loads (onload), call the three Cal APIs:
+ *    - Cal("init", namespace, { origin })
+ *    - Cal.ns[namespace]("inline", { elementOrSelector, calLink, config })
+ *    - Cal.ns[namespace]("ui", { theme, cssVarsPerTheme })
+ *
+ * 3. Attach the bookingSuccessful listener immediately after inline().
+ *
+ * 4. On unmount: remove the script tag, delete window.Cal so the next
+ *    mount gets a completely clean state (no stale namespace queue).
+ *
+ * WHY NO overflow-hidden on wrapper:
+ *    Cal renders an <iframe> that expands to its own height. Clipping
+ *    it with overflow-hidden on the parent causes the spinner to show
+ *    forever because the iframe body never becomes visible.
+ */
+
+let embedScriptEl = null;
+
 function CalStep({ onBack, onBooked }) {
   const embedRef = useRef(null);
-  const scriptRef = useRef(null);
 
   useEffect(() => {
-    let pollTimer = null;
+    function bootCal() {
+      const Cal = window.Cal;
+      if (!Cal) return;
 
-    function initCalEmbed() {
-      try {
-        window.Cal.ns[CAL_NAMESPACE]("inline", {
-          elementOrSelector: `#my-cal-inline-${CAL_NAMESPACE}`,
-          config: { layout: "month_view", useSlotsViewOnSmallScreen: "true" },
-          calLink: CAL_LINK,
-        });
-        attachBookingListener(onBooked);
-      } catch (err) {
-        console.warn("[Cal] Re-init failed:", err);
-      }
-    }
+      Cal("init", CAL_NAMESPACE, { origin: CAL_ORIGIN });
 
-    function waitForCalThenInit() {
-      pollTimer = setInterval(() => {
-        if (window.Cal?.ns?.[CAL_NAMESPACE]) {
-          clearInterval(pollTimer);
-          initCalEmbed();
-        }
-      }, 100);
-    }
-
-    const container = embedRef.current;
-
-    if (calScriptInjected) {
-      if (container && container.children.length > 0) {
-        attachBookingListener(onBooked);
-      } else {
-        if (window.Cal?.ns?.[CAL_NAMESPACE]) {
-          initCalEmbed();
-        } else {
-          waitForCalThenInit();
-        }
-      }
-      return () => { if (pollTimer) clearInterval(pollTimer); };
-    }
-
-    const script = document.createElement("script");
-    script.type = "text/javascript";
-    script.async = true;
-    script.innerHTML = `
-      (function (C, A, L) {
-        let p = function (a, ar) { a.q.push(ar); };
-        let d = C.document;
-        C.Cal = C.Cal || function () {
-          let cal = C.Cal; let ar = arguments;
-          if (!cal.loaded) {
-            cal.ns = {}; cal.q = cal.q || [];
-            d.head.appendChild(d.createElement("script")).src = A;
-            cal.loaded = true;
-          }
-          if (ar[0] === L) {
-            const api = function () { p(api, arguments); };
-            const namespace = ar[1];
-            api.q = api.q || [];
-            if (typeof namespace === "string") {
-              cal.ns[namespace] = cal.ns[namespace] || api;
-              p(cal.ns[namespace], ar);
-              p(cal, ["initNamespace", namespace]);
-            } else p(cal, ar);
-            return;
-          }
-          p(cal, ar);
-        };
-      })(window, "https://app.cal.com/embed/embed.js", "init");
-
-      Cal("init", "${CAL_NAMESPACE}", { origin: "https://app.cal.com" });
-      Cal.config = Cal.config || {};
-      Cal.config.forwardQueryParams = true;
-
-      Cal.ns["${CAL_NAMESPACE}"]("inline", {
-        elementOrSelector: "#my-cal-inline-${CAL_NAMESPACE}",
+      Cal.ns[CAL_NAMESPACE]("inline", {
+        elementOrSelector: embedRef.current,
+        calLink: CAL_LINK,
         config: { layout: "month_view", useSlotsViewOnSmallScreen: "true" },
-        calLink: "${CAL_LINK}",
       });
 
-      Cal.ns["${CAL_NAMESPACE}"]("ui", {
+      Cal.ns[CAL_NAMESPACE]("ui", {
         hideEventTypeDetails: false,
         layout: "month_view",
         theme: "dark",
@@ -267,23 +223,40 @@ function CalStep({ onBack, onBooked }) {
             "cal-border-subtle":  "rgba(255,255,255,0.05)",
             "cal-border-booker":  "rgba(255,255,255,0.07)",
             "cal-border-default": "rgba(255,255,255,0.08)",
-          }
-        }
+          },
+        },
       });
-    `;
 
-    document.body.appendChild(script);
-    scriptRef.current = script;
-    calScriptInjected = true;
+      Cal.ns[CAL_NAMESPACE]("on", {
+        action: "bookingSuccessful",
+        callback: (e) => onBooked(e.detail?.data ?? {}),
+      });
+    }
 
-    waitForCalThenInit();
+    if (embedScriptEl) {
+      // Script already in DOM — Cal may or may not have initialised yet.
+      // If window.Cal exists, boot immediately; otherwise wait for onload.
+      if (window.Cal) {
+        bootCal();
+      } else {
+        embedScriptEl.addEventListener("load", bootCal, { once: true });
+      }
+    } else {
+      const script = document.createElement("script");
+      script.src   = "https://app.cal.com/embed/embed.js";
+      script.async = true;
+      script.addEventListener("load", bootCal, { once: true });
+      document.head.appendChild(script);
+      embedScriptEl = script;
+    }
 
     return () => {
-      if (pollTimer) clearInterval(pollTimer);
-      if (scriptRef.current && document.body.contains(scriptRef.current)) {
-        document.body.removeChild(scriptRef.current);
+      // Full teardown so next mount starts clean
+      if (embedScriptEl && document.head.contains(embedScriptEl)) {
+        document.head.removeChild(embedScriptEl);
       }
-      calScriptInjected = false;
+      embedScriptEl = null;
+      try { delete window.Cal; } catch (_) {}
     };
   }, [onBooked]);
 
@@ -300,8 +273,8 @@ function CalStep({ onBack, onBooked }) {
 
       <div className="mt-6 flex flex-wrap items-center justify-center gap-5">
         {[
-          { icon: Globe2, text: "Your local timezone" },
-          { icon: Clock, text: "60 min sessions" },
+          { icon: Globe2,       text: "Your local timezone" },
+          { icon: Clock,        text: "60 min sessions" },
           { icon: CalendarDays, text: "Available every day" },
         ].map((item) => (
           <div key={item.text} className="flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -311,21 +284,24 @@ function CalStep({ onBack, onBooked }) {
         ))}
       </div>
 
+      {/*
+        IMPORTANT: No overflow-hidden on this wrapper.
+        Cal's iframe grows to its own height — clipping it causes the
+        eternal spinner. Border-radius is applied via border-radius CSS only.
+      */}
       <div
-        className="mt-8 rounded-3xl overflow-hidden shadow-elegant"
+        className="mt-8 rounded-3xl shadow-elegant"
         style={{
-          background: "oklch(0.14 0.024 270 / 0.80)",
-          border: "1px solid rgba(255,255,255,0.07)",
+          background:     "oklch(0.14 0.024 270 / 0.80)",
+          border:         "1px solid rgba(255,255,255,0.07)",
           backdropFilter: "blur(16px)",
         }}
       >
         <div
-          id={`my-cal-inline-${CAL_NAMESPACE}`}
           ref={embedRef}
           style={{
-            width: "100%",
+            width:     "100%",
             minHeight: "clamp(520px, 80vh, 760px)",
-            overflow: "auto",
           }}
         />
       </div>
@@ -342,30 +318,16 @@ function CalStep({ onBack, onBooked }) {
   );
 }
 
-function attachBookingListener(onBooked) {
-  try {
-    window.Cal.ns[CAL_NAMESPACE]("on", {
-      action: "bookingSuccessful",
-      callback: (e) => onBooked(e.detail?.data ?? {}),
-    });
-  } catch (err) {
-    console.warn("[Cal] Could not attach bookingSuccessful listener:", err);
-  }
-}
-
+// ─── Confirmed ────────────────────────────────────────────────────────────────
 function ConfirmedStep({ bookedData }) {
-  const name = bookedData?.attendees?.[0]?.name || "";
-  const email = bookedData?.attendees?.[0]?.email || "";
+  const name      = bookedData?.attendees?.[0]?.name  || "";
+  const email     = bookedData?.attendees?.[0]?.email || "";
   const firstName = name.trim().split(" ")[0] || "friend";
 
   const startTime = bookedData?.startTime
     ? new Date(bookedData.startTime).toLocaleString("en-US", {
-        weekday: "long",
-        month: "long",
-        day: "numeric",
-        hour: "numeric",
-        minute: "2-digit",
-        hour12: true,
+        weekday: "long", month: "long", day: "numeric",
+        hour: "numeric", minute: "2-digit", hour12: true,
         timeZoneName: "short",
       })
     : null;
@@ -377,9 +339,7 @@ function ConfirmedStep({ bookedData }) {
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
         className="relative inline-flex items-center justify-center w-24 h-24 rounded-full"
-        style={{
-          background: "radial-gradient(circle, color-mix(in oklab, var(--gold) 40%, transparent), transparent 70%)",
-        }}
+        style={{ background: "radial-gradient(circle, color-mix(in oklab, var(--gold) 40%, transparent), transparent 70%)" }}
       >
         <CheckCircle2 className="w-14 h-14 text-gold" />
       </motion.div>
@@ -396,8 +356,7 @@ function ConfirmedStep({ bookedData }) {
         className="mt-4 text-muted-foreground max-w-md mx-auto"
       >
         {firstName !== "friend" ? `Thank you, ${firstName}.` : "Thank you."} Your private
-        consultation is booked. A calendar invite and meeting link are on
-        their way to your inbox.
+        consultation is booked. A calendar invite and meeting link are on their way to your inbox.
       </motion.p>
 
       <motion.div
@@ -405,12 +364,10 @@ function ConfirmedStep({ bookedData }) {
         className="mt-10 glass-card rounded-3xl p-8 shadow-elegant text-left"
       >
         {startTime && <SummaryRow label="Date & Time" value={startTime} />}
-        {name && <SummaryRow label="Name" value={name} />}
-        {email && <SummaryRow label="Confirmation sent to" value={email} last />}
+        {name      && <SummaryRow label="Name"        value={name} />}
+        {email     && <SummaryRow label="Confirmation sent to" value={email} last />}
         {!startTime && !name && !email && (
-          <p className="text-sm text-muted-foreground text-center py-4">
-            Check your email for booking details.
-          </p>
+          <p className="text-sm text-muted-foreground text-center py-4">Check your email for booking details.</p>
         )}
       </motion.div>
 
