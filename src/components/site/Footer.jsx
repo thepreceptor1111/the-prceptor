@@ -15,7 +15,7 @@ export default function Footer() {
             <span className="font-serif text-2xl tracking-wide">{siteConfig.name}</span>
           </Link>
           <p className="mt-6 text-muted-foreground max-w-md leading-relaxed">
-            A modern sanctuary for spiritual clarity. Premium astrology consultations for high-intention seekers across the United States and around the world.
+            A modern sanctuary for spiritual clarity. Premium astrology consultations for high-intention seekers globally.
           </p>
           <div className="flex gap-3 mt-8">
             {[
@@ -30,8 +30,6 @@ export default function Footer() {
         </div>
 
         <div className="md:col-span-3">
-          {/* FIX 10: h4 → p to fix non-sequential heading order (Lighthouse a11y).
-              Visual appearance is identical — styling comes from className only. */}
           <p className="text-xs uppercase tracking-[0.3em] text-gold mb-6">Explore</p>
           <ul className="space-y-4 text-sm text-muted-foreground">
             {footerLinks.explore.map((l) => (
@@ -43,7 +41,6 @@ export default function Footer() {
         </div>
 
         <div className="md:col-span-4">
-          {/* FIX 10: Same treatment for the Contact label */}
           <p className="text-xs uppercase tracking-[0.3em] text-gold mb-6">Contact</p>
           <ul className="space-y-4 text-sm text-muted-foreground">
             <li className="flex items-start gap-3">

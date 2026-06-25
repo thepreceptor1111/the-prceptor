@@ -22,20 +22,8 @@ import Reveal from "@/components/site/Reveal";
 const CAL_NAMESPACE = "astrology-session";
 const CAL_LINK     = "preceptor/astrology-session";
 
-/**
- * Module-level flag — survives React re-mounts within the same page session.
- * Reset to false in useEffect cleanup so navigating away + back
- * triggers a clean re-init into the new DOM container.
- *
- * WHY NOT window.__calInitDone:
- *   The global flag persists even after the component unmounts.
- *   When the user navigates away and back, the embed container is a
- *   brand-new empty DOM node — but the global flag says "already done",
- *   so Cal never injects into it → blank white box.
- */
 let calScriptInjected = false;
 
-// Flow: 0 = intro  →  1 = Cal embed  →  2 = confirmed
 export default function BookPage() {
   const [step, setStep]             = useState(0);
   const [bookedData, setBookedData] = useState(null);
@@ -45,7 +33,6 @@ export default function BookPage() {
       <SEO {...PAGE_SEO.book} />
 
       <div className="bg-hero starfield min-h-screen relative overflow-hidden">
-        {/* Ambient glow */}
         <div
           className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2
                      w-[800px] h-[800px] rounded-full opacity-30 blur-3xl"
@@ -92,7 +79,6 @@ function StepWrap({ children }) {
   );
 }
 
-// ─── Intro ───────────────────────────────────────────────────────────────────
 function IntroStep({ onStart }) {
   return (
     <div className="text-center max-w-3xl mx-auto pt-8">
@@ -105,7 +91,7 @@ function IntroStep({ onStart }) {
 
       <motion.h1
         initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-        className="mt-6 text-5xl md:text-7xl leading-[1.05] bg-gradient-gold"
+        className="mt-6 text-5xl md:text-7xl leading-[1.05] bg-gradient-gold bg-clip-text text-transparent"
       >
         Begin Your Spiritual Consultation
       </motion.h1>
@@ -115,14 +101,13 @@ function IntroStep({ onStart }) {
         className="mt-6 text-lg text-muted-foreground leading-relaxed max-w-xl mx-auto"
       >
         A calm, private space to explore your chart with clarity and care.
-        Each session is crafted around your story — guided by quiet intention.
+        Each session is crafted around your story, guided by quiet intention.
       </motion.p>
 
-      {/* Feature cards */}
       <div className="mt-12 grid sm:grid-cols-3 gap-4 max-w-2xl mx-auto">
         {[
-          { icon: Clock,  label: "60 minute session" },
-          { icon: Video,  label: "Online — private 1:1" },
+          { icon: Clock, label: "60 minute session" },
+          { icon: Video, label: "Online, private 1:1" },
           { icon: Globe2, label: "Your local timezone" },
         ].map((item, i) => (
           <motion.div
@@ -137,7 +122,6 @@ function IntroStep({ onStart }) {
         ))}
       </div>
 
-      {/* How it works */}
       <motion.div
         initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
         className="mt-10 max-w-lg mx-auto glass-card rounded-2xl p-6 text-left"
@@ -146,8 +130,8 @@ function IntroStep({ onStart }) {
         <div className="space-y-4">
           {[
             { icon: CalendarDays, step: "01", text: "Choose your date & time slot" },
-            { icon: User,         step: "02", text: "Fill your details & birth info" },
-            { icon: Star,         step: "03", text: "Get instant confirmation by email" },
+            { icon: User, step: "02", text: "Fill your details & birth info" },
+            { icon: Star, step: "03", text: "Get instant confirmation by email" },
           ].map((row) => (
             <div key={row.step} className="flex items-center gap-4">
               <span className="text-[10px] font-mono text-gold/60 w-6 shrink-0">{row.step}</span>
@@ -176,33 +160,14 @@ function IntroStep({ onStart }) {
   );
 }
 
-// ─── Cal embed step ───────────────────────────────────────────────────────────
-/**
- * INIT STRATEGY:
- *
- * 1. calScriptInjected (module-level) tracks whether the Cal loader
- *    script has been appended to document.body in this page session.
- *
- * 2. On mount:
- *    a. If script already injected AND container already has children
- *       (Cal rendered inside it) → just re-attach the booking listener.
- *    b. If script already injected but container is empty
- *       (re-mount after navigation) → re-run inline() to re-render Cal
- *       into the fresh DOM node.
- *    c. If script not injected → full cold init.
- *
- * 3. On unmount (cleanup): remove the injected script, reset
- *    calScriptInjected = false so the next mount does a clean init.
- */
 function CalStep({ onBack, onBooked }) {
-  const embedRef  = useRef(null);
+  const embedRef = useRef(null);
   const scriptRef = useRef(null);
 
   useEffect(() => {
     let pollTimer = null;
 
     function initCalEmbed() {
-      // Re-render Cal into the (now empty) container
       try {
         window.Cal.ns[CAL_NAMESPACE]("inline", {
           elementOrSelector: `#my-cal-inline-${CAL_NAMESPACE}`,
@@ -227,13 +192,9 @@ function CalStep({ onBack, onBooked }) {
     const container = embedRef.current;
 
     if (calScriptInjected) {
-      // Script already in DOM from a previous mount
       if (container && container.children.length > 0) {
-        // Cal already rendered into this container — just re-attach listener
         attachBookingListener(onBooked);
       } else {
-        // Container is a fresh empty node (navigated away + back)
-        // Cal namespace exists; re-run inline() directly
         if (window.Cal?.ns?.[CAL_NAMESPACE]) {
           initCalEmbed();
         } else {
@@ -243,9 +204,8 @@ function CalStep({ onBack, onBooked }) {
       return () => { if (pollTimer) clearInterval(pollTimer); };
     }
 
-    // ── Cold init: first time CalStep mounts ──────────────────────────────
     const script = document.createElement("script");
-    script.type  = "text/javascript";
+    script.type = "text/javascript";
     script.async = true;
     script.innerHTML = `
       (function (C, A, L) {
@@ -313,12 +273,11 @@ function CalStep({ onBack, onBooked }) {
     `;
 
     document.body.appendChild(script);
-    scriptRef.current  = script;
-    calScriptInjected  = true;
+    scriptRef.current = script;
+    calScriptInjected = true;
 
     waitForCalThenInit();
 
-    // Cleanup: remove script, reset flag so next mount does a clean init
     return () => {
       if (pollTimer) clearInterval(pollTimer);
       if (scriptRef.current && document.body.contains(scriptRef.current)) {
@@ -330,21 +289,19 @@ function CalStep({ onBack, onBooked }) {
 
   return (
     <div className="max-w-5xl mx-auto">
-      {/* Header */}
       <div className="text-center max-w-2xl mx-auto">
         <span className="text-xs uppercase tracking-[0.35em] text-gold">Book Your Session</span>
         <h2 className="mt-3 text-4xl md:text-5xl">Choose your time</h2>
         <p className="mt-4 text-muted-foreground">
-          Pick a date and slot — then fill in your details on the next screen.
+          Pick a date and slot, then fill in your details on the next screen.
           All times are shown in your local timezone.
         </p>
       </div>
 
-      {/* Info strip */}
       <div className="mt-6 flex flex-wrap items-center justify-center gap-5">
         {[
-          { icon: Globe2,       text: "Your local timezone" },
-          { icon: Clock,        text: "60 min sessions" },
+          { icon: Globe2, text: "Your local timezone" },
+          { icon: Clock, text: "60 min sessions" },
           { icon: CalendarDays, text: "Available every day" },
         ].map((item) => (
           <div key={item.text} className="flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -354,13 +311,11 @@ function CalStep({ onBack, onBooked }) {
         ))}
       </div>
 
-      {/* Cal.com inline embed container
-          height: fluid clamp — no fixed 720px that traps mobile scroll */}
       <div
         className="mt-8 rounded-3xl overflow-hidden shadow-elegant"
         style={{
-          background:     "oklch(0.14 0.024 270 / 0.80)",
-          border:         "1px solid rgba(255,255,255,0.07)",
+          background: "oklch(0.14 0.024 270 / 0.80)",
+          border: "1px solid rgba(255,255,255,0.07)",
           backdropFilter: "blur(16px)",
         }}
       >
@@ -368,9 +323,9 @@ function CalStep({ onBack, onBooked }) {
           id={`my-cal-inline-${CAL_NAMESPACE}`}
           ref={embedRef}
           style={{
-            width:     "100%",
+            width: "100%",
             minHeight: "clamp(520px, 80vh, 760px)",
-            overflow:  "auto",
+            overflow: "auto",
           }}
         />
       </div>
@@ -387,11 +342,10 @@ function CalStep({ onBack, onBooked }) {
   );
 }
 
-/** Attach bookingSuccessful listener to Cal namespace */
 function attachBookingListener(onBooked) {
   try {
     window.Cal.ns[CAL_NAMESPACE]("on", {
-      action:   "bookingSuccessful",
+      action: "bookingSuccessful",
       callback: (e) => onBooked(e.detail?.data ?? {}),
     });
   } catch (err) {
@@ -399,20 +353,19 @@ function attachBookingListener(onBooked) {
   }
 }
 
-// ─── Confirmed screen ─────────────────────────────────────────────────────────
 function ConfirmedStep({ bookedData }) {
-  const name      = bookedData?.attendees?.[0]?.name  || "";
-  const email     = bookedData?.attendees?.[0]?.email || "";
+  const name = bookedData?.attendees?.[0]?.name || "";
+  const email = bookedData?.attendees?.[0]?.email || "";
   const firstName = name.trim().split(" ")[0] || "friend";
 
   const startTime = bookedData?.startTime
     ? new Date(bookedData.startTime).toLocaleString("en-US", {
-        weekday:      "long",
-        month:        "long",
-        day:          "numeric",
-        hour:         "numeric",
-        minute:       "2-digit",
-        hour12:       true,
+        weekday: "long",
+        month: "long",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
         timeZoneName: "short",
       })
     : null;
@@ -433,7 +386,7 @@ function ConfirmedStep({ bookedData }) {
 
       <motion.h2
         initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-        className="mt-8 text-4xl md:text-5xl bg-gradient-gold"
+        className="mt-8 text-4xl md:text-5xl bg-gradient-gold bg-clip-text text-transparent"
       >
         Your Session is Confirmed
       </motion.h2>
@@ -452,8 +405,8 @@ function ConfirmedStep({ bookedData }) {
         className="mt-10 glass-card rounded-3xl p-8 shadow-elegant text-left"
       >
         {startTime && <SummaryRow label="Date & Time" value={startTime} />}
-        {name      && <SummaryRow label="Name"        value={name} />}
-        {email     && <SummaryRow label="Confirmation sent to" value={email} last />}
+        {name && <SummaryRow label="Name" value={name} />}
+        {email && <SummaryRow label="Confirmation sent to" value={email} last />}
         {!startTime && !name && !email && (
           <p className="text-sm text-muted-foreground text-center py-4">
             Check your email for booking details.

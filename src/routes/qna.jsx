@@ -9,7 +9,6 @@ import { useSanity } from "@/lib/useSanity";
 import { useSiteSettings } from "@/lib/useSiteSettings";
 import { FAQ_QUERY } from "@/lib/sanityQueries";
 
-// ── Static fallback data ──────────────────────────────────────────────────────
 const STATIC_CATEGORIES = [
   {
     id: "sessions",
@@ -17,7 +16,7 @@ const STATIC_CATEGORIES = [
     questions: [
       {
         q: "What happens in a typical consultation?",
-        a: "Each session is a private, 60-minute one-on-one video call. We begin with your birth chart and move into whatever area of life is most calling for attention — career, relationships, timing, or spiritual direction. You'll receive a recording of the session within 24 hours.",
+        a: "Each session is a private, 60-minute one-on-one video call. We begin with your birth chart and move into whatever area of life is most calling for attention, career, relationships, timing, or spiritual direction.",
       },
       {
         q: "Do I need to know anything about astrology beforehand?",
@@ -25,7 +24,7 @@ const STATIC_CATEGORIES = [
       },
       {
         q: "How do I prepare for my session?",
-        a: "The most important thing is your accurate birth time — date, exact time, and city. Beyond that, simply arrive with an open mind and one or two areas of life you'd like to explore. There's no homework required.",
+        a: "The most important thing is your accurate birth time, date, exact time, and city. Beyond that, simply arrive with an open mind and one or two areas of life you'd like to explore. There's no homework required.",
       },
       {
         q: "Can I book sessions for someone else as a gift?",
@@ -43,15 +42,15 @@ const STATIC_CATEGORIES = [
       },
       {
         q: "Is astrology the same as fortune-telling?",
-        a: "No. Astrology maps energetic patterns and timing cycles — it reveals design, not fixed destiny. The goal is always to give you more agency, not less. Knowing the weather doesn't stop you from going outside; it just helps you dress well.",
+        a: "No. Astrology maps energetic patterns and timing cycles. It reveals design, not fixed destiny. The goal is always to give you more agency, not less. Knowing the weather doesn't stop you from going outside; it just helps you dress well.",
       },
       {
         q: "What is a birth chart?",
-        a: "Your birth chart (or natal chart) is a snapshot of the sky at the exact moment and location of your birth. It shows the position of the Sun, Moon, and planets across 12 houses — each governing a different area of life. It is the primary map used in every consultation.",
+        a: "Your birth chart (or natal chart) is a snapshot of the sky at the exact moment and location of your birth. It shows the position of the Sun, Moon, and planets across 12 houses, each governing a different area of life. It is the primary map used in every consultation.",
       },
       {
         q: "Can astrology predict exact events?",
-        a: "Astrology reveals windows of high probability and energetic themes — not fixed outcomes. Timing tools like transits and dashas highlight when certain areas of life are activated, but free will always plays a central role in how those energies manifest.",
+        a: "Astrology reveals windows of high probability and energetic themes, not fixed outcomes. Timing tools like transits and dashas highlight when certain areas of life are activated, but free will always plays a central role in how those energies manifest.",
       },
     ],
   },
@@ -69,7 +68,7 @@ const STATIC_CATEGORIES = [
       },
       {
         q: "How far in advance should I book?",
-        a: "The booking window opens 14 days in advance. Demand is high, so booking 5–7 days ahead is recommended. Same-week slots occasionally open when cancellations occur — check the booking page regularly.",
+        a: "The booking window opens 14 days in advance. Demand is high, so booking 5 to 7 days ahead is recommended. Same-week slots occasionally open when cancellations occur, check the booking page regularly.",
       },
       {
         q: "What is the cancellation policy?",
@@ -91,28 +90,23 @@ const STATIC_CATEGORIES = [
       },
       {
         q: "How is a Tarot Reading different from an astrology session?",
-        a: "Tarot readings are intuitive and symbolic — they respond to the energy of the present moment and your specific question. Astrology readings are chart-based and timing-specific. Many clients find the two work beautifully together.",
+        a: "Tarot readings are intuitive and symbolic. They respond to the energy of the present moment and your specific question. Astrology readings are chart-based and timing-specific. Many clients find the two work beautifully together.",
       },
       {
         q: "Can I request a follow-up session?",
-        a: "Yes. Follow-up sessions are available and encouraged every 6–12 months as major planetary cycles shift. Returning clients receive priority booking access and a discounted rate on their second session.",
+        a: "Yes. Follow-up sessions are available and encouraged every 6 to 12 months as major planetary cycles shift. Returning clients receive priority booking access and a discounted rate on their second session.",
       },
     ],
   },
 ];
 
-// Category display metadata
 const CATEGORY_META = [
-  { id: "sessions",  label: "Sessions" },
+  { id: "sessions", label: "Sessions" },
   { id: "astrology", label: "Astrology" },
   { id: "logistics", label: "Logistics" },
-  { id: "readings",  label: "Types of Readings" },
+  { id: "readings", label: "Types of Readings" },
 ];
 
-/**
- * Group a flat array of Sanity FAQ docs into the CATEGORIES shape.
- * Docs without a recognised category fall into 'sessions' by default.
- */
 function groupByCategory(faqs) {
   const map = {};
   CATEGORY_META.forEach(({ id }) => { map[id] = []; });
@@ -123,25 +117,22 @@ function groupByCategory(faqs) {
     map[cat].push({ q: faq.question, a: faq.answer });
   });
 
-  // Only return categories that have at least one question
   return CATEGORY_META
     .filter(({ id }) => map[id].length > 0)
     .map(({ id, label }) => ({ id, label, questions: map[id] }));
 }
 
-// ── Page ──────────────────────────────────────────────────────────────────────
 export default function QnAPage() {
   const { data: cmsFaqs } = useSanity(FAQ_QUERY, null);
-  const { settings }      = useSiteSettings();
+  const { settings } = useSiteSettings();
 
-  // Build categories from CMS when available; fall back to static
   const CATEGORIES =
     cmsFaqs && cmsFaqs.length > 0
       ? groupByCategory(cmsFaqs)
       : STATIC_CATEGORIES;
 
   const [activeCategory, setActiveCategory] = useState(CATEGORIES[0]?.id ?? "sessions");
-  const [openIndex, setOpenIndex]           = useState(null);
+  const [openIndex, setOpenIndex] = useState(null);
 
   const activeQuestions =
     CATEGORIES.find((c) => c.id === activeCategory)?.questions ?? [];
@@ -158,7 +149,6 @@ export default function QnAPage() {
       <SEO {...PAGE_SEO.qna} />
 
       <div className="bg-hero starfield min-h-screen relative overflow-hidden">
-        {/* Ambient glow */}
         <div
           className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-[700px] h-[700px] rounded-full opacity-25 blur-3xl"
           style={{
@@ -166,7 +156,6 @@ export default function QnAPage() {
           }}
         />
 
-        {/* ── Hero ── */}
         <section className="relative max-w-5xl mx-auto px-6 lg:px-10 pt-20 pb-16 text-center">
           <Reveal>
             <motion.span
@@ -177,12 +166,12 @@ export default function QnAPage() {
             >
               <Sparkles className="w-3.5 h-3.5" /> Questions &amp; Answers
             </motion.span>
-            <h1 className="mt-6 text-5xl md:text-7xl leading-[1.05] bg-gradient-gold">
+            <h1 className="mt-6 text-5xl md:text-7xl leading-[1.05] bg-gradient-gold bg-clip-text text-transparent">
               {settings?.faqSectionHeading ?? "Everything you want to know."}
             </h1>
             <p className="mt-6 text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-              From how sessions work to the deeper philosophy behind the practice
-              — find honest, clear answers below.
+              From how sessions work to the deeper philosophy behind the practice,
+              find honest, clear answers below.
             </p>
           </Reveal>
 
@@ -193,7 +182,6 @@ export default function QnAPage() {
           </Reveal>
         </section>
 
-        {/* ── Category tabs ── */}
         <section className="max-w-5xl mx-auto px-6 lg:px-10 pb-6">
           <Reveal>
             <div className="flex flex-wrap gap-3 justify-center">
@@ -214,7 +202,6 @@ export default function QnAPage() {
           </Reveal>
         </section>
 
-        {/* ── Accordion ── */}
         <section className="max-w-3xl mx-auto px-6 lg:px-10 pb-28">
           <AnimatePresence mode="wait">
             <motion.div
@@ -287,7 +274,6 @@ export default function QnAPage() {
           </AnimatePresence>
         </section>
 
-        {/* ── Still have questions CTA ── */}
         <section className="max-w-3xl mx-auto px-6 lg:px-10 pb-28">
           <Reveal>
             <div className="glass-card rounded-3xl p-10 md:p-14 text-center border border-gold/20 shadow-elegant relative overflow-hidden">
@@ -302,19 +288,19 @@ export default function QnAPage() {
                 Still curious?
               </span>
               <h2 className="mt-4 text-3xl md:text-4xl">
-                Didn't find your answer?
+                Didn&apos;t find your answer?
               </h2>
               <p className="mt-4 text-muted-foreground max-w-md mx-auto">
-                Reach out directly — every question is welcome. A response lands
+                Reach out directly. Every question is welcome. A response lands
                 in your inbox within 24 hours.
               </p>
               <div className="mt-8 flex flex-wrap gap-4 justify-center">
-                <Link
-                  to="/contact"
+                <a
+                  href="mailto:thepreceptor1111@gmail.com"
                   className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-primary text-primary-foreground font-medium shadow-gold hover:scale-[1.03] transition"
                 >
                   Ask a Question <ArrowRight className="w-4 h-4" />
-                </Link>
+                </a>
                 <Link
                   to="/book"
                   className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full gold-border text-foreground hover:bg-gold/10 transition"
