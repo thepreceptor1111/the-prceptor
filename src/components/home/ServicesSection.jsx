@@ -58,38 +58,51 @@ function ServiceCard({ s, i }) {
       exit={{ opacity: 0, y: 8 }}
       transition={{ duration: 0.35, delay: i * 0.05, ease: [0.22, 1, 0.36, 1] }}
     >
-      <motion.div
-        whileHover={{ y: -6 }}
-        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-        className="glass-card rounded-2xl p-8 h-full group cursor-pointer hover:border-primary/40 relative overflow-hidden"
-      >
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,oklch(0.82_0.12_85_/_0.07),transparent_40%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-        <div className="relative z-10 flex flex-col h-full gap-3">
-          <div className="w-12 h-12 rounded-full bg-primary/10 text-gold flex items-center justify-center group-hover:bg-primary/20 transition">
-            <Icon className="w-5 h-5" />
-          </div>
-          {s.isPopular && (
-            <span className="inline-block self-start text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border border-gold/30 text-gold bg-gold/5">Popular</span>
-          )}
-          {s.badge && !s.isPopular && (
-            <span className="inline-block self-start text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border border-gold/20 text-gold">{s.badge}</span>
-          )}
-          {s.isSoldOut && (
-            <span className="inline-block self-start text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border border-red-400/30 text-red-400">Sold Out</span>
-          )}
-          <h3 className="text-xl leading-snug">{s.title}</h3>
-          <p className="text-muted-foreground text-sm leading-relaxed line-clamp-3 flex-1">{s.desc}</p>
-          <div className="mt-2 flex items-center justify-between border-t border-gold/10 pt-3">
-            <span className="flex items-center gap-1 text-xs text-gold">
-              <Clock className="w-3 h-3" />{s.duration}
-            </span>
-            <div className="flex items-baseline gap-2">
-              {s.originalPrice && <span className="text-xs text-muted-foreground line-through">{s.originalPrice}</span>}
-              <span className="font-semibold text-gold text-lg">{s.price}</span>
+      {/* Entire card is now a link to /book */}
+      <Link to="/book" className="block h-full">
+        <motion.div
+          whileHover={{ y: -6 }}
+          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          className="glass-card rounded-2xl p-8 h-full group cursor-pointer hover:border-primary/40 relative overflow-hidden"
+        >
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,oklch(0.82_0.12_85_/_0.07),transparent_40%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <div className="relative z-10 flex flex-col h-full gap-3">
+            <div className="w-12 h-12 rounded-full bg-primary/10 text-gold flex items-center justify-center group-hover:bg-primary/20 transition">
+              <Icon className="w-5 h-5" />
+            </div>
+
+            {/*
+              Fix: Popular tag and Badge title now appear TOGETHER when both are set.
+              Previously badge was hidden when isPopular was true.
+              Now: Popular pill always shows if isPopular, badge pill always shows if badge exists.
+              Badge text is NOT truncated — white-space normal, no line-clamp.
+            */}
+            <div className="flex flex-wrap gap-1.5">
+              {s.isPopular && (
+                <span className="inline-block text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border border-gold/30 text-gold bg-gold/5">Popular</span>
+              )}
+              {s.badge && (
+                <span className="inline-block text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border border-gold/20 text-gold break-words">{s.badge}</span>
+              )}
+              {s.isSoldOut && (
+                <span className="inline-block text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border border-red-400/30 text-red-400">Sold Out</span>
+              )}
+            </div>
+
+            <h3 className="text-xl leading-snug">{s.title}</h3>
+            <p className="text-muted-foreground text-sm leading-relaxed line-clamp-3 flex-1">{s.desc}</p>
+            <div className="mt-2 flex items-center justify-between border-t border-gold/10 pt-3">
+              <span className="flex items-center gap-1 text-xs text-gold">
+                <Clock className="w-3 h-3" />{s.duration}
+              </span>
+              <div className="flex items-baseline gap-2">
+                {s.originalPrice && <span className="text-xs text-muted-foreground line-through">{s.originalPrice}</span>}
+                <span className="font-semibold text-gold text-lg">{s.price}</span>
+              </div>
             </div>
           </div>
-        </div>
-      </motion.div>
+        </motion.div>
+      </Link>
     </motion.div>
   );
 }

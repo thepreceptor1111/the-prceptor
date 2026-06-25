@@ -40,7 +40,7 @@ function Particle({ x, y, size, delay, duration, drift }) {
   );
 }
 
-// Word-by-word staggered heading
+// Word-by-word staggered heading — slowed down per client request
 function StaggeredHeading({ line1, line2Gold, delay = 0 }) {
   const words1 = line1.split(" ");
   const words2 = line2Gold.split(" ");
@@ -49,7 +49,8 @@ function StaggeredHeading({ line1, line2Gold, delay = 0 }) {
     hidden: { opacity: 0, x: -22, filter: "blur(4px)" },
     visible: (i) => ({
       opacity: 1, x: 0, filter: "blur(0px)",
-      transition: { delay: delay + i * 0.09, duration: 0.75, ease: [0.22, 1, 0.36, 1] },
+      // Slowed from 0.09 → 0.13 stagger and 0.75 → 1.1 duration
+      transition: { delay: delay + i * 0.13, duration: 1.1, ease: [0.22, 1, 0.36, 1] },
     }),
   };
 
@@ -165,11 +166,11 @@ export function HeroSection() {
         style={{ background: "radial-gradient(ellipse at center, oklch(0.38 0.10 38 / 0.22), transparent 60%)" }}
       />
 
-      {/* Hero figure */}
+      {/* Hero figure — slowed entry from 1.4 → 2.2s per client request */}
       <motion.div
-        initial={{ opacity: 0.88, y: 18, scale: 1.04 }}
+        initial={{ opacity: 0.88, y: 28, scale: 1.04 }}
         animate={{ opacity: 0.88, y: 0, scale: 1 }}
-        transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 2.2, ease: [0.22, 1, 0.36, 1] }}
         className="absolute inset-y-0 right-0 w-full lg:w-[68%] xl:w-[62%] pointer-events-none"
         style={{
           WebkitMaskImage: [
@@ -281,7 +282,7 @@ export function HeroSection() {
             <a href="#services" className="btn-secondary">{cta2Label}</a>
           </motion.div>
 
-          {/* Social proof */}
+          {/* Social proof — "Trusted By" label removed, stat numbers kept */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -301,7 +302,7 @@ export function HeroSection() {
                 </motion.span>
               ))}
             </div>
-            <span>Trusted by {clientCount} {clientLabel} across {countryCount} countries</span>
+            <span>{clientCount} {clientLabel} across {countryCount} countries</span>
           </motion.div>
 
         </div>

@@ -7,6 +7,8 @@ import { useSanity } from "@/lib/useSanity";
 import { useSiteSettings } from "@/lib/useSiteSettings";
 import { FAQ_QUERY } from "@/lib/sanityQueries";
 
+const HOME_FAQ_LIMIT = 5; // Max FAQs shown on home page — rest only on /qna
+
 function normalise(f) {
   return { q: f.question ?? f.q, a: f.answer ?? f.a };
 }
@@ -18,7 +20,9 @@ export function FaqSection() {
   const sectionLabel   = settings?.faqSectionLabel   ?? "FAQ";
   const sectionHeading = settings?.faqSectionHeading ?? "Common questions.";
 
-  const faqs = cmsFaqs ? cmsFaqs.map(normalise) : FAQS;
+  // Cap at HOME_FAQ_LIMIT — full list is on the /qna page
+  const allFaqs = cmsFaqs ? cmsFaqs.map(normalise) : FAQS;
+  const faqs = allFaqs.slice(0, HOME_FAQ_LIMIT);
   const [open, setOpen] = useState(null);
 
   return (
