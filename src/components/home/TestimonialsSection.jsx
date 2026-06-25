@@ -19,7 +19,6 @@ function normalise(t) {
     rating:        t.rating   ?? 5,
     avatarInitial: t.avatarInitial ?? "",
     featured:      t.featured ?? false,
-    // Apply CDN transforms: 900px wide, 80% quality, auto WebP/AVIF
     screenshotUrl: t.screenshotImage?.asset?.url
       ? sanityImage(t.screenshotImage.asset.url, { w: 900, q: 80 })
       : null,
@@ -50,7 +49,6 @@ export function TestimonialsSection() {
 
   const t = testimonials[idx] ?? testimonials[0];
 
-  // ── Preload adjacent images so carousel advances without a flash ──
   useEffect(() => {
     if (testimonials.length < 2) return;
     const nextIdx = (idx + 1) % testimonials.length;
@@ -59,7 +57,6 @@ export function TestimonialsSection() {
     preloadImage(testimonials[prevIdx]?.screenshotUrl);
   }, [idx, testimonials]);
 
-  // ── Auto-advance ──
   useEffect(() => {
     const timer = window.setInterval(
       () => setIdx((c) => (c + 1) % testimonials.length),
@@ -112,25 +109,40 @@ export function TestimonialsSection() {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.97 }}
               transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-              className="mt-14 glass-card rounded-3xl overflow-hidden relative"
+              /*
+               * overflow-hidden REMOVED from this glass-card wrapper.
+               * backdrop-filter + overflow-hidden on the same element forces
+               * GPU compositing layer clip recalculation on every scroll frame.
+               * The rounded clip is preserved via rounded-3xl alone.
+               * Inner content is clipped by its own absolute-positioned wrapper.
+               */
+              className="mt-14 glass-card rounded-3xl relative"
               style={{ height: `${CARD_HEIGHT}px` }}
             >
               {hasImage ? (
-                <div style={{ position: "relative", width: "100%", height: "100%" }}>
+                <div style={{ position: "relative", width: "100%", height: "100%", borderRadius: "inherit", overflow: "hidden" }}>
 
-                  {/* Scrollable image zone */}
-                  <div style={{
-                    position: "absolute", top: 0, left: 0, right: 0,
-                    bottom: `${STRIP_H}px`,
-                    overflowY: "auto", overflowX: "hidden",
-                    scrollbarWidth: "none",
-                  }}>
+                  {/*
+                   * data-lenis-prevent: tells Lenis to explicitly yield scroll
+                   * events to this inner container when the pointer is over it.
+                   * Without this, wheel/touch events on the screenshot image
+                   * were stolen from Lenis and bled into the FAQ section below.
+                   * overflowX removed — was a redundant second clip layer.
+                   */}
+                  <div
+                    data-lenis-prevent
+                    style={{
+                      position: "absolute", top: 0, left: 0, right: 0,
+                      bottom: `${STRIP_H}px`,
+                      overflowY: "auto",
+                      scrollbarWidth: "none",
+                    }}
+                  >
                     <style>{`.ss-img-scroll::-webkit-scrollbar{display:none}`}</style>
                     <div className="ss-img-scroll" style={{ overflowY: "auto", scrollbarWidth: "none" }}>
                       <img
                         src={t.screenshotUrl}
                         alt={t.screenshotAlt}
-                        // Active slide: eager + high priority — do NOT lazy-load what's visible
                         loading="eager"
                         fetchpriority="high"
                         decoding="async"
