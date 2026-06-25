@@ -6,21 +6,23 @@ import { FAQS } from "@/utils/constants";
 import { useSanity } from "@/lib/useSanity";
 import { useSiteSettings } from "@/lib/useSiteSettings";
 import { FAQ_QUERY } from "@/lib/sanityQueries";
+import { useLenisResize } from "@/hooks/useLenisResize";
 
-const HOME_FAQ_LIMIT = 5; // Max FAQs shown on home page — rest only on /qna
+const HOME_FAQ_LIMIT = 5;
 
 function normalise(f) {
   return { q: f.question ?? f.q, a: f.answer ?? f.a };
 }
 
 export function FaqSection() {
+  useLenisResize();
+
   const { data: cmsFaqs } = useSanity(FAQ_QUERY, null);
   const { settings } = useSiteSettings();
 
   const sectionLabel   = settings?.faqSectionLabel   ?? "FAQ";
   const sectionHeading = settings?.faqSectionHeading ?? "Common questions.";
 
-  // Cap at HOME_FAQ_LIMIT — full list is on the /qna page
   const allFaqs = cmsFaqs ? cmsFaqs.map(normalise) : FAQS;
   const faqs = allFaqs.slice(0, HOME_FAQ_LIMIT);
   const [open, setOpen] = useState(null);
@@ -32,17 +34,9 @@ export function FaqSection() {
           <span className="text-xs uppercase tracking-[0.3em] text-gold">{sectionLabel}</span>
           <h2 className="mt-4 text-4xl md:text-5xl">{sectionHeading}</h2>
         </Reveal>
-
         <div className="mt-12 space-y-3">
           {faqs.map((faq, i) => (
             <Reveal key={i} delay={i * 0.04}>
-              {/*
-                overflow-hidden REMOVED from glass-card wrapper.
-                backdrop-filter + overflow-hidden on the same element forces
-                the browser to recalculate the compositing layer clip on every
-                scroll frame — 5 cards × GPU stall = scroll drag through FAQ.
-                The border-radius clip is handled by the rounded-2xl class alone.
-              */}
               <div className="glass-card rounded-2xl">
                 <button
                   onClick={() => setOpen(open === i ? null : i)}

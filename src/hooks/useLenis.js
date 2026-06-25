@@ -1,27 +1,20 @@
-import { useEffect } from "react";
-import Lenis from "lenis";
+import { useEffect } from 'react';
+import Lenis from 'lenis';
+import { useLenisContext } from '@/context/LenisContext';
 
 /**
- * Initialises Lenis smooth scroll on mount and tears it down on unmount.
+ * Initialises Lenis smooth scroll and stores the instance in LenisContext
+ * so lazy-loaded sections can call lenis.resize() after their content mounts.
  *
- * Bug fix: the previous implementation only cancelled the outer rafId.
- * The inner requestAnimationFrame call inside raf() was never cancelled,
- * so every remount (React strict mode, hot reload) spawned an orphaned
- * RAF loop that fought the new one — causing scroll stutter and bounce.
- *
- * Fix: track innerRafId and cancel it in the cleanup function alongside
- * the outer rafId and lenis.destroy().
- *
- * Tuning guide:
- *   lerp            — interpolation factor each rAF tick.
- *                     0.05 = very slow/floaty (Awwwards-style)
- *                     0.12 = fast & silky (current setting)
- *                     0.20 = snappy, close to native
- *   wheelMultiplier — how far one wheel tick scrolls.
- *                     1.0 = default, 1.1 = slightly faster
- *   smoothTouch     — keep false; native touch scroll is already good on mobile.
+ * Root-cause fix for scroll freeze:
+ * Lenis caches document.scrollHeight on init. Lazy Suspense sections replace
+ * 400px placeholders with real content AFTER init — scrollHeight grows but
+ * Lenis never recalculates. Each lazy section calls useLenisResize() on mount
+ * to trigger lenis.resize() and correct the cached height.
  */
 export function useLenis() {
+  const lenisRef = useLenisContext();
+
   useEffect(() => {
     const lenis = new Lenis({
       lerp: 0.12,
@@ -31,6 +24,9 @@ export function useLenis() {
       touchMultiplier: 1.5,
       infinite: false,
     });
+
+    // Store instance in context ref so lazy sections can call resize()
+    if (lenisRef) lenisRef.current = lenis;
 
     let innerRafId = null;
 
@@ -42,10 +38,9 @@ export function useLenis() {
     innerRafId = requestAnimationFrame(raf);
 
     return () => {
-      // Cancel both the current scheduled frame AND the lenis instance.
-      // Without cancelling innerRafId the loop keeps running after unmount.
       if (innerRafId) cancelAnimationFrame(innerRafId);
       lenis.destroy();
+      if (lenisRef) lenisRef.current = null;
     };
   }, []);
 }

@@ -11,6 +11,7 @@ import { HOME_SERVICES } from "@/utils/constants";
 import { useSanity } from "@/lib/useSanity";
 import { useSiteSettings } from "@/lib/useSiteSettings";
 import { SERVICES_QUERY } from "@/lib/sanityQueries";
+import { useLenisResize } from "@/hooks/useLenisResize";
 
 const ICON_MAP = {
   Star, BookOpen, Heart,
@@ -99,6 +100,8 @@ function ServiceCard({ s, i }) {
 }
 
 export function ServicesSection() {
+  useLenisResize();
+
   const { data: allServices, loading } = useSanity(SERVICES_QUERY, null);
   const { settings } = useSiteSettings();
   const [activeTab, setActiveTab] = useState('all');
@@ -115,35 +118,22 @@ export function ServicesSection() {
     : services.filter(s => s.sessionTier === activeTab);
 
   return (
-    /*
-     * overflow-hidden REMOVED from section root.
-     * Previously this clipped the Lenis scroll height calculation —
-     * Lenis reported a shorter document height than what was rendered,
-     * causing scroll to stop early. Orb decorations now clipped inside
-     * their own absolute wrapper below.
-     */
     <section id="services" className="py-32 relative bg-cosmic-deep">
-      {/* Orb decorations — overflow-hidden scoped HERE only, not on section */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden>
         <div className="absolute inset-0 section-glow-services" />
         <div className="absolute top-0 right-0 w-[50%] h-[60%] bg-[radial-gradient(ellipse_at_top_right,oklch(0.55_0.08_310_/_0.15),transparent_65%)] blur-3xl" />
         <div className="absolute bottom-0 left-0 w-[40%] h-[50%] bg-[radial-gradient(ellipse_at_bottom_left,oklch(0.82_0.12_85_/_0.08),transparent_65%)] blur-3xl" />
       </div>
       <div className="cosmic-stars absolute inset-0 pointer-events-none" aria-hidden />
-
       <div className="max-w-7xl mx-auto px-6 lg:px-10 relative z-10">
-        {/* Header */}
         <Reveal className="text-center max-w-2xl mx-auto">
           <span className="text-xs uppercase tracking-[0.3em] text-gold">{sectionLabel}</span>
           <h2 className="mt-4 text-4xl md:text-5xl">{sectionHeading}</h2>
           {sectionSubtitle && <p className="mt-5 text-muted-foreground">{sectionSubtitle}</p>}
         </Reveal>
-
         <Reveal className="mt-10">
           <OfferTimer />
         </Reveal>
-
-        {/* Filter tabs — only show when tiers exist */}
         {!loading && hasTiers && (
           <Reveal className="mt-10">
             <div className="flex flex-wrap justify-center gap-2">
@@ -171,15 +161,11 @@ export function ServicesSection() {
             </div>
           </Reveal>
         )}
-
-        {/* Loading */}
         {loading && (
           <div className="flex justify-center items-center py-20">
             <Loader2 className="w-6 h-6 text-gold animate-spin" />
           </div>
         )}
-
-        {/* Cards */}
         {!loading && (
           <AnimatePresence mode="wait">
             <motion.div
@@ -201,7 +187,6 @@ export function ServicesSection() {
             </motion.div>
           </AnimatePresence>
         )}
-
         <Reveal className="mt-12 text-center">
           <Link
             to="/services"

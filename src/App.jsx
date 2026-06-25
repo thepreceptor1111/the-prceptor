@@ -10,8 +10,8 @@ import AdminPortal from "./components/site/AdminPortal";
 import { SITE } from "./content/seo";
 import { useLenis } from "./hooks/useLenis";
 import { SiteSettingsProvider } from "./lib/SiteSettingsContext";
+import { LenisProvider } from "./context/LenisContext";
 
-// Home is imported eagerly — entry page, must never flash on first visit
 import Home from "./routes/index";
 
 const About        = lazy(() => import("./routes/about"));
@@ -26,7 +26,6 @@ const Terms        = lazy(() => import("./routes/terms"));
 const NotFound     = lazy(() => import("./routes/not-found"));
 const Admin        = lazy(() => import("./routes/admin"));
 
-// Pure CSS loader — no framer-motion in the critical path
 function CosmicLoader() {
   return (
     <div
@@ -100,7 +99,8 @@ const orgSchema = {
   paymentAccepted: "Online payment",
 };
 
-export default function App() {
+// Inner component so useLenis can access LenisContext
+function AppInner() {
   const location = useLocation();
   const isAdmin  = location.pathname.startsWith("/command-center");
   const isHome   = location.pathname === "/";
@@ -126,13 +126,6 @@ export default function App() {
           {!isAdmin && <AdminPortal />}
           {!isAdmin && <Nav />}
 
-          {/*
-            pt-20 = nav height offset for all pages EXCEPT:
-            - /command-center (admin, no nav)
-            - / (home — HeroSection is full-bleed behind nav, manages its
-              own top padding internally with pt-28 sm:pt-32 lg:py-40)
-            Without this fix the hero was pushed down by pt-20 + pt-28 = ~11rem.
-          */}
           <main className={isAdmin ? "flex-1" : isHome ? "flex-1" : "flex-1 pt-20"}>
             <Suspense fallback={<CosmicLoader />}>
               <Routes>
@@ -156,5 +149,13 @@ export default function App() {
         </div>
       </SiteSettingsProvider>
     </ErrorBoundary>
+  );
+}
+
+export default function App() {
+  return (
+    <LenisProvider>
+      <AppInner />
+    </LenisProvider>
   );
 }

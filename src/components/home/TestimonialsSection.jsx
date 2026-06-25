@@ -8,6 +8,7 @@ import { useSanity } from "@/lib/useSanity";
 import { useSiteSettings } from "@/lib/useSiteSettings";
 import { TESTIMONIALS_QUERY } from "@/lib/sanityQueries";
 import { sanityImage, preloadImage } from "@/lib/sanityImage";
+import { useLenisResize } from "@/hooks/useLenisResize";
 
 const SLIDE_INTERVAL = 6000;
 
@@ -30,6 +31,8 @@ const CARD_HEIGHT = 520;
 const STRIP_H    = 72;
 
 export function TestimonialsSection() {
+  useLenisResize();
+
   const { data: cmsTestimonials } = useSanity(TESTIMONIALS_QUERY, null);
   const { settings }              = useSiteSettings();
 
@@ -94,13 +97,11 @@ export function TestimonialsSection() {
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] aspect-square rounded-full bg-[radial-gradient(circle,oklch(0.55_0.08_310_/_0.12),transparent_65%)] blur-3xl" />
       </div>
-
       <div className="max-w-5xl mx-auto px-6 lg:px-10 text-center relative z-10">
         <Reveal>
           <span className="text-xs uppercase tracking-[0.3em] text-gold">{sectionLabel}</span>
           <h2 className="mt-4 text-4xl md:text-5xl">{sectionHeading}</h2>
         </Reveal>
-
         <Reveal delay={0.1}>
           <AnimatePresence mode="wait">
             <motion.div
@@ -109,26 +110,11 @@ export function TestimonialsSection() {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.97 }}
               transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-              /*
-               * overflow-hidden REMOVED from this glass-card wrapper.
-               * backdrop-filter + overflow-hidden on the same element forces
-               * GPU compositing layer clip recalculation on every scroll frame.
-               * The rounded clip is preserved via rounded-3xl alone.
-               * Inner content is clipped by its own absolute-positioned wrapper.
-               */
               className="mt-14 glass-card rounded-3xl relative"
               style={{ height: `${CARD_HEIGHT}px` }}
             >
               {hasImage ? (
                 <div style={{ position: "relative", width: "100%", height: "100%", borderRadius: "inherit", overflow: "hidden" }}>
-
-                  {/*
-                   * data-lenis-prevent: tells Lenis to explicitly yield scroll
-                   * events to this inner container when the pointer is over it.
-                   * Without this, wheel/touch events on the screenshot image
-                   * were stolen from Lenis and bled into the FAQ section below.
-                   * overflowX removed — was a redundant second clip layer.
-                   */}
                   <div
                     data-lenis-prevent
                     style={{
@@ -150,23 +136,17 @@ export function TestimonialsSection() {
                       />
                     </div>
                   </div>
-
-                  {/* Top fade */}
                   <div style={{
                     position: "absolute", top: 0, left: 0, right: 0, height: "60px",
                     background: "linear-gradient(to bottom, rgba(0,0,0,0.35), transparent)",
                     pointerEvents: "none", zIndex: 1,
                   }} />
-
-                  {/* Bottom gradient */}
                   <div style={{
                     position: "absolute", left: 0, right: 0, bottom: 0,
                     height: `${STRIP_H + 60}px`,
                     background: "linear-gradient(to bottom, transparent, rgba(0,0,0,0.92) 55%)",
                     pointerEvents: "none", zIndex: 1,
                   }} />
-
-                  {/* Name + controls strip */}
                   <div style={{
                     position: "absolute", bottom: 0, left: 0, right: 0,
                     height: `${STRIP_H}px`,
@@ -202,7 +182,6 @@ export function TestimonialsSection() {
                     </div>
                   </div>
                 </div>
-
               ) : (
                 <div className="p-12 relative z-10 h-full flex flex-col justify-center">
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,oklch(0.82_0.12_85_/_0.07),transparent_40%)] pointer-events-none" />
@@ -230,7 +209,6 @@ export function TestimonialsSection() {
               )}
             </motion.div>
           </AnimatePresence>
-
           <div className="mt-8 flex justify-center">
             <Link to="/testimonials"
               className="inline-flex items-center gap-2 text-gold font-medium hover:text-foreground transition">
