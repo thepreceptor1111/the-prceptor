@@ -1,6 +1,6 @@
 import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, Star, Quote } from "lucide-react";
 import { Reveal } from "@/components/site/Reveal";
 import { TESTIMONIALS } from "@/utils/constants";
@@ -57,17 +57,58 @@ function Dots({ total, current, onDot }) {
   );
 }
 
+/**
+ * useScrollPassthrough — attaches a wheel listener to the given ref element.
+ * When the inner scroll zone has reached its top or bottom boundary,
+ * the wheel delta is forwarded to window so Lenis / native page scroll
+ * continues uninterrupted. overscroll-behavior:contain prevents the
+ * browser's built-in scroll-chaining as a CSS-level backup.
+ */
+function useScrollPassthrough(ref) {
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    function onWheel(e) {
+      const atTop    = el.scrollTop === 0;
+      const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1;
+
+      // If scrolling up at top OR scrolling down at bottom → pass to page
+      if ((e.deltaY < 0 && atTop) || (e.deltaY > 0 && atBottom)) {
+        e.preventDefault();
+        window.dispatchEvent(new WheelEvent("wheel", {
+          deltaY:    e.deltaY,
+          deltaMode: e.deltaMode,
+          bubbles:   true,
+          cancelable: true,
+        }));
+      }
+    }
+
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, [ref]);
+}
+
 function ScreenshotCard({ r, cardH, stripH, isActive = false, showControls = false, onPrev, onNext, total, current, onDot }) {
+  const scrollRef = useRef(null);
+  useScrollPassthrough(scrollRef);
+
   return (
     <div className="glass-card rounded-3xl overflow-hidden relative" style={{ height: `${cardH}px` }}>
 
       {/* Scrollable image zone */}
-      <div style={{
-        position: "absolute", top: 0, left: 0, right: 0,
-        bottom: `${stripH}px`,
-        overflowY: "auto", overflowX: "hidden",
-        scrollbarWidth: "none",
-      }}>
+      <div
+        ref={scrollRef}
+        style={{
+          position: "absolute", top: 0, left: 0, right: 0,
+          bottom: `${stripH}px`,
+          overflowY: "auto", overflowX: "hidden",
+          scrollbarWidth: "none",
+          // CSS-level scroll-chaining prevention — backup for touch/trackpad
+          overscrollBehavior: "contain",
+        }}
+      >
         <style>{`.ss-scroll::-webkit-scrollbar{display:none}`}</style>
         <div className="ss-scroll" style={{ overflowY: "auto", scrollbarWidth: "none" }}>
           <img
