@@ -36,7 +36,14 @@ export function FaqSection() {
         <div className="mt-12 space-y-3">
           {faqs.map((faq, i) => (
             <Reveal key={i} delay={i * 0.04}>
-              <div className="glass-card rounded-2xl overflow-hidden">
+              {/*
+                overflow-hidden REMOVED from glass-card wrapper.
+                backdrop-filter + overflow-hidden on the same element forces
+                the browser to recalculate the compositing layer clip on every
+                scroll frame — 5 cards × GPU stall = scroll drag through FAQ.
+                The border-radius clip is handled by the rounded-2xl class alone.
+              */}
+              <div className="glass-card rounded-2xl">
                 <button
                   onClick={() => setOpen(open === i ? null : i)}
                   className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left"
