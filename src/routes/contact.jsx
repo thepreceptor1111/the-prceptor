@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import { Mail, MapPin, Send, Instagram, Clock, Globe2, ShieldCheck, Sparkles, ChevronDown, ArrowRight } from "lucide-react";
 import { Reveal } from "@/components/site/Reveal";
+import { SelectField } from "@/components/site/SelectField";
 import { siteConfig } from "@/content/site";
 import contactHeroImg from "@/assets/contact-hero.png";
 
@@ -73,6 +74,10 @@ function ContactPage() {
 
   const update = (k) => (e) => {
     setData((prev) => ({ ...prev, [k]: e.target.value }));
+  };
+
+  const updateDirect = (k) => (val) => {
+    setData((prev) => ({ ...prev, [k]: val }));
   };
 
   const submit = (e) => {
@@ -231,15 +236,18 @@ function ContactPage() {
                 <Field label="Country (optional)" error={errors.country} className="sm:col-span-2">
                   <input value={data.country} onChange={update("country")} className={inputCls} placeholder="United States" />
                 </Field>
-                <Field label="Consultation Type" error={errors.consultationType} className="sm:col-span-2">
-                  <div className="relative">
-                    <select value={data.consultationType} onChange={update("consultationType")} className={`${inputCls} appearance-none pr-10`}>
-                      <option value="">Select a focus (optional)</option>
-                      {consultationTypes.map((t) => <option key={t} value={t}>{t}</option>)}
-                    </select>
-                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gold pointer-events-none" />
-                  </div>
-                </Field>
+
+                {/* ── Custom styled dropdown — replaces native <select> ── */}
+                <SelectField
+                  label="Consultation Type"
+                  placeholder="Select a focus (optional)"
+                  value={data.consultationType}
+                  onChange={updateDirect("consultationType")}
+                  options={consultationTypes}
+                  error={errors.consultationType}
+                  className="sm:col-span-2"
+                />
+
                 <Field label="Subject" error={errors.subject} className="sm:col-span-2">
                   <input value={data.subject} onChange={update("subject")} className={inputCls} placeholder="What can we help you with?" />
                 </Field>
