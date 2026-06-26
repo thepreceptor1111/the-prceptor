@@ -12,6 +12,9 @@ export const LenisContext = createContext(null);
 export function LenisProvider({ children }) {
   const lenisRef = useRef(null);
 
+  // DIAGNOSTIC — confirms when the context ref object is created
+  console.log('[LenisContext] context ref created — lenisRef.current is:', lenisRef.current);
+
   return (
     <LenisContext.Provider value={lenisRef}>
       {children}
