@@ -19,45 +19,53 @@ export default defineConfig({
     },
   },
   build: {
-    // FIX 5: Target modern browsers — stops Rollup emitting Object.create
-    // polyfills and other legacy transforms that bloat the Sanity vendor
-    // chunk by ~10 KB and add ~150 ms to LCP.
+    // Target modern browsers — stops Rollup emitting legacy polyfills.
     target: "es2020",
-    // Using Vite's default esbuild minifier (built-in, no extra install needed).
-    // drop_console strips all console.* calls from the production bundle.
-    // NOTE: terser was previously set here but is NOT installed as a dep;
-    // esbuild is faster and sufficient for this project's bundle sizes.
+    // esbuild minifier — faster than terser, no extra install needed.
     minify: "esbuild",
     esbuildOptions: {
       drop: ["console", "debugger"],
     },
+    // FIX 7: Increase warning threshold now that micro-chunks are consolidated.
+    chunkSizeWarningLimit: 600,
     rollupOptions: {
       output: {
-        // Split the single monolithic bundle into focused vendor chunks.
-        // Each chunk is independently cacheable — updating app code does
-        // NOT bust the vendor-react or vendor-motion cache entries.
         manualChunks(id) {
-          // React core — smallest, most stable, cache forever
+          // ── Vendor: React core — smallest, most stable, cache forever ──────
           if (id.includes('node_modules/react/') ||
               id.includes('node_modules/react-dom/') ||
               id.includes('node_modules/react-router-dom/') ||
               id.includes('node_modules/scheduler/')) {
             return 'vendor-react';
           }
-          // Framer Motion — largest single dependency (~180 KB gz)
+
+          // ── Vendor: Framer Motion — largest single dep, lazy-loaded ────────
           if (id.includes('node_modules/framer-motion/')) {
             return 'vendor-motion';
           }
-          // Sanity — CMS client + image URL builder
+
+          // ── Vendor: Sanity — CMS client + image URL builder ─────────────
           if (id.includes('node_modules/@sanity/') ||
               id.includes('node_modules/sanity/') ||
               id.includes('node_modules/@portabletext/')) {
             return 'vendor-sanity';
           }
-          // UI helpers — icons + helmet
+
+          // ── Vendor: UI helpers — icons + helmet ─────────────────────────
           if (id.includes('node_modules/lucide-react/') ||
               id.includes('node_modules/react-helmet-async/')) {
             return 'vendor-ui';
+          }
+
+          // FIX 7: Consolidate all small app micro-chunks (< 5 KB) that were
+          // previously emitted as individual files (Reveal.js, useLenisResize.js,
+          // sanityImage.js, constants.js etc.) — 9+ tiny round-trips → 1.
+          // Any src/ file that isn't a route-level chunk lands here.
+          if (id.includes('/src/') &&
+              !id.includes('/src/routes/') &&
+              !id.includes('/src/components/home/') &&
+              !id.includes('/src/components/site/')) {
+            return 'app-utils';
           }
         },
       },

@@ -4,59 +4,28 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- ── Hero image preload — tells browser to fetch it before JS parses ── -->
+    <!-- ── FIX 1: Hero LCP image — preload + fetchpriority=high ──────────── -->
+    <!-- fetchpriority="high" on the <link> tells the preload scanner to treat
+         this as the most important resource before the parser even reaches <body>.
+         This alone can shave 200-400ms off LCP on mid-range mobile. -->
     <link rel="preload" as="image" href="/hero-section.webp" fetchpriority="high" type="image/webp">
 
-    <!-- ── FIX 4: preconnect to ALL external origins used on first paint ── -->
-    <!-- Sanity CMS API — eliminates hidden preflight RTT on first CMS fetch -->
+    <!-- ── FIX 2: Preconnect to all external origins used at first paint ── -->
+    <!-- Sanity CMS API — eliminates hidden DNS + TCP cost on first CMS fetch -->
     <link rel="dns-prefetch"  href="https://cdn.sanity.io" />
-    <link rel="preconnect"   href="https://cdn.sanity.io"        crossorigin />
+    <link rel="preconnect"   href="https://cdn.sanity.io"           crossorigin />
     <link rel="preconnect"   href="https://9w7fo0ix.api.sanity.io" crossorigin />
-    <!-- Google Fonts — preconnect was already present, kept as-is -->
+
+    <!-- ── FIX 3: Self-host fonts via @fontsource ──────────────────────── -->
+    <!-- Google Fonts adds 78ms RTT (fonts.gstatic.com) + 2 extra TCP connections.
+         @fontsource packages are served from your own CDN (Vercel edge) — zero
+         external RTT, no CORS preflight, no render-blocking stylesheet.
+         SETUP: run  npm install @fontsource/inter @fontsource/fraunces
+         Then import in src/styles.css (see that file for the @import lines).
+         The block below is the FALLBACK for no-JS; remove once npm pkgs added. -->
+    <!-- Google Fonts fallback (non-blocking) — remove after @fontsource setup -->
     <link rel="preconnect"   href="https://fonts.googleapis.com" />
     <link rel="preconnect"   href="https://fonts.gstatic.com"    crossorigin />
-
-    <!-- ── Favicon ─────────────────────────────────────────────────── -->
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="google-site-verification" content="-ppSJQ86nfQyg4_noRGe1XvQ9elyoSM_O1A-0pLF6FU" />
-
-    <!-- ── Primary Meta ─────────────────────────────────────────── -->
-    <title>The Preceptor — Vedic Astrology Readings &amp; Spiritual Consultations Online</title>
-    <meta
-      name="description"
-      content="Book a private Vedic astrology consultation online with The Preceptor — 7 years of experience, Psychology honors graduate. Birth chart readings, career &amp; relationship clarity for seekers across the USA."
-    />
-    <meta name="robots" content="index, follow" />
-    <!-- FIX 7: aligned to www canonical (matches seo.js SITE.domain) -->
-    <link rel="canonical" href="https://www.thepreceptorglobal.com/" />
-
-    <!-- ── Theme color (PWA + browser chrome) ─────────────────────── -->
-    <meta name="theme-color" content="#0a0818" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-
-    <!-- ── Open Graph ────────────────────────────────────────────── -->
-    <meta property="og:type"        content="website" />
-    <meta property="og:url"         content="https://www.thepreceptorglobal.com/" />
-    <meta property="og:site_name"   content="The Preceptor" />
-    <meta property="og:locale"      content="en_US" />
-    <meta property="og:title"       content="The Preceptor — Vedic Astrology Readings &amp; Spiritual Consultations Online" />
-    <meta property="og:description" content="Book a private Vedic astrology consultation online with The Preceptor — 7 years of experience, Psychology honors graduate. Birth chart readings, career &amp; relationship clarity for seekers across the USA." />
-    <meta property="og:image"        content="https://www.thepreceptorglobal.com/og-image.webp" />
-    <meta property="og:image:width"  content="1200" />
-    <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt"    content="The Preceptor — For those who seek clarity." />
-    <meta property="og:image:type"   content="image/webp" />
-
-    <!-- ── Twitter / X Card ────────────────────────────────────────── -->
-    <meta name="twitter:card"        content="summary_large_image" />
-    <meta name="twitter:site"        content="@thepreceptorglobal" />
-    <meta name="twitter:title"       content="The Preceptor — Vedic Astrology Readings &amp; Spiritual Consultations Online" />
-    <meta name="twitter:description" content="Book a private Vedic astrology consultation online with The Preceptor — 7 years of experience, Psychology honors graduate. Birth chart readings, career &amp; relationship clarity for seekers across the USA." />
-    <meta name="twitter:image"       content="https://www.thepreceptorglobal.com/og-image.webp" />
-    <meta name="twitter:image:alt"   content="The Preceptor — For those who seek clarity." />
-
-    <!-- ── Google Fonts — preconnect + non-blocking load ────────────── -->
     <link
       href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,400&family=Inter:wght@200;300;400;500;600&display=swap"
       rel="stylesheet"
@@ -69,6 +38,45 @@
         rel="stylesheet"
       />
     </noscript>
+
+    <!-- ── Favicon ──────────────────────────────────────────────────── -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="google-site-verification" content="-ppSJQ86nfQyg4_noRGe1XvQ9elyoSM_O1A-0pLF6FU" />
+
+    <!-- ── Primary Meta ──────────────────────────────────────────────── -->
+    <title>The Preceptor — Vedic Astrology Readings &amp; Spiritual Consultations Online</title>
+    <meta
+      name="description"
+      content="Book a private Vedic astrology consultation online with The Preceptor — 7 years of experience, Psychology honors graduate. Birth chart readings, career &amp; relationship clarity for seekers across the USA."
+    />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://www.thepreceptorglobal.com/" />
+
+    <!-- ── Theme color (PWA + browser chrome) ────────────────────────── -->
+    <meta name="theme-color" content="#0a0818" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    <!-- ── Open Graph ──────────────────────────────────────────────── -->
+    <meta property="og:type"        content="website" />
+    <meta property="og:url"         content="https://www.thepreceptorglobal.com/" />
+    <meta property="og:site_name"   content="The Preceptor" />
+    <meta property="og:locale"      content="en_US" />
+    <meta property="og:title"       content="The Preceptor — Vedic Astrology Readings &amp; Spiritual Consultations Online" />
+    <meta property="og:description" content="Book a private Vedic astrology consultation online with The Preceptor — 7 years of experience, Psychology honors graduate. Birth chart readings, career &amp; relationship clarity for seekers across the USA." />
+    <meta property="og:image"        content="https://www.thepreceptorglobal.com/og-image.webp" />
+    <meta property="og:image:width"  content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt"    content="The Preceptor — For those who seek clarity." />
+    <meta property="og:image:type"   content="image/webp" />
+
+    <!-- ── Twitter / X Card ──────────────────────────────────────────── -->
+    <meta name="twitter:card"        content="summary_large_image" />
+    <meta name="twitter:site"        content="@thepreceptorglobal" />
+    <meta name="twitter:title"       content="The Preceptor — Vedic Astrology Readings &amp; Spiritual Consultations Online" />
+    <meta name="twitter:description" content="Book a private Vedic astrology consultation online with The Preceptor — 7 years of experience, Psychology honors graduate. Birth chart readings, career &amp; relationship clarity for seekers across the USA." />
+    <meta name="twitter:image"       content="https://www.thepreceptorglobal.com/og-image.webp" />
+    <meta name="twitter:image:alt"   content="The Preceptor — For those who seek clarity." />
 
     <style>
       *,*::before,*::after{box-sizing:border-box}
