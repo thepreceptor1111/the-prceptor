@@ -121,6 +121,23 @@ export function SelectField({
     }
   }
 
+  // Prevent the page from scrolling when the mouse wheel is used
+  // inside the options list. Must be a non-passive listener so
+  // preventDefault() is honoured by the browser.
+  function onListWheel(e) {
+    const el = listRef.current;
+    if (!el) return;
+    const atTop    = el.scrollTop === 0;
+    const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1;
+    // Only block propagation when there is still room to scroll inside the list
+    if (!(atTop && e.deltaY < 0) && !(atBottom && e.deltaY > 0)) {
+      e.stopPropagation();
+    }
+    // Always prevent default so the page never scrolls while pointer is over list
+    e.preventDefault();
+    el.scrollTop += e.deltaY;
+  }
+
   const displayValue = value || "";
 
   return (
@@ -174,12 +191,15 @@ export function SelectField({
           </div>
         </button>
 
-        {/* ── Dropdown panel ── */}
+        {/* ── Dropdown panel ──
+              NOTE: NO overflow-hidden on this wrapper — it was clipping
+              the inner scrollable list and causing page scroll instead.
+        */}
         {open && (
           <div
             role="listbox"
             aria-label={label || placeholder}
-            className="absolute z-50 mt-2 w-full rounded-2xl overflow-hidden flex flex-col"
+            className="absolute z-50 mt-2 w-full rounded-2xl flex flex-col"
             style={{
               background:
                 "linear-gradient(160deg, oklch(0.22 0.030 270 / 0.97), oklch(0.16 0.025 270 / 0.97))",
@@ -188,10 +208,14 @@ export function SelectField({
               border: "1px solid oklch(1 0 0 / 0.09)",
               boxShadow:
                 "0 1px 0 oklch(1 0 0 / 0.06) inset, 0 24px 64px -12px oklch(0 0 0 / 0.60)",
+              // Clip children to rounded corners without using overflow-hidden
+              // which would interfere with internal scrolling
+              borderRadius: "1rem",
+              overflow: "clip",
             }}
           >
             {/* ── Search input ── */}
-            <div className="px-3 pt-3 pb-2 border-b border-white/[0.06]">
+            <div className="px-3 pt-3 pb-2 border-b border-white/[0.06] shrink-0">
               <div className="flex items-center gap-2 bg-white/[0.05] border border-white/[0.08] rounded-xl px-3 py-2">
                 <Search className="w-3.5 h-3.5 text-gold/60 shrink-0" />
                 <input
@@ -217,12 +241,17 @@ export function SelectField({
               </div>
             </div>
 
-            {/* ── Options list — scrollable ── */}
+            {/* ── Options list — scrollable, isolated from page scroll ── */}
             <div
               ref={listRef}
+              onWheel={onListWheel}
               style={{
                 maxHeight: "220px",
                 overflowY: "auto",
+                // iOS momentum scrolling
+                WebkitOverflowScrolling: "touch",
+                // Prevent scroll chain to page on touch devices
+                overscrollBehavior: "contain",
                 scrollbarWidth: "thin",
                 scrollbarColor: "oklch(0.82 0.12 85 / 0.40) transparent",
               }}
