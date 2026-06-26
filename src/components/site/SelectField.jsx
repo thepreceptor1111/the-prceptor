@@ -1,6 +1,18 @@
 /**
  * SelectField — custom styled dropdown with type-to-filter search.
- * DEBUG BUILD — console logs active for scroll diagnosis.
+ *
+ * Props:
+ *   value        {string}          — controlled value
+ *   onChange     {(val) => void}   — called with the selected string
+ *   options      {string[]}        — list of option strings
+ *   placeholder  {string}          — shown when value is ""
+ *   label        {string}          — field label above the trigger
+ *   error        {string}          — inline validation message
+ *   className    {string}          — extra class on the outer wrapper
+ *   id           {string}          — for label htmlFor
+ *
+ * Keyboard: Arrow Up/Down navigate, Enter selects, Escape clears search
+ * then closes, Click outside closes.
  */
 
 import { useEffect, useRef, useState } from "react";
@@ -27,47 +39,7 @@ export function SelectField({
     ? options.filter((o) => o.toLowerCase().includes(query.toLowerCase()))
     : options;
 
-  // ── DEBUG: native wheel listener to check if passive is the issue ──
-  useEffect(() => {
-    const el = listRef.current;
-    if (!el || !open) return;
-
-    function nativeWheelHandler(e) {
-      const atTop    = el.scrollTop === 0;
-      const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1;
-
-      console.log("[SelectField] ── wheel event ──");
-      console.log("  scrollTop before:", el.scrollTop);
-      console.log("  deltaY:", e.deltaY);
-      console.log("  atTop:", atTop, " | atBottom:", atBottom);
-      console.log("  scrollHeight:", el.scrollHeight, " clientHeight:", el.clientHeight);
-      console.log("  canScrollInternally:", el.scrollHeight > el.clientHeight);
-
-      // Try calling preventDefault — if this throws a console warning
-      // 'Unable to preventDefault inside passive event listener' then
-      // the passive listener theory is CONFIRMED.
-      try {
-        e.preventDefault();
-        console.log("  preventDefault: ✅ SUCCEEDED (non-passive)");
-      } catch (err) {
-        console.warn("  preventDefault: ❌ FAILED —", err.message);
-      }
-
-      e.stopPropagation();
-      el.scrollTop += e.deltaY;
-      console.log("  scrollTop after:", el.scrollTop);
-    }
-
-    // Attach as NON-passive so preventDefault works
-    el.addEventListener("wheel", nativeWheelHandler, { passive: false });
-    console.log("[SelectField] Native wheel listener attached (passive: false)");
-
-    return () => {
-      el.removeEventListener("wheel", nativeWheelHandler);
-      console.log("[SelectField] Native wheel listener removed");
-    };
-  }, [open]);
-
+  // Auto-focus search input when panel opens
   useEffect(() => {
     if (open) {
       setFocused(value ? Math.max(filtered.indexOf(value), 0) : 0);
@@ -77,13 +49,16 @@ export function SelectField({
     }
   }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Reset focused index when query changes
   useEffect(() => { setFocused(0); }, [query]);
 
+  // Scroll focused item into view
   useEffect(() => {
     if (!open || focused < 0) return;
     listRef.current?.children?.[focused]?.scrollIntoView({ block: "nearest" });
   }, [focused, open]);
 
+  // Close on outside click
   useEffect(() => {
     if (!open) return;
     function handleClick(e) {
@@ -93,12 +68,30 @@ export function SelectField({
     return () => document.removeEventListener("mousedown", handleClick);
   }, [open]);
 
+  // Native non-passive wheel listener — fallback for browsers/setups
+  // where Lenis is not present. data-lenis-prevent handles Lenis itself.
+  useEffect(() => {
+    const el = listRef.current;
+    if (!el || !open) return;
+    function handleWheel(e) {
+      const atTop    = el.scrollTop === 0;
+      const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1;
+      if (!(atTop && e.deltaY < 0) && !(atBottom && e.deltaY > 0)) {
+        e.stopPropagation();
+      }
+      e.preventDefault();
+      el.scrollTop += e.deltaY;
+    }
+    el.addEventListener("wheel", handleWheel, { passive: false });
+    return () => el.removeEventListener("wheel", handleWheel);
+  }, [open]);
+
   function openPanel() {
     setOpen(true);
     setFocused(value ? Math.max(options.indexOf(value), 0) : 0);
   }
   function closePanel() { setOpen(false); setQuery(""); }
-  function select(opt) { onChange(opt); closePanel(); }
+  function select(opt)  { onChange(opt); closePanel(); }
   function clearSelection(e) { e.stopPropagation(); onChange(""); }
 
   function onTriggerKeyDown(e) {
@@ -119,42 +112,56 @@ export function SelectField({
   return (
     <div className={`block ${className}`}>
       {label && (
-        <span id={id ? `${id}-label` : undefined}
-          className="block text-[0.7rem] uppercase tracking-[0.22em] text-muted-foreground mb-2">
+        <span
+          id={id ? `${id}-label` : undefined}
+          className="block text-[0.7rem] uppercase tracking-[0.22em] text-muted-foreground mb-2"
+        >
           {label}
         </span>
       )}
 
       <div ref={containerRef} className="relative" onKeyDown={onTriggerKeyDown}>
-        {/* Trigger */}
+        {/* ── Trigger ── */}
         <button
-          type="button" role="combobox"
-          aria-haspopup="listbox" aria-expanded={open}
+          type="button"
+          role="combobox"
+          aria-haspopup="listbox"
+          aria-expanded={open}
           aria-labelledby={id ? `${id}-label` : undefined}
           onClick={openPanel}
           className={[
             "w-full flex items-center justify-between gap-3",
             "bg-secondary/40 border rounded-xl px-4 py-3.5 text-sm text-left transition-all duration-300",
-            open ? "border-gold bg-secondary/60 ring-2 ring-gold/20" : "border-border hover:border-gold/50 hover:bg-secondary/50",
+            open
+              ? "border-gold bg-secondary/60 ring-2 ring-gold/20"
+              : "border-border hover:border-gold/50 hover:bg-secondary/50",
             displayValue ? "text-foreground" : "text-muted-foreground/60",
           ].join(" ")}
         >
           <span className="truncate">{displayValue || placeholder}</span>
           <div className="flex items-center gap-1.5 shrink-0">
             {value && (
-              <span role="button" tabIndex={-1} aria-label="Clear selection" onClick={clearSelection}
-                className="w-4 h-4 rounded-full flex items-center justify-center text-muted-foreground hover:text-gold transition-colors">
+              <span
+                role="button" tabIndex={-1} aria-label="Clear selection"
+                onClick={clearSelection}
+                className="w-4 h-4 rounded-full flex items-center justify-center text-muted-foreground hover:text-gold transition-colors"
+              >
                 <X className="w-3 h-3" />
               </span>
             )}
-            <ChevronDown className={`w-4 h-4 text-gold transition-transform duration-300 ${open ? "rotate-180" : ""}`} />
+            <ChevronDown
+              className={`w-4 h-4 text-gold transition-transform duration-300 ${
+                open ? "rotate-180" : ""
+              }`}
+            />
           </div>
         </button>
 
-        {/* Dropdown panel */}
+        {/* ── Dropdown panel ── */}
         {open && (
           <div
-            role="listbox" aria-label={label || placeholder}
+            role="listbox"
+            aria-label={label || placeholder}
             className="absolute z-50 mt-2 w-full rounded-2xl flex flex-col"
             style={{
               background: "linear-gradient(160deg, oklch(0.22 0.030 270 / 0.97), oklch(0.16 0.025 270 / 0.97))",
@@ -166,12 +173,14 @@ export function SelectField({
               overflow: "clip",
             }}
           >
-            {/* Search input */}
+            {/* ── Search input ── */}
             <div className="px-3 pt-3 pb-2 border-b border-white/[0.06] shrink-0">
               <div className="flex items-center gap-2 bg-white/[0.05] border border-white/[0.08] rounded-xl px-3 py-2">
                 <Search className="w-3.5 h-3.5 text-gold/60 shrink-0" />
                 <input
-                  ref={searchRef} type="text" value={query}
+                  ref={searchRef}
+                  type="text"
+                  value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   onKeyDown={onSearchKeyDown}
                   placeholder="Type to search…"
@@ -179,17 +188,25 @@ export function SelectField({
                   aria-label="Search options"
                 />
                 {query && (
-                  <button type="button" onClick={() => setQuery("")}
-                    className="text-muted-foreground hover:text-gold transition-colors" aria-label="Clear search">
+                  <button
+                    type="button" onClick={() => setQuery("")}
+                    className="text-muted-foreground hover:text-gold transition-colors"
+                    aria-label="Clear search"
+                  >
                     <X className="w-3.5 h-3.5" />
                   </button>
                 )}
               </div>
             </div>
 
-            {/* Options list — native wheel listener handles scroll isolation */}
+            {/* ── Options list
+                  data-lenis-prevent → tells Lenis smooth scroll to ignore
+                  wheel events that originate inside this element, preventing
+                  the page from scrolling while the user scrolls the list.
+            */}
             <div
               ref={listRef}
+              data-lenis-prevent
               style={{
                 maxHeight: "220px",
                 overflowY: "auto",
@@ -209,7 +226,8 @@ export function SelectField({
                 const isFocused = i === focused;
                 return (
                   <button
-                    key={opt} type="button" role="option" aria-selected={isActive}
+                    key={opt}
+                    type="button" role="option" aria-selected={isActive}
                     onMouseEnter={() => setFocused(i)}
                     onClick={() => select(opt)}
                     className={[
