@@ -1,16 +1,47 @@
 import SEO from "@/components/site/SEO";
 import { PAGE_SEO } from "@/content/seo";
 import { motion } from "framer-motion";
-import { Sparkles, GraduationCap, Bell } from "lucide-react";
 import { useState } from "react";
 import { Reveal } from "@/components/site/Reveal";
+
+// ── Inline SVG icons — no lucide-react ───────────────────────────────────
+function SparklesIcon({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      className={className} aria-hidden="true">
+      <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z" />
+      <path d="M5 3v4" /><path d="M19 17v4" /><path d="M3 5h4" /><path d="M17 19h4" />
+    </svg>
+  );
+}
+function GraduationCapIcon({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      className={className} aria-hidden="true">
+      <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+      <path d="M6 12v5c3 3 9 3 12 0v-5" />
+    </svg>
+  );
+}
+function BellIcon({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      className={className} aria-hidden="true">
+      <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+      <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+    </svg>
+  );
+}
 
 const FORMSPREE_ID  = "YOUR_FORMSPREE_ID";
 const FORMSPREE_URL = `https://formspree.io/f/${FORMSPREE_ID}`;
 
 const previews = [
   {
-    icon: GraduationCap,
+    icon: GraduationCapIcon,
     t: "Courses & Ebooks",
     d: "Self-paced learning to read your own chart.",
   },
@@ -60,7 +91,7 @@ export default function ShopPage() {
               transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
               className="w-20 h-20 mx-auto rounded-full gold-border flex items-center justify-center"
             >
-              <Sparkles className="w-8 h-8 text-gold" />
+              <SparklesIcon className="w-8 h-8 text-gold" />
             </motion.div>
 
             <span className="mt-8 inline-block text-xs uppercase tracking-[0.3em] text-gold">
@@ -79,7 +110,7 @@ export default function ShopPage() {
               onSubmit={handleSubmit}
               className="mt-12 max-w-md mx-auto glass-card rounded-full p-2 flex items-center"
             >
-              <Bell className="w-5 h-5 text-gold mx-4" />
+              <BellIcon className="w-5 h-5 text-gold mx-4" />
               <input
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
