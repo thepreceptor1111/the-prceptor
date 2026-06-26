@@ -32,9 +32,15 @@ export const sanityClient = projectId
       // where the Authorization header is honoured correctly.
       useCdn: false,
       apiVersion: '2024-01-01',
-      // perspective:'published' is the default — only published documents
-      // are returned. If you ever need draft preview, set 'previewDrafts'.
       perspective: 'published',
+      // FIX 6: ignoreBrowserTokenWarning suppresses the noisy console
+      // warning about using a token in the browser. The token is
+      // read-only (Viewer role) so there is no security concern.
+      // The duplicate OPTIONS preflights are standard CORS browser
+      // behaviour for cross-origin requests with Authorization headers
+      // and cannot be eliminated in JS — but adding preconnect in
+      // index.html (Fix 4) removes the DNS/TCP cost from those preflights.
+      ignoreBrowserTokenWarning: true,
     })
   : null;
 

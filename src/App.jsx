@@ -12,8 +12,10 @@ import { useLenis } from "./hooks/useLenis";
 import { SiteSettingsProvider } from "./lib/SiteSettingsContext";
 import { LenisProvider } from "./context/LenisContext";
 
-import Home from "./routes/index";
-
+// FIX 3: Home is now lazy-loaded like every other route.
+// Previously it was the only eager import, forcing React + all home-section
+// code into the initial bundle and blocking TTI by ~3-4 seconds.
+const Home         = lazy(() => import("./routes/index"));
 const About        = lazy(() => import("./routes/about"));
 const Book         = lazy(() => import("./routes/book"));
 const Contact      = lazy(() => import("./routes/contact"));
