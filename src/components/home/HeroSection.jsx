@@ -1,9 +1,9 @@
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useSiteSettings } from "@/lib/useSiteSettings";
 
-// ── Inline SVG icons — removes lucide-react dependency ────────────────────
+// ── Inline SVG icons ────────────────────────────────────────────────────────
 function ArrowRight({ className }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -36,10 +36,13 @@ function Sparkles({ className }) {
   );
 }
 
-// Hero image lives in /public — no Vite hash, matches the <link rel="preload"> in index.html exactly.
+// Hero image: /public dir → no Vite hash → always /hero-section.webp.
+// Absolute path (leading /) MUST match the <link rel="preload"> href in
+// index.html so both share the same browser cache entry. Relative path
+// resolves to a different key → preload wasted → double fetch.
 const heroImg = "/hero-section.webp";
 
-// Reduced to 6 particles (was 18) — fewer RAF loops on mount
+// 6 particles (was 18) — fewer RAF loops on mount
 function Particle({ x, y, size, delay, duration, drift }) {
   return (
     <motion.span
@@ -72,15 +75,23 @@ function Particle({ x, y, size, delay, duration, drift }) {
   );
 }
 
-// Word-by-word staggered heading — slowed down per client request
+// Word-by-word staggered heading.
+//
+// PERF: filter:blur REMOVED.
+// blur is non-composited — forces a main-thread paint + composite on
+// every animation frame. With 9 word spans simultaneously animating
+// filter, Lighthouse flagged 6 non-composited animations and recorded
+// ~100ms extra Style/Layout cost on mobile.
+// opacity + transform are GPU-composited → zero main-thread cost.
 function StaggeredHeading({ line1, line2Gold, delay = 0 }) {
   const words1 = line1.split(" ");
   const words2 = line2Gold.split(" ");
 
   const wordVariant = {
-    hidden: { opacity: 0, x: -22, filter: "blur(4px)" },
+    hidden: { opacity: 0, x: -22 },
     visible: (i) => ({
-      opacity: 1, x: 0, filter: "blur(0px)",
+      opacity: 1,
+      x: 0,
       transition: { delay: delay + i * 0.13, duration: 1.1, ease: [0.22, 1, 0.36, 1] },
     }),
   };
