@@ -25,7 +25,8 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id) {
-          // ── Vendor: React core ──────────────────────────────────────────────
+          // ── Vendor: React core ────────────────────────────────────────────
+          // Stable across every deploy → cache forever on CDN.
           if (
             id.includes('node_modules/react/') ||
             id.includes('node_modules/react-dom/') ||
@@ -33,51 +34,46 @@ export default defineConfig({
             id.includes('node_modules/scheduler/')
           ) return 'vendor-react';
 
-          // ── Vendor: Framer Motion ──────────────────────────────────────────
+          // ── Vendor: Framer Motion ─────────────────────────────────────────
+          // 114 KB gzip — isolated so a motion update doesn't bust react cache.
           if (id.includes('node_modules/framer-motion/'))
             return 'vendor-motion';
 
           // ── Vendor: Sanity npm packages ───────────────────────────────────
+          // ONLY the node_modules/@sanity/* packages go here.
+          // src/lib/sanity*.js and src/lib/SiteSettingsContext.jsx are
+          // deliberately left out so Rollup can resolve the import graph
+          // without creating a CJS interop cycle.
           if (
             id.includes('node_modules/@sanity/') ||
             id.includes('node_modules/sanity/') ||
             id.includes('node_modules/@portabletext/')
           ) return 'vendor-sanity';
 
-          // ── Vendor: UI helpers ───────────────────────────────────────────────
+          // ── Vendor: UI helpers ────────────────────────────────────────────
           if (
             id.includes('node_modules/lucide-react/') ||
             id.includes('node_modules/react-helmet-async/')
           ) return 'vendor-ui';
 
-          // ── App: Sanity client wrappers (src/lib/sanity*) ─────────────────
+          // ── src/ files: NO manual chunks ─────────────────────────────────
           //
-          // CRITICAL: These files MUST be in their own chunk, separate from
-          // both vendor-sanity AND app-utils.
+          // Previously, src/ files were grouped into app-utils / app-sanity
+          // manual chunks. This caused a fatal CJS interop cycle:
           //
-          // The circular chunk warning (vendor-sanity -> app-utils ->
-          // vendor-sanity) was caused by sanityClient.js / sanityQueries.js /
-          // sanityImage.js landing in app-utils (they match /src/ but not the
-          // route/component exclusions). Those files import @sanity/* which is
-          // vendor-sanity, and vendor-sanity’s CJS interop shim imports back
-          // through the app-utils entry — creating a cycle that makes the CJS
-          // `exports` object undefined at runtime (TypeError on boot).
+          //   vendor-sanity (node_modules/@sanity/client)
+          //     imports → app-utils (which contained sanityClient.js)
+          //     imports → vendor-sanity  ← CYCLE
           //
-          // By routing them to a dedicated app-sanity chunk the graph becomes:
-          //   vendor-sanity  <—  app-sanity  <—  route chunks
-          // Linear. No cycle.
-          if (
-            id.includes('/src/lib/sanity') ||
-            id.includes('/src/lib/useSanity')
-          ) return 'app-sanity';
-
-          // ── App: all other non-route src/ utilities ────────────────────────
-          if (
-            id.includes('/src/') &&
-            !id.includes('/src/routes/') &&
-            !id.includes('/src/components/home/') &&
-            !id.includes('/src/components/site/')
-          ) return 'app-utils';
+          // Rollup’s CJS shim accesses module.exports of the importer at
+          // init time. When app-utils is mid-evaluation the exports object
+          // is undefined → TypeError: Cannot read properties of undefined
+          // (reading 'exports').
+          //
+          // Letting Rollup auto-split src/ files resolves this: it builds
+          // the correct evaluation order and never creates the cycle.
+          // Route-level code splitting (React.lazy) still works because
+          // Rollup emits separate async chunks for each lazy() import.
         },
       },
     },
