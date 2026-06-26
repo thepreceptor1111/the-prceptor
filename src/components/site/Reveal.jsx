@@ -34,6 +34,25 @@ export function Reveal({ children, delay = 0, className }) {
         transform: visible ? 'translateY(0)' : 'translateY(28px)',
         transition: `opacity 0.75s cubic-bezier(0.22,1,0.36,1) ${delay}s, transform 0.75s cubic-bezier(0.22,1,0.36,1) ${delay}s`,
       }}
+      onWheel={(e) => {
+        // DIAGNOSTIC — is this invisible Reveal div intercepting wheel events?
+        // If you see these logs while the page is FROZEN and [FaqSection] logs
+        // are SILENT, this div is confirmed as the scroll trap.
+        if (!visible) {
+          console.warn(
+            '[Reveal] 🚨 INVISIBLE div received wheel event — SCROLL TRAP CONFIRMED.',
+            '| visible:', visible,
+            '| scrollY:', window.scrollY,
+            '| defaultPrevented:', e.defaultPrevented,
+            '| element rect:', ref.current?.getBoundingClientRect()
+          );
+        } else {
+          console.log(
+            '[Reveal] ✅ visible div received wheel event (normal).',
+            '| scrollY:', window.scrollY
+          );
+        }
+      }}
     >
       {children}
     </div>
