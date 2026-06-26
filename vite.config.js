@@ -65,7 +65,7 @@ export default defineConfig({
           //     imports → app-utils (which contained sanityClient.js)
           //     imports → vendor-sanity  ← CYCLE
           //
-          // Rollup’s CJS shim accesses module.exports of the importer at
+          // Rollup's CJS shim accesses module.exports of the importer at
           // init time. When app-utils is mid-evaluation the exports object
           // is undefined → TypeError: Cannot read properties of undefined
           // (reading 'exports').
