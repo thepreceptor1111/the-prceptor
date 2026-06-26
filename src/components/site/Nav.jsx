@@ -1,8 +1,31 @@
 import { NavLink, Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { navLinks, siteConfig } from "@/content/site";
+
+// ── Inline SVG icons — replaces lucide-react (874 KB) entirely ────────────
+function MenuIcon({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      className={className} aria-hidden="true">
+      <line x1="4" x2="20" y1="12" y2="12" />
+      <line x1="4" x2="20" y1="6" y2="6" />
+      <line x1="4" x2="20" y1="18" y2="18" />
+    </svg>
+  );
+}
+
+function XIcon({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      className={className} aria-hidden="true">
+      <path d="M18 6 6 18" />
+      <path d="m6 6 12 12" />
+    </svg>
+  );
+}
 
 const mobileFooterLinks = [
   { to: "/privacy", label: "Privacy Policy" },
@@ -10,7 +33,6 @@ const mobileFooterLinks = [
 ];
 
 // ── Animation variants ─────────────────────────────────────────────────────
-// Header: simple clean fade-drop — one motion, no drama.
 const headerVariants = {
   hidden:  { y: -8, opacity: 0 },
   visible: {
@@ -20,14 +42,12 @@ const headerVariants = {
   },
 };
 
-// Mobile overlay: elegant fade only — no sliding, no scaling.
 const overlayVariants = {
   hidden:  { opacity: 0 },
   visible: { opacity: 1, transition: { duration: 0.3, ease: "easeOut" } },
   exit:    { opacity: 0, transition: { duration: 0.22, ease: "easeIn" } },
 };
 
-// Mobile nav items: stagger from opacity only — no y movement (cleaner).
 const itemVariants = {
   hidden:  { opacity: 0 },
   visible: (i) => ({
@@ -48,10 +68,8 @@ export default function Nav() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Close mobile nav on route change
   useEffect(() => { setOpen(false); }, [location.pathname]);
 
-  // Lock body scroll when mobile nav is open
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
@@ -59,7 +77,6 @@ export default function Nav() {
 
   return (
     <>
-      {/* ── Desktop / main header ───────────────────────────────────── */}
       <motion.header
         variants={headerVariants}
         initial="hidden"
@@ -72,7 +89,6 @@ export default function Nav() {
       >
         <div className="max-w-7xl mx-auto px-6 lg:px-10 h-20 flex items-center justify-between">
 
-          {/* Logo */}
           <Link to="/" className="flex items-center gap-2.5 group">
             <span className="text-gold font-serif text-2xl group-hover:rotate-12 transition-transform duration-500">
               ✦
@@ -80,7 +96,6 @@ export default function Nav() {
             <span className="font-serif text-xl tracking-wide">{siteConfig.name}</span>
           </Link>
 
-          {/* Desktop nav links */}
           <nav className="hidden lg:flex items-center gap-10" aria-label="Primary navigation">
             {navLinks.map((l) => (
               <NavLink
@@ -93,7 +108,6 @@ export default function Nav() {
                 }
               >
                 {l.label}
-                {/* Slim gold underline on hover / active */}
                 <span
                   className="absolute -bottom-2 left-0 right-0 h-px scale-x-0 group-hover:scale-x-100 transition-transform duration-400"
                   style={{
@@ -106,7 +120,6 @@ export default function Nav() {
             ))}
           </nav>
 
-          {/* Desktop CTA */}
           <Link
             to="/book"
             className="hidden lg:inline-flex items-center px-6 py-2.5 rounded-full bg-primary text-primary-foreground btn-text hover:scale-[1.03] hover:shadow-gold transition-all duration-300"
@@ -114,7 +127,6 @@ export default function Nav() {
             Book a Session
           </Link>
 
-          {/* Hamburger — morphs Menu ↔ X */}
           <button
             className="lg:hidden text-foreground relative w-10 h-10 flex items-center justify-center"
             onClick={() => setOpen((v) => !v)}
@@ -127,20 +139,19 @@ export default function Nav() {
               transition={{ duration: 0.2 }}
               className="absolute"
             >
-              <Menu className="w-6 h-6" />
+              <MenuIcon className="w-6 h-6" />
             </motion.span>
             <motion.span
               animate={{ rotate: open ? 0 : -90, opacity: open ? 1 : 0 }}
               transition={{ duration: 0.2 }}
               className="absolute"
             >
-              <X className="w-6 h-6" />
+              <XIcon className="w-6 h-6" />
             </motion.span>
           </button>
         </div>
       </motion.header>
 
-      {/* ── Mobile full-screen overlay ──────────────────────────────── */}
       <AnimatePresence>
         {open && (
           <motion.div
@@ -154,14 +165,12 @@ export default function Nav() {
             exit="exit"
             className="lg:hidden fixed inset-0 z-40 bg-background/96 backdrop-blur-2xl"
           >
-            {/* Subtle nebula tint behind links */}
             <div className="absolute inset-0 bg-hero opacity-50 pointer-events-none" />
 
             <nav
               className="relative h-full flex flex-col items-center justify-center gap-7 px-8"
               aria-label="Mobile primary navigation"
             >
-              {/* Primary links */}
               {navLinks.map((l, i) => (
                 <motion.div
                   key={l.to}
@@ -180,7 +189,6 @@ export default function Nav() {
                 </motion.div>
               ))}
 
-              {/* Book CTA */}
               <motion.div
                 custom={navLinks.length}
                 variants={itemVariants}
@@ -197,7 +205,6 @@ export default function Nav() {
                 </Link>
               </motion.div>
 
-              {/* Legal links at bottom */}
               <motion.div
                 custom={navLinks.length + 1}
                 variants={itemVariants}
