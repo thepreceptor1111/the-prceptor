@@ -1,5 +1,5 @@
 /**
- * SelectField — custom styled dropdown, drop-in replacement for <select>.
+ * SelectField — custom styled dropdown with type-to-filter search.
  *
  * Props:
  *   value        {string}          — controlled value
@@ -11,12 +11,12 @@
  *   className    {string}          — extra class on the outer wrapper
  *   id           {string}          — for label htmlFor
  *
- * Keyboard: Arrow Up/Down navigate, Enter/Space select, Escape closes.
- * Click outside closes.
+ * Keyboard: Arrow Up/Down navigate, Enter selects, Escape clears search
+ * then closes, Click outside closes.
  */
 
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown, Check } from "lucide-react";
+import { ChevronDown, Check, Search, X } from "lucide-react";
 
 export function SelectField({
   value,
@@ -29,9 +29,37 @@ export function SelectField({
   id,
 }) {
   const [open, setOpen]       = useState(false);
-  const [focused, setFocused] = useState(-1);
+  const [query, setQuery]     = useState("");
+  const [focused, setFocused] = useState(0);
   const containerRef          = useRef(null);
   const listRef               = useRef(null);
+  const searchRef             = useRef(null);
+
+  // Filtered options based on search query
+  const filtered = query.trim()
+    ? options.filter((o) => o.toLowerCase().includes(query.toLowerCase()))
+    : options;
+
+  // Auto-focus the search input when panel opens
+  useEffect(() => {
+    if (open) {
+      setFocused(value ? Math.max(filtered.indexOf(value), 0) : 0);
+      setTimeout(() => searchRef.current?.focus(), 0);
+    } else {
+      setQuery("");
+    }
+  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Reset focused index when query changes
+  useEffect(() => {
+    setFocused(0);
+  }, [query]);
+
+  // Scroll focused item into view
+  useEffect(() => {
+    if (!open || focused < 0) return;
+    listRef.current?.children?.[focused]?.scrollIntoView({ block: "nearest" });
+  }, [focused, open]);
 
   // Close on outside click
   useEffect(() => {
@@ -43,33 +71,54 @@ export function SelectField({
     return () => document.removeEventListener("mousedown", handleClick);
   }, [open]);
 
-  // Scroll focused item into view
-  useEffect(() => {
-    if (!open || focused < 0) return;
-    listRef.current?.children?.[focused]?.scrollIntoView({ block: "nearest" });
-  }, [focused, open]);
+  function openPanel() {
+    setOpen(true);
+    setFocused(value ? Math.max(options.indexOf(value), 0) : 0);
+  }
 
-  function toggle() { setOpen((o) => !o); setFocused(value ? options.indexOf(value) : 0); }
+  function closePanel() {
+    setOpen(false);
+    setQuery("");
+  }
 
   function select(opt) {
     onChange(opt);
-    setOpen(false);
-    setFocused(-1);
+    closePanel();
   }
 
-  function onKeyDown(e) {
-    if (!open) {
-      if (["Enter", " ", "ArrowDown", "ArrowUp"].includes(e.key)) {
-        e.preventDefault();
-        setOpen(true);
-        setFocused(value ? options.indexOf(value) : 0);
-      }
+  function clearSelection(e) {
+    e.stopPropagation();
+    onChange("");
+  }
+
+  function onTriggerKeyDown(e) {
+    if (!open && ["Enter", " ", "ArrowDown", "ArrowUp"].includes(e.key)) {
+      e.preventDefault();
+      openPanel();
+    }
+  }
+
+  function onSearchKeyDown(e) {
+    if (e.key === "Escape") {
+      if (query) { setQuery(""); }
+      else { closePanel(); }
       return;
     }
-    if (e.key === "Escape") { setOpen(false); return; }
-    if (e.key === "ArrowDown") { e.preventDefault(); setFocused((f) => Math.min(f + 1, options.length - 1)); return; }
-    if (e.key === "ArrowUp")   { e.preventDefault(); setFocused((f) => Math.max(f - 1, 0)); return; }
-    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); if (focused >= 0) select(options[focused]); return; }
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setFocused((f) => Math.min(f + 1, filtered.length - 1));
+      return;
+    }
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setFocused((f) => Math.max(f - 1, 0));
+      return;
+    }
+    if (e.key === "Enter") {
+      e.preventDefault();
+      if (focused >= 0 && filtered[focused]) select(filtered[focused]);
+      return;
+    }
   }
 
   const displayValue = value || "";
@@ -85,7 +134,7 @@ export function SelectField({
         </span>
       )}
 
-      <div ref={containerRef} className="relative" onKeyDown={onKeyDown}>
+      <div ref={containerRef} className="relative" onKeyDown={onTriggerKeyDown}>
         {/* ── Trigger ── */}
         <button
           type="button"
@@ -93,7 +142,7 @@ export function SelectField({
           aria-haspopup="listbox"
           aria-expanded={open}
           aria-labelledby={id ? `${id}-label` : undefined}
-          onClick={toggle}
+          onClick={openPanel}
           className={[
             "w-full flex items-center justify-between gap-3",
             "bg-secondary/40 border rounded-xl px-4 py-3.5 text-sm text-left",
@@ -105,65 +154,116 @@ export function SelectField({
           ].join(" ")}
         >
           <span className="truncate">{displayValue || placeholder}</span>
-          <ChevronDown
-            className={`w-4 h-4 text-gold shrink-0 transition-transform duration-300 ${
-              open ? "rotate-180" : ""
-            }`}
-          />
+          <div className="flex items-center gap-1.5 shrink-0">
+            {value && (
+              <span
+                role="button"
+                tabIndex={-1}
+                aria-label="Clear selection"
+                onClick={clearSelection}
+                className="w-4 h-4 rounded-full flex items-center justify-center text-muted-foreground hover:text-gold transition-colors"
+              >
+                <X className="w-3 h-3" />
+              </span>
+            )}
+            <ChevronDown
+              className={`w-4 h-4 text-gold transition-transform duration-300 ${
+                open ? "rotate-180" : ""
+              }`}
+            />
+          </div>
         </button>
 
         {/* ── Dropdown panel ── */}
         {open && (
           <div
             role="listbox"
-            ref={listRef}
             aria-label={label || placeholder}
-            className="absolute z-50 mt-2 w-full rounded-2xl overflow-hidden"
+            className="absolute z-50 mt-2 w-full rounded-2xl overflow-hidden flex flex-col"
             style={{
               background:
-                "linear-gradient(160deg, oklch(0.22 0.030 270 / 0.96), oklch(0.16 0.025 270 / 0.96))",
+                "linear-gradient(160deg, oklch(0.22 0.030 270 / 0.97), oklch(0.16 0.025 270 / 0.97))",
               backdropFilter: "blur(24px) saturate(1.4)",
               WebkitBackdropFilter: "blur(24px) saturate(1.4)",
               border: "1px solid oklch(1 0 0 / 0.09)",
               boxShadow:
                 "0 1px 0 oklch(1 0 0 / 0.06) inset, 0 24px 64px -12px oklch(0 0 0 / 0.60)",
-              maxHeight: "260px",
-              overflowY: "auto",
-              scrollbarWidth: "thin",
-              scrollbarColor: "oklch(0.82 0.12 85 / 0.40) transparent",
             }}
           >
-            {options.map((opt, i) => {
-              const isActive  = opt === value;
-              const isFocused = i === focused;
-              return (
-                <button
-                  key={opt}
-                  type="button"
-                  role="option"
-                  aria-selected={isActive}
-                  onMouseEnter={() => setFocused(i)}
-                  onClick={() => select(opt)}
-                  className={[
-                    "w-full flex items-center justify-between gap-3",
-                    "px-4 py-3 text-sm text-left transition-all duration-150",
-                    "border-b last:border-b-0",
-                    isFocused || isActive
-                      ? "bg-gold/10 text-gold border-gold/10"
-                      : "text-foreground/80 border-white/5 hover:bg-white/5",
-                  ].join(" ")}
-                >
-                  <span className="flex items-center gap-2.5">
-                    {isActive && (
-                      <span className="w-1 h-4 rounded-full bg-gold shrink-0" />
-                    )}
-                    {!isActive && <span className="w-1 shrink-0" />}
-                    {opt}
-                  </span>
-                  {isActive && <Check className="w-3.5 h-3.5 text-gold shrink-0" />}
-                </button>
-              );
-            })}
+            {/* ── Search input ── */}
+            <div className="px-3 pt-3 pb-2 border-b border-white/[0.06]">
+              <div className="flex items-center gap-2 bg-white/[0.05] border border-white/[0.08] rounded-xl px-3 py-2">
+                <Search className="w-3.5 h-3.5 text-gold/60 shrink-0" />
+                <input
+                  ref={searchRef}
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  onKeyDown={onSearchKeyDown}
+                  placeholder="Type to search…"
+                  className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground/50 outline-none min-w-0"
+                  aria-label="Search options"
+                />
+                {query && (
+                  <button
+                    type="button"
+                    onClick={() => setQuery("")}
+                    className="text-muted-foreground hover:text-gold transition-colors"
+                    aria-label="Clear search"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* ── Options list — scrollable ── */}
+            <div
+              ref={listRef}
+              style={{
+                maxHeight: "220px",
+                overflowY: "auto",
+                scrollbarWidth: "thin",
+                scrollbarColor: "oklch(0.82 0.12 85 / 0.40) transparent",
+              }}
+            >
+              {filtered.length === 0 && (
+                <p className="px-4 py-5 text-sm text-center text-muted-foreground/60">
+                  No options match &ldquo;{query}&rdquo;
+                </p>
+              )}
+              {filtered.map((opt, i) => {
+                const isActive  = opt === value;
+                const isFocused = i === focused;
+                return (
+                  <button
+                    key={opt}
+                    type="button"
+                    role="option"
+                    aria-selected={isActive}
+                    onMouseEnter={() => setFocused(i)}
+                    onClick={() => select(opt)}
+                    className={[
+                      "w-full flex items-center justify-between gap-3",
+                      "px-4 py-3 text-sm text-left transition-all duration-150",
+                      "border-b last:border-b-0",
+                      isFocused || isActive
+                        ? "bg-gold/10 text-gold border-gold/10"
+                        : "text-foreground/80 border-white/5 hover:bg-white/5",
+                    ].join(" ")}
+                  >
+                    <span className="flex items-center gap-2.5">
+                      {isActive && (
+                        <span className="w-1 h-4 rounded-full bg-gold shrink-0" />
+                      )}
+                      {!isActive && <span className="w-1 shrink-0" />}
+                      {opt}
+                    </span>
+                    {isActive && <Check className="w-3.5 h-3.5 text-gold shrink-0" />}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         )}
       </div>
