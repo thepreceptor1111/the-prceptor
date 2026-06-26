@@ -16,13 +16,7 @@
     <link rel="preconnect"   href="https://cdn.sanity.io"           crossorigin />
     <link rel="preconnect"   href="https://9w7fo0ix.api.sanity.io" crossorigin />
 
-    <!-- ── FIX 3: Self-host fonts via @fontsource ──────────────────────── -->
-    <!-- Google Fonts adds 78ms RTT (fonts.gstatic.com) + 2 extra TCP connections.
-         @fontsource packages are served from your own CDN (Vercel edge) — zero
-         external RTT, no CORS preflight, no render-blocking stylesheet.
-         SETUP: run  npm install @fontsource/inter @fontsource/fraunces
-         Then import in src/styles.css (see that file for the @import lines).
-         The block below is the FALLBACK for no-JS; remove once npm pkgs added. -->
+    <!-- ── FIX 3: Self-host fonts via @fontsource ──────────────────── -->
     <!-- Google Fonts fallback (non-blocking) — remove after @fontsource setup -->
     <link rel="preconnect"   href="https://fonts.googleapis.com" />
     <link rel="preconnect"   href="https://fonts.gstatic.com"    crossorigin />
@@ -39,11 +33,11 @@
       />
     </noscript>
 
-    <!-- ── Favicon ──────────────────────────────────────────────────── -->
+    <!-- ── Favicon ──────────────────────────────────────────────────────────── -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="google-site-verification" content="-ppSJQ86nfQyg4_noRGe1XvQ9elyoSM_O1A-0pLF6FU" />
 
-    <!-- ── Primary Meta ──────────────────────────────────────────────── -->
+    <!-- ── Primary Meta ──────────────────────────────────────────────────────── -->
     <title>The Preceptor — Vedic Astrology Readings &amp; Spiritual Consultations Online</title>
     <meta
       name="description"
@@ -57,7 +51,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-    <!-- ── Open Graph ──────────────────────────────────────────────── -->
+    <!-- ── Open Graph ────────────────────────────────────────────────────── -->
     <meta property="og:type"        content="website" />
     <meta property="og:url"         content="https://www.thepreceptorglobal.com/" />
     <meta property="og:site_name"   content="The Preceptor" />
@@ -70,7 +64,7 @@
     <meta property="og:image:alt"    content="The Preceptor — For those who seek clarity." />
     <meta property="og:image:type"   content="image/webp" />
 
-    <!-- ── Twitter / X Card ──────────────────────────────────────────── -->
+    <!-- ── Twitter / X Card ──────────────────────────────────────────────────── -->
     <meta name="twitter:card"        content="summary_large_image" />
     <meta name="twitter:site"        content="@thepreceptorglobal" />
     <meta name="twitter:title"       content="The Preceptor — Vedic Astrology Readings &amp; Spiritual Consultations Online" />
@@ -90,6 +84,22 @@
       #root {
         isolation: isolate;
       }
+      /*
+       * CLS FIX: Pre-reserve footer height BEFORE React mounts.
+       *
+       * The footer shifts with CLS 0.245 because style={{ minHeight: 966 }}
+       * in JSX only applies AFTER React hydrates (~3.5s on mobile). By then
+       * the browser has already painted the footer at its natural (collapsed)
+       * height and recorded the layout shift.
+       *
+       * This rule is parsed by the browser during the initial HTML parse,
+       * before any JavaScript runs, so the footer is already 966px tall at
+       * first paint. The JSX inline style becomes a no-op (same value).
+       *
+       * 966px = observed footer boundingRect height from Lighthouse report
+       * (boundingRect top:8934, bottom:9900 → height:966).
+       */
+      footer.relative { min-height: 966px; }
     </style>
   </head>
   <body>

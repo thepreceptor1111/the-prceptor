@@ -6,12 +6,24 @@ export function useLenis() {
   const lenisRef = useLenisContext();
 
   useEffect(() => {
+    // ─── MOBILE BAIL-OUT ────────────────────────────────────────────────────────────────────
+    //
+    // Skip Lenis entirely on touch / coarse-pointer devices (phones, tablets).
+    //
+    // Why: Lenis hijacks native scroll and replaces it with a JS-driven rAF
+    // loop. On mobile this:
+    //   1. Fights the browser’s native momentum scroll (terrible UX)
+    //   2. Runs a 60fps requestAnimationFrame loop that produced ALL 20 long
+    //      tasks in Lighthouse (8,476ms TBT / 22.2s TTI) because the rAF
+    //      fired concurrently with React hydration on the main thread.
+    //
+    // On desktop (pointer: fine = mouse), Lenis is still fully active.
+    // Lighthouse always audits as a simulated mobile device with a coarse
+    // pointer, so this single guard eliminates the entire TBT problem.
+    if (window.matchMedia('(pointer: coarse)').matches) return;
+
     const lenis = new Lenis({
       // ─── SCROLL FREEZE FIX ───────────────────────────────────────────
-      // autoResize: true in Lenis 1.3.x only observes document.documentElement
-      // (the viewport). It does NOT fire when lazy React sections resolve and
-      // grow document.body. The ResizeObserver on document.body below is the
-      // real fix — it calls lenis.resize() on any content height change.
       autoResize: true,
 
       // ─── SMOOTHNESS TUNING ───────────────────────────────────────────
@@ -29,9 +41,6 @@ export function useLenis() {
     if (lenisRef) lenisRef.current = lenis;
 
     // ─── BODY RESIZE OBSERVER ─────────────────────────────────────────
-    // Watches document.body height directly. Fires whenever any content
-    // grows the page — lazy Suspense resolves, images load, accordions
-    // open. Ensures Lenis.limit always matches the real scrollable range.
     const bodyResizeObserver = new ResizeObserver(() => {
       lenis.resize();
     });
@@ -39,16 +48,9 @@ export function useLenis() {
 
     // ─── RAF LOOP — deferred until page is interactive ────────────────
     //
-    // PERF FIX: Previously the rAF loop started immediately on mount,
-    // running concurrently with React hydration + JS parsing. This caused
-    // ALL 20 long tasks in Lighthouse to be "Unattributable" (25s of
-    // main-thread blocking) — the rAF tick was firing every ~16ms and
-    // forcing style recalc + composite work on top of already-busy parsing.
-    //
-    // Fix: delay the first tick until window 'load' fires (all scripts
+    // PERF FIX: delay the first tick until window 'load' fires (all scripts
     // parsed, all lazy chunks evaluated). After that, the rAF loop runs
     // at full 60fps with nothing competing on the main thread.
-    // Lenis is still CREATED now so context/refs are immediately available.
     let rafId = null;
 
     function raf(time) {
@@ -61,10 +63,8 @@ export function useLenis() {
     }
 
     if (document.readyState === 'complete') {
-      // Already loaded (e.g. HMR re-mount in dev) — start immediately
       startRaf();
     } else {
-      // Page still loading — wait for all scripts + lazy chunks to finish
       window.addEventListener('load', startRaf, { once: true });
     }
 
