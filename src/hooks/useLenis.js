@@ -8,10 +8,10 @@ export function useLenis() {
   useEffect(() => {
     const lenis = new Lenis({
       // ─── SCROLL FREEZE FIX ───────────────────────────────────────────
-      // autoResize: true in Lenis 1.3.x only observes the wrapper element
-      // (document.documentElement when wrapper=window). It fires on viewport
-      // resize — NOT on content height growth from lazy sections resolving.
-      // The ResizeObserver on document.body below is the real fix for that.
+      // autoResize: true in Lenis 1.3.x only observes document.documentElement
+      // (the viewport). It does NOT fire when lazy React sections resolve and
+      // grow document.body. The ResizeObserver on document.body below is the
+      // real fix — it calls lenis.resize() on any content height change.
       autoResize: true,
 
       // ─── SMOOTHNESS TUNING ───────────────────────────────────────────
@@ -28,33 +28,16 @@ export function useLenis() {
 
     if (lenisRef) lenisRef.current = lenis;
 
-    // DIAGNOSTIC — confirms Lenis init state and initial limit
-    console.log(
-      '[useLenis] ✅ Lenis initialized.',
-      '| Initial limit:', lenis.limit,
-      '| scrollHeight:', document.body.scrollHeight,
-      '| lenisRef.current set:', !!lenisRef?.current
-    );
-
-    // ─── THE ACTUAL FIX ──────────────────────────────────────────────
-    // autoResize: true does NOT catch lazy React sections growing the page
-    // height after mount (it only watches viewport resize). We observe
-    // document.body directly — this fires any time content height changes:
-    // lazy Suspense resolves, image loads, accordion opens, anything.
+    // ─── BODY RESIZE OBSERVER ─────────────────────────────────────────
+    // Watches document.body height directly. Fires whenever any content
+    // grows the page — lazy Suspense resolves, images load, accordions
+    // open. Ensures Lenis.limit always matches the real scrollable range.
     const bodyResizeObserver = new ResizeObserver(() => {
-      const limitBefore = lenis.limit;
       lenis.resize();
-      // DIAGNOSTIC — shows ResizeObserver firing and limit updating in real time
-      console.log(
-        '[useLenis] 📐 body ResizeObserver fired — lenis.resize() called.',
-        '| limit BEFORE:', limitBefore,
-        '| limit AFTER:', lenis.limit,
-        '| scrollHeight:', document.body.scrollHeight
-      );
     });
     bodyResizeObserver.observe(document.body);
 
-    // ─── RAF LOOP ────────────────────────────────────────────────────
+    // ─── RAF LOOP ─────────────────────────────────────────────────────
     let rafId = null;
 
     function raf(time) {

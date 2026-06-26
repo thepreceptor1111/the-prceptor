@@ -28,21 +28,7 @@ export function FaqSection() {
   const [open, setOpen] = useState(null);
 
   return (
-    <section
-      className="py-24 lg:py-32 relative"
-      onWheel={(e) => {
-        // DIAGNOSTIC — if these logs STOP appearing while page is frozen,
-        // wheel events are being swallowed before reaching this section.
-        // If they keep firing while frozen, the trap is NOT here — Lenis
-        // ceiling (stale scrollHeight) is the confirmed cause.
-        console.log(
-          '[FaqSection] 🌀 wheel event received.',
-          '| scrollY:', window.scrollY,
-          '| defaultPrevented:', e.defaultPrevented,
-          '| target:', e.target.tagName, e.target.className?.toString?.().slice(0, 60)
-        );
-      }}
-    >
+    <section className="py-24 lg:py-32 relative">
       <div className="max-w-3xl mx-auto px-6 lg:px-10">
         <Reveal className="text-center">
           <span className="text-xs uppercase tracking-[0.3em] text-gold">{sectionLabel}</span>
