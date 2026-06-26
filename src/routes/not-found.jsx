@@ -2,7 +2,42 @@ import SEO from "@/components/site/SEO";
 import { PAGE_SEO } from "@/content/seo";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Home, RefreshCw } from "lucide-react";
+
+// ── Inline SVG icons — removes lucide-react dependency ────────────────────
+function ArrowLeftIcon({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      className={className} aria-hidden="true">
+      <path d="m12 19-7-7 7-7" />
+      <path d="M19 12H5" />
+    </svg>
+  );
+}
+
+function HomeIcon({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      className={className} aria-hidden="true">
+      <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+      <polyline points="9 22 9 12 15 12 15 22" />
+    </svg>
+  );
+}
+
+function RefreshCwIcon({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      className={className} aria-hidden="true">
+      <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+      <path d="M21 3v5h-5" />
+      <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+      <path d="M8 16H3v5" />
+    </svg>
+  );
+}
 
 export default function NotFoundPage() {
 
@@ -48,19 +83,19 @@ export default function NotFoundPage() {
                 onClick={() => window.history.back()}
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-gold/30 text-gold hover:bg-gold/10 transition"
               >
-                <ArrowLeft className="w-4 h-4" /> Go Back
+                <ArrowLeftIcon className="w-4 h-4" /> Go Back
               </button>
               <Link
                 to="/"
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition"
               >
-                <Home className="w-4 h-4" /> Return Home
+                <HomeIcon className="w-4 h-4" /> Return Home
               </Link>
               <button
                 onClick={() => window.location.reload()}
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-gold/30 text-gold hover:bg-gold/10 transition"
               >
-                <RefreshCw className="w-4 h-4" /> Try Again
+                <RefreshCwIcon className="w-4 h-4" /> Try Again
               </button>
             </div>
           </motion.div>
