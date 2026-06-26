@@ -1,6 +1,6 @@
 import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
-import { ShieldCheck, Lock, Eye, Database, Globe2, Mail, FileText, Sparkles } from "lucide-react";
+import { ShieldCheck, Lock, Eye, Database, Globe2, Mail, FileText, Sparkles, Archive } from "lucide-react";
 import Reveal from "@/components/site/Reveal";
 import { siteConfig } from "@/content/site";
 
@@ -17,12 +17,10 @@ export default function PrivacyPage() {
       </Helmet>
 
       <div className="relative min-h-screen">
-        {/* Hero — NO overflow-hidden on section; Lenis needs full scroll height visible */}
+        {/* Hero */}
         <section className="relative pt-40 pb-20 md:pt-52 md:pb-28">
           <div className="absolute inset-0 bg-hero" />
           <div className="absolute inset-0 starfield" />
-
-          {/* Decorative orb — overflow-hidden scoped only to this wrapper */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
             <motion.div
               animate={{ opacity: [0.25, 0.50, 0.25] }}
@@ -31,7 +29,6 @@ export default function PrivacyPage() {
                          bg-[radial-gradient(circle,oklch(0.82_0.12_85_/_0.14),transparent_65%)] blur-3xl"
             />
           </div>
-
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background pointer-events-none" />
 
           <div className="relative max-w-3xl mx-auto px-6 lg:px-10 text-center">
@@ -55,7 +52,7 @@ export default function PrivacyPage() {
             </Reveal>
             <Reveal delay={0.3}>
               <p className="mt-4 text-xs text-muted-foreground tracking-wide">
-                Effective {EFFECTIVE_DATE} · Last reviewed June 2025
+                Effective {EFFECTIVE_DATE} &middot; Last reviewed June 2025
               </p>
             </Reveal>
           </div>
@@ -65,33 +62,65 @@ export default function PrivacyPage() {
         <section className="relative py-16 md:py-24">
           <div className="max-w-3xl mx-auto px-6 lg:px-10 space-y-14">
 
+            {/* 1. Information We Collect */}
             <PolicySection icon={Database} title="1. Information We Collect" delay={0}>
-              <p>We collect information you provide directly when you fill out a contact or booking form, book a session through our scheduling system, or correspond with us by email. This includes:</p>
-              <PolicyList items={[
-                "Full name and email address",
-                "Country and city of residence (for timezone scheduling)",
-                "Date and time of birth (required for astrological chart preparation)",
-                "The nature of your consultation inquiry",
-                "Any additional details you voluntarily share in your message",
-              ]} />
-              <p>We do not use tracking pixels, behavioral ad networks, or any third-party analytics beyond what is strictly necessary to operate the website.</p>
+              <p>
+                When you book a consultation, we collect the information you voluntarily provide — your
+                name, email address, date of birth, time of birth, place of birth, and any details you
+                share about the purpose of your session. This information is necessary to prepare your
+                personalised reading.
+              </p>
+              <p>
+                We do not use tracking pixels, behavioral ad networks, or any third-party analytics
+                beyond what is strictly necessary to operate the website.
+              </p>
+              <p>
+                We do not collect payment card details directly. All payments are processed through
+                third-party processors (Cal.com, Remitly) that operate under their own privacy policies.
+              </p>
             </PolicySection>
 
+            {/* 2. How We Use Your Information */}
             <PolicySection icon={Eye} title="2. How We Use Your Information" delay={0.04}>
               <p>Your information is used solely to:</p>
               <PolicyList items={[
                 "Respond to your inquiry and schedule your consultation",
                 "Prepare your astrological chart and session materials in advance",
+                "Communicate with you about your booking — confirmation emails, reminders, and post-session follow-ups",
                 "Send confirmation emails and session reminders via our scheduling platform (Cal.com)",
                 "Improve the quality and relevance of our services",
               ]} />
-              <p>We do not sell, rent, or trade your personal information to any third party. Ever.</p>
+              <p>
+                We never sell, rent, or trade your personal information to third parties. We do not use
+                your birth data or session content for any purpose other than delivering your
+                consultation. However, with your express consent, your data may be used for research
+                purposes or for the study of astrological patterns and observations, while being kept
+                strictly confidential and anonymized to protect your identity.
+              </p>
             </PolicySection>
 
-            <PolicySection icon={Globe2} title="3. Third-Party Services" delay={0.08}>
+            {/* 3. Data Retention — NEW */}
+            <PolicySection icon={Archive} title="3. Data Retention" delay={0.06}>
+              <p>
+                We retain client data — including birth details, consultation records, and session
+                content — only for as long as reasonably necessary to provide our services and fulfil
+                the purpose for which the data was collected.
+              </p>
+              <p>
+                We never sell, rent, or trade your personal information to third parties. We do not use
+                your birth data or session content for any purpose other than delivering your
+                consultation. However, with your express consent, your data may be used for research
+                purposes or for the study of astrological patterns and observations, while being kept
+                strictly confidential and anonymized to protect your identity.
+              </p>
+            </PolicySection>
+
+            {/* 4. Third-Party Services */}
+            <PolicySection icon={Globe2} title="4. Third-Party Services" delay={0.08}>
               <p>To operate this website and its booking system, we use the following third-party platforms. Each processes your data only as necessary to provide its service:</p>
               <PolicyList items={[
                 "Cal.com — session scheduling and calendar management. Subject to Cal.com's Privacy Policy.",
+                "Remitly — payment processing for international transactions. Subject to Remitly's Privacy Policy.",
                 "Google Calendar — calendar conflict checking and meeting link generation (Cal Video).",
                 "Sanity.io — content management for public site content only. No personal client data is stored there.",
                 "Cloudflare Workers — site hosting and edge delivery. No personal data is logged.",
@@ -99,12 +128,14 @@ export default function PrivacyPage() {
               <p>We do not integrate any advertising networks, social login systems, or data broker services.</p>
             </PolicySection>
 
-            <PolicySection icon={Lock} title="4. Data Security" delay={0.12}>
-              <p>All data in transit is encrypted via HTTPS/TLS. Sensitive session details (birth time, birth date) are retained only for as long as necessary to prepare and deliver your consultation. We do not store payment information — all transactions are handled directly by Cal.com's payment processor.</p>
+            {/* 5. Data Security */}
+            <PolicySection icon={Lock} title="5. Data Security" delay={0.12}>
+              <p>All data in transit is encrypted via HTTPS/TLS. Sensitive session details (birth time, birth date) are retained only for as long as necessary to prepare and deliver your consultation. We do not store payment information — all transactions are handled directly by Cal.com and Remitly.</p>
               <p>Access to client records is strictly limited to The Preceptor and is never shared with employees, contractors, or other practitioners.</p>
             </PolicySection>
 
-            <PolicySection icon={ShieldCheck} title="5. Your Rights" delay={0.16}>
+            {/* 6. Your Rights */}
+            <PolicySection icon={ShieldCheck} title="6. Your Rights" delay={0.16}>
               <p>You have the right to request access to the personal information we hold about you, correct any inaccurate information, request deletion of your data, and withdraw consent for future communications at any time. To exercise any of these rights, contact us at:</p>
               <a
                 href={`mailto:${siteConfig.email}?subject=Privacy%20Request`}
@@ -115,20 +146,33 @@ export default function PrivacyPage() {
               <p className="mt-4">We will respond to all privacy requests within 30 days.</p>
             </PolicySection>
 
-            <PolicySection icon={FileText} title="6. Cookies" delay={0.20}>
+            {/* 7. Cookies */}
+            <PolicySection icon={FileText} title="7. Cookies" delay={0.20}>
               <p>This website uses only essential session cookies required for the booking embed to function. We do not use advertising cookies, retargeting cookies, or third-party tracking cookies. No cookie consent banner is displayed because no non-essential cookies are set.</p>
             </PolicySection>
 
-            <PolicySection icon={Sparkles} title="7. Children’s Privacy" delay={0.24}>
-              <p>Our services are intended for adults aged 18 and over. We do not knowingly collect personal information from anyone under 18. If you believe a minor has submitted information to us, please contact us immediately and we will delete it.</p>
+            {/* 8. Children's Privacy — updated to 16+ with parental consent */}
+            <PolicySection icon={Sparkles} title="8. Children&apos;s Privacy" delay={0.24}>
+              <p>
+                Our services are mainly intended for individuals aged 18 and over. However, individuals
+                aged 16 or over may use our services only with the express consent of a parent or legal
+                guardian. By requesting or participating in a session, the parent or legal guardian
+                confirms that they have reviewed and approved the minor&apos;s use of services.
+              </p>
+              <p>
+                If you believe someone under 16 has submitted information to us without parental consent,
+                please contact us immediately and we will delete it.
+              </p>
             </PolicySection>
 
-            <PolicySection icon={Globe2} title="8. International Clients" delay={0.28}>
+            {/* 9. International Clients */}
+            <PolicySection icon={Globe2} title="9. International Clients" delay={0.28}>
               <p>We serve clients worldwide. By submitting your information, you consent to its processing in accordance with this Privacy Policy, regardless of where you are located. We apply the same high standard of care to all client data irrespective of jurisdiction.</p>
             </PolicySection>
 
-            <PolicySection icon={FileText} title="9. Changes to This Policy" delay={0.32}>
-              <p>We may update this Privacy Policy from time to time. When we do, the “Last reviewed” date at the top of this page will be updated. Continued use of the website after any change constitutes acceptance of the revised policy. We will not reduce your rights under this policy without your explicit consent.</p>
+            {/* 10. Changes to This Policy */}
+            <PolicySection icon={FileText} title="10. Changes to This Policy" delay={0.32}>
+              <p>We may update this Privacy Policy from time to time. When we do, the &ldquo;Last reviewed&rdquo; date at the top of this page will be updated. Continued use of the website after any change constitutes acceptance of the revised policy. We will not reduce your rights under this policy without your explicit consent.</p>
             </PolicySection>
 
             {/* Contact card */}
@@ -137,7 +181,7 @@ export default function PrivacyPage() {
                 <Lock className="w-8 h-8 text-gold mx-auto" />
                 <h3 className="mt-4 text-xl">Questions about your privacy?</h3>
                 <p className="mt-3 text-muted-foreground text-sm max-w-md mx-auto">
-                  We take every privacy inquiry personally. Reach us directly and we’ll respond within 24 hours.
+                  We take every privacy inquiry personally. Reach us directly and we&apos;ll respond within 24 hours.
                 </p>
                 <a
                   href={`mailto:${siteConfig.email}?subject=Privacy%20Inquiry`}

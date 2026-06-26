@@ -42,21 +42,21 @@ function validateForm(data) {
 
 const initial = { name: "", email: "", country: "", consultationType: "", subject: "", message: "" };
 
+// Exact 14 options per client document (June 2026)
 const consultationTypes = [
   "Quick Overview About YOU!",
-  "General Birth Chart Readings",
+  "General Birth Chart Reading (Mid-level)",
   "Detailed Birth Chart Reading",
-  "Relationship Guidance",
-  "Partner Compatibility",
-  "Career Direction",
+  "Relationship Guidance (Quick one)",
+  "Partner Compatibility (Mid-Level or In-depth)",
   "Career Consultation",
-  "Long-Term Compatibility Assessment",
   "Marriage Consultation",
   "Current Situation Guidance",
   "Later Life Reading",
   "Mahadasha Guidance",
   "Saturn's Seven and a Half Guidance",
   "Birth Time Rectification (using D9 chart)",
+  "About The Preceptor",
   "Not sure yet",
 ];
 
@@ -124,7 +124,7 @@ function ContactPage() {
           </Reveal>
           <Reveal delay={0.2}>
             <p className="mt-8 lead mx-auto">
-              A quiet conversation can shift the trajectory of a decade. Share what's on your mind — we respond personally within 24 hours.
+              A quiet conversation can shift the trajectory of a decade. Share what&apos;s on your mind — we respond personally within 24 hours.
             </p>
           </Reveal>
           <Reveal delay={0.3}>
@@ -157,7 +157,7 @@ function ContactPage() {
               <span className="eyebrow">— Direct Channels</span>
               <h2 className="mt-5 text-4xl md:text-5xl text-balance">A private line to the studio.</h2>
               <p className="mt-6 text-muted-foreground leading-relaxed max-w-md">
-                Whether you're booking a session, planning a partnership, or seeking press — the inbox below reaches us personally.
+                Whether you&apos;re booking a session, planning a partnership, or seeking press — the inbox below reaches us personally.
               </p>
             </Reveal>
 
@@ -252,7 +252,7 @@ function ContactPage() {
                   <input value={data.subject} onChange={update("subject")} className={inputCls} placeholder="What can we help you with?" />
                 </Field>
                 <Field label="Your Message" error={errors.message} className="sm:col-span-2">
-                  <textarea rows={6} value={data.message} onChange={update("message")} className={`${inputCls} resize-none`} placeholder="Share what's on your mind…" />
+                  <textarea rows={6} value={data.message} onChange={update("message")} className={`${inputCls} resize-none`} placeholder="Share what&apos;s on your mind…" />
                 </Field>
               </div>
 

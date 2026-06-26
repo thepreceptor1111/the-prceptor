@@ -1,6 +1,6 @@
 import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
-import { ScrollText, Star, CreditCard, RefreshCw, AlertTriangle, Globe2, Mail, Shield, FileText, Scale } from "lucide-react";
+import { ScrollText, Star, CreditCard, RefreshCw, AlertTriangle, Globe2, Mail, Shield, FileText, Scale, Banknote } from "lucide-react";
 import Reveal from "@/components/site/Reveal";
 import { siteConfig } from "@/content/site";
 
@@ -11,18 +11,16 @@ export default function TermsPage() {
   return (
     <>
       <Helmet>
-        <title>Terms & Conditions — The Preceptor</title>
+        <title>Terms &amp; Conditions — The Preceptor</title>
         <meta name="description" content="Terms and conditions governing use of The Preceptor's website and astrological consultation services." />
         <link rel="canonical" href={`${SITE_URL}/terms`} />
       </Helmet>
 
       <div className="relative min-h-screen">
-        {/* Hero — NO overflow-hidden on section; Lenis needs full scroll height visible */}
+        {/* Hero */}
         <section className="relative pt-40 pb-20 md:pt-52 md:pb-28">
           <div className="absolute inset-0 bg-hero" />
           <div className="absolute inset-0 starfield" />
-
-          {/* Decorative orb — overflow-hidden scoped only to this wrapper */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
             <motion.div
               animate={{ opacity: [0.25, 0.50, 0.25] }}
@@ -31,14 +29,13 @@ export default function TermsPage() {
                          bg-[radial-gradient(circle,oklch(0.82_0.12_85_/_0.14),transparent_65%)] blur-3xl"
             />
           </div>
-
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background pointer-events-none" />
 
           <div className="relative max-w-3xl mx-auto px-6 lg:px-10 text-center">
             <Reveal>
               <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-card
                                text-xs uppercase tracking-[0.25em] text-gold">
-                <ScrollText className="w-3 h-3" /> Terms & Conditions
+                <ScrollText className="w-3 h-3" /> Terms &amp; Conditions
               </span>
             </Reveal>
             <Reveal delay={0.1}>
@@ -55,7 +52,7 @@ export default function TermsPage() {
             </Reveal>
             <Reveal delay={0.3}>
               <p className="mt-4 text-xs text-muted-foreground tracking-wide">
-                Effective {EFFECTIVE_DATE} · Last reviewed June 2025
+                Effective {EFFECTIVE_DATE} &middot; Last reviewed June 2025
               </p>
             </Reveal>
           </div>
@@ -65,68 +62,117 @@ export default function TermsPage() {
         <section className="relative py-16 md:py-24">
           <div className="max-w-3xl mx-auto px-6 lg:px-10 space-y-14">
 
+            {/* 1 */}
             <TermsSection icon={FileText} title="1. Acceptance of Terms" delay={0}>
-              <p>By accessing or using this website or booking a consultation, you agree to be bound by these Terms & Conditions. If you do not agree, please do not use the site or our services. These terms apply to all visitors, clients, and others who access or use our services.</p>
+              <p>By accessing or using this website or booking a consultation, you agree to be bound by these Terms &amp; Conditions. If you do not agree, please do not use the site or our services. These terms apply to all visitors, clients, and others who access or use our services.</p>
             </TermsSection>
 
+            {/* 2 */}
             <TermsSection icon={Star} title="2. Nature of Services" delay={0.04}>
-              <p>The Preceptor offers private Vedic and Western astrological consultation services. All consultations are provided for <strong className="text-foreground font-medium">informational, spiritual, and personal guidance purposes only</strong>.</p>
-              <p>Astrological readings are not a substitute for professional advice in the fields of medicine, law, finance, psychology, or any other regulated profession. You should not make major life decisions based solely on astrological guidance.</p>
-              <p>By booking a session, you acknowledge that you are engaging with astrology as a form of personal reflection and spiritual inquiry, and that outcomes or interpretations are subject to your own free will and judgment.</p>
+              <p>
+                The Preceptor offers private astrology consultation services including, but not limited
+                to, Vedic birth chart readings, relationship synastry, career guidance, and spiritual
+                consultations. All consultations are provided for{" "}
+                <strong className="text-foreground font-medium">entertainment, personal insight, and spiritual guidance purposes only</strong>.
+              </p>
+              <p>Astrology readings do not constitute medical, legal, financial, or psychological advice. You should not make life decisions based solely on the content of a reading.</p>
+              <p>The Preceptor does not guarantee any specific outcome, result, or change in circumstances as a result of a consultation. By booking a session, you acknowledge that you are engaging with astrology as a form of personal reflection and spiritual inquiry, and that outcomes or interpretations are subject to your own free will and judgment.</p>
             </TermsSection>
 
-            <TermsSection icon={CreditCard} title="3. Booking & Payment" delay={0.08}>
-              <p>Sessions are booked through our integrated scheduling platform (Cal.com). By completing a booking you agree to Cal.com’s Terms of Service in addition to these terms.</p>
+            {/* 3 — expanded with birth info liability, 18+ confirm, Cal Video 10-min */}
+            <TermsSection icon={CreditCard} title="3. Booking &amp; Scheduling" delay={0.08}>
+              <p>Sessions are booked through our integrated scheduling platform (Cal.com). A booking is confirmed only once you have received a written confirmation email. By completing a booking you also agree to Cal.com&apos;s Terms of Service in addition to these terms.</p>
               <TermsList items={[
                 "Payment is due at the time of booking unless otherwise agreed in writing.",
                 "Session fees are displayed on the booking page and are subject to change. Any fee change will not apply to sessions already confirmed.",
-                "Accepted payment methods are those available through our booking platform at the time of booking.",
                 "All prices are listed in USD unless otherwise stated.",
               ]} />
+              <p>
+                You are responsible for providing accurate birth information (date, time, and place of
+                birth) at the time of booking. Inaccurate birth data may affect the quality of your
+                reading. The Preceptor is not liable for readings based on incorrect information
+                provided by the client.
+              </p>
+              <p>
+                By booking a session, you confirm that you are 18 years of age or older, or that you
+                have obtained parental or guardian consent.
+              </p>
+              <p>
+                You will be sent a confirmation email containing a Cal Video link to briefly discuss
+                your expectations with The Preceptor prior to the session. This preliminary discussion
+                is limited to a maximum of 10 minutes and is intended solely for clarification
+                purposes.
+              </p>
             </TermsSection>
 
-            <TermsSection icon={RefreshCw} title="4. Rescheduling & Cancellations" delay={0.12}>
+            {/* 4 */}
+            <TermsSection icon={RefreshCw} title="4. Rescheduling &amp; Cancellations" delay={0.12}>
               <p>We understand that life is unpredictable. Our policy is designed to be fair to both parties:</p>
               <TermsList items={[
-                "Rescheduling is permitted up to 24 hours before your session at no charge.",
-                "Cancellations made more than 24 hours before the session are eligible for a full refund.",
-                "Cancellations made within 24 hours of the session are non-refundable.",
-                "No-shows (failure to attend without notice) are non-refundable.",
-                "If The Preceptor needs to cancel or reschedule, you will receive a full refund or a priority rebooking slot, at your preference.",
+                "You may reschedule your appointment up to 24 hours before the scheduled session time at no charge, using the link provided in your confirmation email.",
+                "Cancellations made less than 24 hours before a scheduled session will generally not be accepted. However, exceptions may be made in cases of genuine emergency, provided that the client notifies us by email as soon as reasonably possible.",
+                "In the event of a no-show (failure to attend without prior notice), the client may submit a rescheduling request with an explanation. Any rescheduling shall be at The Preceptor's discretion. No refunds will be issued for missed sessions.",
+                "If The Preceptor needs to cancel or reschedule due to unforeseen circumstances, you will be notified by email as soon as possible and offered an alternative time slot.",
               ]} />
               <p>To reschedule or cancel, use the link in your booking confirmation email or contact us directly.</p>
             </TermsSection>
 
-            <TermsSection icon={Shield} title="5. Confidentiality" delay={0.16}>
-              <p>The Preceptor treats all client information — including birth details, personal circumstances, and consultation content — with strict confidence. This information will never be shared, published, or discussed with any third party without your explicit written consent.</p>
+            {/* 5 — NEW: Payments & Refunds */}
+            <TermsSection icon={Banknote} title="5. Payments &amp; Refunds" delay={0.16}>
+              <p>All consultation fees are stated clearly at the time of booking. Prices are in USD unless otherwise specified. We accept payment in USD, GBP, EUR, INR, and all other major currencies via our payment processors.</p>
+              <TermsList items={[
+                "Payment is required in full at the time of booking to secure your appointment slot.",
+                "We primarily accept payments via Remitly. Other payment methods available through Cal.com may also be accepted.",
+                "Refunds will not be provided if you decide to cancel a booking or no longer wish to proceed with a scheduled session.",
+                "If you are unable to attend, you may request a rescheduling by providing prior notice via email in accordance with our cancellation policy. Rescheduling requests will be accommodated where reasonably possible.",
+                "Except as expressly stated in these Terms, no refunds will be issued under any circumstances.",
+                "The Preceptor does not store your payment card information. All payment processing is handled by third-party processors.",
+              ]} />
+            </TermsSection>
+
+            {/* 6 */}
+            <TermsSection icon={Shield} title="6. Confidentiality" delay={0.20}>
+              <p>All information shared during a consultation — including personal circumstances, relationships, and birth data — is treated as strictly confidential. We will never share, publish, or use session content for marketing purposes without your explicit written consent.</p>
+              <p>Client testimonials shared on the website are done so with the client&apos;s express consent, or where the client&apos;s identity has been anonymized to protect their privacy.</p>
               <p>We ask that clients extend the same courtesy. Session recordings, transcripts, or summaries shared for your personal reference are for your private use only and may not be published or redistributed without our prior written permission.</p>
             </TermsSection>
 
-            <TermsSection icon={AlertTriangle} title="6. Disclaimer of Liability" delay={0.20}>
-              <p>To the fullest extent permitted by applicable law, The Preceptor shall not be liable for any direct, indirect, incidental, or consequential damages arising from:</p>
+            {/* 7 */}
+            <TermsSection icon={AlertTriangle} title="7. Disclaimer of Warranties" delay={0.24}>
+              <p>The Preceptor website and services are provided on an &ldquo;as is&rdquo; basis. We make no warranties, express or implied, regarding the accuracy, completeness, reliability, or fitness for a particular purpose of our services.</p>
+              <p>Astrology is an interpretive and symbolic discipline. Readings reflect the practitioner&apos;s analysis and interpretation of astrological factors and their potential correlations with human experience. Such readings are not guarantees, promises, or predictions of fixed future events. Clients remain solely responsible for their personal decisions, actions, and outcomes.</p>
+            </TermsSection>
+
+            {/* 8 */}
+            <TermsSection icon={AlertTriangle} title="8. Limitation of Liability" delay={0.28}>
+              <p>To the fullest extent permitted by applicable law, The Preceptor shall not be liable for any indirect, incidental, consequential, punitive, or other damages — including but not limited to loss of income, loss of opportunity, emotional distress, or other consequences arising from:</p>
               <TermsList items={[
                 "Decisions made in reliance on astrological guidance received during a session",
                 "Technical issues with third-party scheduling or communication platforms",
                 "Any inaccuracies arising from incorrect birth information provided by the client",
                 "Force majeure events beyond our reasonable control",
               ]} />
-              <p>Our total liability to you for any claim arising from these terms or a session shall not exceed the fee paid for that session.</p>
+              <p>In any event, The Preceptor&apos;s total liability in connection with any consultation or service shall not exceed the amount paid by the client for that specific consultation.</p>
             </TermsSection>
 
-            <TermsSection icon={Globe2} title="7. Intellectual Property" delay={0.24}>
-              <p>All content on this website — including text, design, imagery, session frameworks, and written materials — is the intellectual property of The Preceptor and is protected by copyright. You may not reproduce, distribute, or create derivative works from any content without prior written permission.</p>
-              <p>Session recordings or notes provided to you after a consultation are licensed for your personal, non-commercial use only.</p>
+            {/* 9 */}
+            <TermsSection icon={Globe2} title="9. Intellectual Property" delay={0.32}>
+              <p>All content on this website — including text, design, imagery, the brand name &ldquo;The Preceptor,&rdquo; session frameworks, and written interpretations provided in consultations — is the intellectual property of The Preceptor and is protected by applicable copyright law. You may not reproduce, republish, redistribute, or sell any content from this website or from your private consultation without prior written permission.</p>
+              <p>Personal use of your own reading content — sharing insights privately, keeping notes for yourself — is encouraged and permitted.</p>
             </TermsSection>
 
-            <TermsSection icon={Globe2} title="8. Governing Law" delay={0.28}>
-              <p>These Terms & Conditions are governed by and construed in accordance with applicable law. Any disputes arising from or related to these terms or our services shall first be attempted to be resolved through good-faith communication. If unresolved, disputes will be submitted to the jurisdiction of the relevant courts.</p>
+            {/* 10 */}
+            <TermsSection icon={Globe2} title="10. Governing Law" delay={0.36}>
+              <p>These Terms &amp; Conditions are governed by and construed in accordance with applicable law. Any disputes arising from or related to these terms or our services shall first be attempted to be resolved through good-faith communication. If unresolved, disputes will be submitted to the jurisdiction of the relevant courts.</p>
             </TermsSection>
 
-            <TermsSection icon={Scale} title="9. Modifications" delay={0.32}>
-              <p>We reserve the right to update these Terms & Conditions at any time. Changes will be posted on this page with an updated “Last reviewed” date. Your continued use of the website or services after any changes constitutes acceptance of the revised terms. We recommend reviewing this page periodically.</p>
+            {/* 11 */}
+            <TermsSection icon={Scale} title="11. Modifications" delay={0.40}>
+              <p>We reserve the right to update these Terms &amp; Conditions at any time. Changes will be posted on this page with an updated &ldquo;Last reviewed&rdquo; date. Your continued use of the website or services after any changes constitutes acceptance of the revised terms. We recommend reviewing this page periodically.</p>
             </TermsSection>
 
-            <TermsSection icon={Mail} title="10. Contact" delay={0.36}>
+            {/* 12 */}
+            <TermsSection icon={Mail} title="12. Contact" delay={0.44}>
               <p>For any questions about these terms or our services, please contact us:</p>
               <a
                 href={`mailto:${siteConfig.email}?subject=Terms%20Inquiry`}
@@ -137,7 +183,7 @@ export default function TermsPage() {
             </TermsSection>
 
             {/* Bottom CTA */}
-            <Reveal delay={0.40}>
+            <Reveal delay={0.48}>
               <div className="glass-card rounded-3xl p-8 text-center">
                 <ScrollText className="w-8 h-8 text-gold mx-auto" />
                 <h3 className="mt-4 text-xl">Ready to begin?</h3>

@@ -25,6 +25,9 @@ const ICON_MAP = {
   Moon, Sparkles,
 };
 
+// Fallback if Sanity setting is absent — client can override via Site Settings
+const DEFAULT_HOME_SERVICES_LIMIT = 6;
+
 const TABS = [
   { key: 'all',     label: 'All',           icon: null },
   { key: 'quick',   label: 'Quick Guidance', icon: Zap },
@@ -110,12 +113,19 @@ export function ServicesSection() {
   const sectionHeading  = settings?.servicesSectionHeading  ?? "Consultations crafted with intention.";
   const sectionSubtitle = settings?.servicesSectionSubtitle ?? null;
 
+  // Sanity-controlled limit: set `homeServicesLimit` in Site Settings dashboard.
+  // Falls back to DEFAULT_HOME_SERVICES_LIMIT (6) if not configured.
+  const homeLimit = settings?.homeServicesLimit
+    ? Number(settings.homeServicesLimit)
+    : DEFAULT_HOME_SERVICES_LIMIT;
+
   const hasTiers = allServices?.some(s => s.sessionTier);
   const services = allServices ? allServices.map(normalise) : HOME_SERVICES;
 
-  const filtered = activeTab === 'all'
+  const filtered = (activeTab === 'all'
     ? services
-    : services.filter(s => s.sessionTier === activeTab);
+    : services.filter(s => s.sessionTier === activeTab)
+  ).slice(0, homeLimit);
 
   return (
     <section id="services" className="py-32 relative bg-cosmic-deep">
