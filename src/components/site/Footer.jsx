@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { siteConfig, footerLinks } from "@/content/site";
 
-// ── Inline SVG icons — replaces lucide-react entirely ────────────────────
+// ── Inline SVG icons ───────────────────────────────────────────────────────────────────────────────────
 function InstagramIcon({ className }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -52,6 +52,8 @@ export default function Footer() {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent" />
 
       <div className="relative max-w-7xl mx-auto px-6 lg:px-10 py-24 grid grid-cols-1 md:grid-cols-12 gap-12">
+
+        {/* Brand column */}
         <div className="md:col-span-5">
           <Link to="/" className="flex items-center gap-2.5">
             <span className="text-gold font-serif text-3xl">✦</span>
@@ -80,26 +82,34 @@ export default function Footer() {
           </div>
         </div>
 
+        {/* Links columns — footerLinks is an object { explore: [], legal: [] } */}
         <div className="md:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-8">
-          {footerLinks.map((group) => (
-            <div key={group.heading}>
-              <h3 className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-5">
-                {group.heading}
-              </h3>
-              <ul className="space-y-3">
-                {group.links.map((l) => (
-                  <li key={l.to}>
-                    <Link
-                      to={l.to}
-                      className="text-sm text-muted-foreground hover:text-foreground transition"
-                    >
-                      {l.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+
+          <div>
+            <h3 className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-5">Explore</h3>
+            <ul className="space-y-3">
+              {footerLinks.explore.map((l) => (
+                <li key={l.to}>
+                  <Link to={l.to} className="text-sm text-muted-foreground hover:text-foreground transition">
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-5">Legal</h3>
+            <ul className="space-y-3">
+              {footerLinks.legal.map((l) => (
+                <li key={l.to}>
+                  <Link to={l.to} className="text-sm text-muted-foreground hover:text-foreground transition">
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
 
           <div>
             <h3 className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-5">Contact</h3>
@@ -116,6 +126,7 @@ export default function Footer() {
               </li>
             </ul>
           </div>
+
         </div>
       </div>
 
