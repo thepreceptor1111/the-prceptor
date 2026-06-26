@@ -1,8 +1,19 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Clock } from "lucide-react";
 import { OFFER_END_DATE } from "@/utils/constants";
 import { useSiteSettings } from "@/lib/useSiteSettings";
+
+// ── Inline SVG icon — removes lucide-react dependency ─────────────────────
+function ClockIcon({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      className={className} aria-hidden="true">
+      <circle cx="12" cy="12" r="10" />
+      <polyline points="12 6 12 12 16 14" />
+    </svg>
+  );
+}
 
 function getTimeLeft(deadline) {
   const diff = new Date(deadline) - Date.now();
@@ -56,7 +67,7 @@ export function OfferTimer() {
   return (
     <div className="flex flex-col items-center gap-4 py-4">
       <div className="flex items-center gap-2 text-xs uppercase tracking-[0.25em] text-gold/80">
-        <Clock className="w-3.5 h-3.5" />
+        <ClockIcon className="w-3.5 h-3.5" />
         <span>{timerLabel}</span>
       </div>
       <div className="flex items-end gap-2 sm:gap-3">
