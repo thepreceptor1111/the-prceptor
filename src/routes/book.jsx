@@ -1,6 +1,5 @@
 import SEO from "@/components/site/SEO";
 import { PAGE_SEO } from "@/content/seo";
-import { SITE } from "@/content/seo";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -16,26 +15,47 @@ import {
   CalendarDays,
   Star,
   User,
+  AlertTriangle,
+  X,
 } from "lucide-react";
 import Reveal from "@/components/site/Reveal";
+import { siteConfig } from "@/content/site";
 
 const CAL_NAMESPACE = "astrology-session";
 const CAL_LINK     = "preceptor/astrology-session";
+const CAL_ORIGIN   = "https://app.cal.com";
+const EMBED_ID     = "cal-embed-astrology";
 
 /**
- * Module-level flag — survives React re-mounts within the same page session.
- * Reset to false in useEffect cleanup so navigating away + back
- * triggers a clean re-init into the new DOM container.
+ * CAL.COM EMBED — OFFICIAL QUEUE PATTERN
  *
- * WHY NOT window.__calInitDone:
- *   The global flag persists even after the component unmounts.
- *   When the user navigates away and back, the embed container is a
- *   brand-new empty DOM node — but the global flag says "already done",
- *   so Cal never injects into it → blank white box.
+ * The only reliable approach (per Cal docs) is:
+ *
+ *  1. Write the stub IIFE synchronously to window.Cal via script.innerHTML.
+ *     This creates the queue BEFORE embed.js loads.
+ *
+ *  2. Queue Cal("init"), Cal.ns[ns]("inline"), Cal.ns[ns]("ui")
+ *     synchronously right after the stub — they go into the queue,
+ *     not executed yet.
+ *
+ *  3. Inject <script src="embed.js"> separately. It loads async,
+ *     finds the pre-built queue, replays every call in order.
+ *
+ *  4. NEVER delete window.Cal on unmount. Cal registers <cal-modal-box>
+ *     as a custom element once per page session. CustomElementRegistry
+ *     is permanent — re-registering throws NotSupportedError.
+ *     On unmount: clear the container innerHTML only.
+ *
+ *  5. Guard re-mount with window.Cal?.loaded so we never call
+ *     inline() twice on an already-running embed.
+ *
+ *  6. Always pass a stable CSS selector string to elementOrSelector,
+ *     never a raw DOM ref (fragile if ref is null at call time).
  */
-let calScriptInjected = false;
 
-// Flow: 0 = intro  →  1 = Cal embed  →  2 = confirmed
+let calStubInjected  = false;
+let calSrcInjected   = false;
+
 export default function BookPage() {
   const [step, setStep]             = useState(0);
   const [bookedData, setBookedData] = useState(null);
@@ -43,15 +63,12 @@ export default function BookPage() {
   return (
     <>
       <SEO {...PAGE_SEO.book} />
-
       <div className="bg-hero starfield min-h-screen relative overflow-hidden">
-        {/* Ambient glow */}
         <div
           className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2
                      w-[800px] h-[800px] rounded-full opacity-30 blur-3xl"
           style={{ background: "radial-gradient(circle, var(--gold) 0%, transparent 60%)" }}
         />
-
         <section className="relative max-w-6xl mx-auto px-6 lg:px-10 py-16 lg:py-24">
           <AnimatePresence mode="wait">
             {step === 0 && (
@@ -92,7 +109,7 @@ function StepWrap({ children }) {
   );
 }
 
-// ─── Intro ───────────────────────────────────────────────────────────────────
+// ─── Intro ─────────────────────────────────────────────────────────────────────────────
 function IntroStep({ onStart }) {
   return (
     <div className="text-center max-w-3xl mx-auto pt-8">
@@ -105,7 +122,7 @@ function IntroStep({ onStart }) {
 
       <motion.h1
         initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-        className="mt-6 text-5xl md:text-7xl leading-[1.05] bg-gradient-gold"
+        className="mt-6 text-5xl md:text-7xl leading-[1.05] bg-gradient-gold bg-clip-text text-transparent"
       >
         Begin Your Spiritual Consultation
       </motion.h1>
@@ -115,14 +132,13 @@ function IntroStep({ onStart }) {
         className="mt-6 text-lg text-muted-foreground leading-relaxed max-w-xl mx-auto"
       >
         A calm, private space to explore your chart with clarity and care.
-        Each session is crafted around your story — guided by quiet intention.
+        Each session is crafted around your story, guided by quiet intention.
       </motion.p>
 
-      {/* Feature cards */}
       <div className="mt-12 grid sm:grid-cols-3 gap-4 max-w-2xl mx-auto">
         {[
           { icon: Clock,  label: "60 minute session" },
-          { icon: Video,  label: "Online — private 1:1" },
+          { icon: Video,  label: "Online, private 1:1" },
           { icon: Globe2, label: "Your local timezone" },
         ].map((item, i) => (
           <motion.div
@@ -137,7 +153,6 @@ function IntroStep({ onStart }) {
         ))}
       </div>
 
-      {/* How it works */}
       <motion.div
         initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
         className="mt-10 max-w-lg mx-auto glass-card rounded-2xl p-6 text-left"
@@ -176,171 +191,188 @@ function IntroStep({ onStart }) {
   );
 }
 
-// ─── Cal embed step ───────────────────────────────────────────────────────────
-/**
- * INIT STRATEGY:
- *
- * 1. calScriptInjected (module-level) tracks whether the Cal loader
- *    script has been appended to document.body in this page session.
- *
- * 2. On mount:
- *    a. If script already injected AND container already has children
- *       (Cal rendered inside it) → just re-attach the booking listener.
- *    b. If script already injected but container is empty
- *       (re-mount after navigation) → re-run inline() to re-render Cal
- *       into the fresh DOM node.
- *    c. If script not injected → full cold init.
- *
- * 3. On unmount (cleanup): remove the injected script, reset
- *    calScriptInjected = false so the next mount does a clean init.
- */
+// ─── Booking Failed Banner ────────────────────────────────────────────────────────────
+function BookingFailedBanner({ onDismiss }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -12 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -12 }}
+      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+      className="relative mb-6 rounded-2xl overflow-hidden"
+      style={{
+        background: "linear-gradient(135deg, oklch(0.18 0.025 270 / 0.95), oklch(0.14 0.022 270 / 0.95))",
+        border: "1px solid oklch(0.82 0.12 85 / 0.35)",
+        boxShadow: "0 0 32px -8px oklch(0.82 0.12 85 / 0.18)",
+      }}
+    >
+      {/* Gold top accent line */}
+      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-gold to-transparent opacity-60" />
+
+      <div className="p-5 flex items-start gap-4">
+        {/* Icon */}
+        <div className="shrink-0 w-9 h-9 rounded-full flex items-center justify-center"
+          style={{ background: "oklch(0.82 0.12 85 / 0.12)", border: "1px solid oklch(0.82 0.12 85 / 0.30)" }}
+        >
+          <AlertTriangle className="w-4 h-4 text-gold" />
+        </div>
+
+        {/* Message */}
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-medium text-foreground leading-snug">
+            We couldn’t complete your booking.
+          </p>
+          <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">
+            This usually happens when the selected time slot doesn’t align with your timezone.
+            Please <strong className="text-foreground font-medium">try a different time slot</strong>,
+            or reach us directly and we’ll schedule your session manually.
+          </p>
+          <a
+            href={`mailto:${siteConfig.email}?subject=Session%20Booking%20Help`}
+            className="inline-flex items-center gap-1.5 mt-3 text-xs text-gold hover:text-gold/80 transition-colors"
+          >
+            <Mail className="w-3.5 h-3.5" />
+            {siteConfig.email}
+          </a>
+        </div>
+
+        {/* Dismiss */}
+        <button
+          onClick={onDismiss}
+          aria-label="Dismiss"
+          className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-white/10 transition-all"
+        >
+          <X className="w-3.5 h-3.5" />
+        </button>
+      </div>
+    </motion.div>
+  );
+}
+
+// ─── Cal embed ─────────────────────────────────────────────────────────────────────────────
 function CalStep({ onBack, onBooked }) {
-  const embedRef  = useRef(null);
-  const scriptRef = useRef(null);
+  const [bookingFailed, setBookingFailed] = useState(false);
 
   useEffect(() => {
-    let pollTimer = null;
+    if (!calStubInjected) {
+      const stub = document.createElement("script");
+      stub.innerHTML = `
+        (function (C, A, L) {
+          let p = function (a, ar) { a.q.push(ar); };
+          let d = C.document;
+          C.Cal = C.Cal || function () {
+            let cal = C.Cal;
+            let ar = arguments;
+            if (!cal.loaded) {
+              cal.ns  = {};
+              cal.q   = cal.q || [];
+              cal.loaded = false;
+            }
+            if (ar[0] === L) {
+              const api = function () { p(api, arguments); };
+              const ns  = ar[1];
+              api.q = api.q || [];
+              if (typeof ns === "string") {
+                cal.ns[ns] = cal.ns[ns] || api;
+                p(cal.ns[ns], ar);
+                p(cal, ["initNamespace", ns]);
+              } else { p(cal, ar); }
+              return;
+            }
+            p(cal, ar);
+          };
+        })(window, "https://app.cal.com/embed/embed.js", "init");
+      `;
+      document.head.appendChild(stub);
+      calStubInjected = true;
+    }
 
-    function initCalEmbed() {
-      // Re-render Cal into the (now empty) container
+    if (window.Cal?.loaded) {
       try {
-        window.Cal.ns[CAL_NAMESPACE]("inline", {
-          elementOrSelector: `#my-cal-inline-${CAL_NAMESPACE}`,
-          config: { layout: "month_view", useSlotsViewOnSmallScreen: "true" },
-          calLink: CAL_LINK,
+        window.Cal.ns[CAL_NAMESPACE]("on", {
+          action:   "bookingSuccessful",
+          callback: (e) => onBooked(e.detail?.data ?? {}),
         });
-        attachBookingListener(onBooked);
-      } catch (err) {
-        console.warn("[Cal] Re-init failed:", err);
-      }
+        window.Cal.ns[CAL_NAMESPACE]("on", {
+          action:   "bookingFailed",
+          callback: () => setBookingFailed(true),
+        });
+      } catch (_) {}
+      return;
     }
 
-    function waitForCalThenInit() {
-      pollTimer = setInterval(() => {
-        if (window.Cal?.ns?.[CAL_NAMESPACE]) {
-          clearInterval(pollTimer);
-          initCalEmbed();
-        }
-      }, 100);
+    window.Cal("init", CAL_NAMESPACE, { origin: CAL_ORIGIN });
+
+    window.Cal.ns[CAL_NAMESPACE]("inline", {
+      elementOrSelector: `#${EMBED_ID}`,
+      calLink:           CAL_LINK,
+      config:            { layout: "month_view", useSlotsViewOnSmallScreen: "true" },
+    });
+
+    window.Cal.ns[CAL_NAMESPACE]("ui", {
+      hideEventTypeDetails: false,
+      layout: "month_view",
+      theme:  "dark",
+      cssVarsPerTheme: {
+        dark: {
+          "cal-bg":             "#14121e",
+          "cal-bg-emphasis":    "#1c192d",
+          "cal-bg-subtle":      "#1f1c30",
+          "cal-bg-muted":       "#18162a",
+          "cal-bg-inverted":    "#f5f0e8",
+          "cal-text":           "#f0ede6",
+          "cal-text-emphasis":  "#faf8f3",
+          "cal-text-subtle":    "#9b97a8",
+          "cal-text-muted":     "#6b6778",
+          "cal-text-inverted":  "#14121e",
+          "cal-brand":          "#d4a84b",
+          "cal-brand-emphasis": "#e8c068",
+          "cal-brand-subtle":   "#2a2318",
+          "cal-brand-text":     "#14121e",
+          "cal-border":         "rgba(255,255,255,0.08)",
+          "cal-border-subtle":  "rgba(255,255,255,0.05)",
+          "cal-border-booker":  "rgba(255,255,255,0.07)",
+          "cal-border-default": "rgba(255,255,255,0.08)",
+        },
+      },
+    });
+
+    window.Cal.ns[CAL_NAMESPACE]("on", {
+      action:   "bookingSuccessful",
+      callback: (e) => onBooked(e.detail?.data ?? {}),
+    });
+
+    // ── bookingFailed: show branded error banner with timezone guidance
+    window.Cal.ns[CAL_NAMESPACE]("on", {
+      action:   "bookingFailed",
+      callback: () => setBookingFailed(true),
+    });
+
+    if (!calSrcInjected) {
+      const src = document.createElement("script");
+      src.src   = "https://app.cal.com/embed/embed.js";
+      src.async = true;
+      document.head.appendChild(src);
+      calSrcInjected = true;
     }
 
-    const container = embedRef.current;
-
-    if (calScriptInjected) {
-      // Script already in DOM from a previous mount
-      if (container && container.children.length > 0) {
-        // Cal already rendered into this container — just re-attach listener
-        attachBookingListener(onBooked);
-      } else {
-        // Container is a fresh empty node (navigated away + back)
-        // Cal namespace exists; re-run inline() directly
-        if (window.Cal?.ns?.[CAL_NAMESPACE]) {
-          initCalEmbed();
-        } else {
-          waitForCalThenInit();
-        }
-      }
-      return () => { if (pollTimer) clearInterval(pollTimer); };
-    }
-
-    // ── Cold init: first time CalStep mounts ──────────────────────────────
-    const script = document.createElement("script");
-    script.type  = "text/javascript";
-    script.async = true;
-    script.innerHTML = `
-      (function (C, A, L) {
-        let p = function (a, ar) { a.q.push(ar); };
-        let d = C.document;
-        C.Cal = C.Cal || function () {
-          let cal = C.Cal; let ar = arguments;
-          if (!cal.loaded) {
-            cal.ns = {}; cal.q = cal.q || [];
-            d.head.appendChild(d.createElement("script")).src = A;
-            cal.loaded = true;
-          }
-          if (ar[0] === L) {
-            const api = function () { p(api, arguments); };
-            const namespace = ar[1];
-            api.q = api.q || [];
-            if (typeof namespace === "string") {
-              cal.ns[namespace] = cal.ns[namespace] || api;
-              p(cal.ns[namespace], ar);
-              p(cal, ["initNamespace", namespace]);
-            } else p(cal, ar);
-            return;
-          }
-          p(cal, ar);
-        };
-      })(window, "https://app.cal.com/embed/embed.js", "init");
-
-      Cal("init", "${CAL_NAMESPACE}", { origin: "https://app.cal.com" });
-      Cal.config = Cal.config || {};
-      Cal.config.forwardQueryParams = true;
-
-      Cal.ns["${CAL_NAMESPACE}"]("inline", {
-        elementOrSelector: "#my-cal-inline-${CAL_NAMESPACE}",
-        config: { layout: "month_view", useSlotsViewOnSmallScreen: "true" },
-        calLink: "${CAL_LINK}",
-      });
-
-      Cal.ns["${CAL_NAMESPACE}"]("ui", {
-        hideEventTypeDetails: false,
-        layout: "month_view",
-        theme: "dark",
-        cssVarsPerTheme: {
-          dark: {
-            "cal-bg":             "#14121e",
-            "cal-bg-emphasis":    "#1c192d",
-            "cal-bg-subtle":      "#1f1c30",
-            "cal-bg-muted":       "#18162a",
-            "cal-bg-inverted":    "#f5f0e8",
-            "cal-text":           "#f0ede6",
-            "cal-text-emphasis":  "#faf8f3",
-            "cal-text-subtle":    "#9b97a8",
-            "cal-text-muted":     "#6b6778",
-            "cal-text-inverted":  "#14121e",
-            "cal-brand":          "#d4a84b",
-            "cal-brand-emphasis": "#e8c068",
-            "cal-brand-subtle":   "#2a2318",
-            "cal-brand-text":     "#14121e",
-            "cal-border":         "rgba(255,255,255,0.08)",
-            "cal-border-subtle":  "rgba(255,255,255,0.05)",
-            "cal-border-booker":  "rgba(255,255,255,0.07)",
-            "cal-border-default": "rgba(255,255,255,0.08)",
-          }
-        }
-      });
-    `;
-
-    document.body.appendChild(script);
-    scriptRef.current  = script;
-    calScriptInjected  = true;
-
-    waitForCalThenInit();
-
-    // Cleanup: remove script, reset flag so next mount does a clean init
     return () => {
-      if (pollTimer) clearInterval(pollTimer);
-      if (scriptRef.current && document.body.contains(scriptRef.current)) {
-        document.body.removeChild(scriptRef.current);
-      }
-      calScriptInjected = false;
+      const container = document.getElementById(EMBED_ID);
+      if (container) container.innerHTML = "";
     };
   }, [onBooked]);
 
   return (
     <div className="max-w-5xl mx-auto">
-      {/* Header */}
       <div className="text-center max-w-2xl mx-auto">
         <span className="text-xs uppercase tracking-[0.35em] text-gold">Book Your Session</span>
         <h2 className="mt-3 text-4xl md:text-5xl">Choose your time</h2>
         <p className="mt-4 text-muted-foreground">
-          Pick a date and slot — then fill in your details on the next screen.
+          Pick a date and slot, then fill in your details on the next screen.
           All times are shown in your local timezone.
         </p>
       </div>
 
-      {/* Info strip */}
       <div className="mt-6 flex flex-wrap items-center justify-center gap-5">
         {[
           { icon: Globe2,       text: "Your local timezone" },
@@ -354,10 +386,17 @@ function CalStep({ onBack, onBooked }) {
         ))}
       </div>
 
-      {/* Cal.com inline embed container
-          height: fluid clamp — no fixed 720px that traps mobile scroll */}
+      {/* ── Booking failed banner ── */}
+      <AnimatePresence>
+        {bookingFailed && (
+          <div className="mt-6">
+            <BookingFailedBanner onDismiss={() => setBookingFailed(false)} />
+          </div>
+        )}
+      </AnimatePresence>
+
       <div
-        className="mt-8 rounded-3xl overflow-hidden shadow-elegant"
+        className="mt-8 rounded-3xl shadow-elegant"
         style={{
           background:     "oklch(0.14 0.024 270 / 0.80)",
           border:         "1px solid rgba(255,255,255,0.07)",
@@ -365,13 +404,8 @@ function CalStep({ onBack, onBooked }) {
         }}
       >
         <div
-          id={`my-cal-inline-${CAL_NAMESPACE}`}
-          ref={embedRef}
-          style={{
-            width:     "100%",
-            minHeight: "clamp(520px, 80vh, 760px)",
-            overflow:  "auto",
-          }}
+          id={EMBED_ID}
+          style={{ width: "100%", minHeight: "clamp(520px, 80vh, 760px)" }}
         />
       </div>
 
@@ -387,19 +421,7 @@ function CalStep({ onBack, onBooked }) {
   );
 }
 
-/** Attach bookingSuccessful listener to Cal namespace */
-function attachBookingListener(onBooked) {
-  try {
-    window.Cal.ns[CAL_NAMESPACE]("on", {
-      action:   "bookingSuccessful",
-      callback: (e) => onBooked(e.detail?.data ?? {}),
-    });
-  } catch (err) {
-    console.warn("[Cal] Could not attach bookingSuccessful listener:", err);
-  }
-}
-
-// ─── Confirmed screen ─────────────────────────────────────────────────────────
+// ─── Confirmed ─────────────────────────────────────────────────────────────────────────────
 function ConfirmedStep({ bookedData }) {
   const name      = bookedData?.attendees?.[0]?.name  || "";
   const email     = bookedData?.attendees?.[0]?.email || "";
@@ -407,12 +429,8 @@ function ConfirmedStep({ bookedData }) {
 
   const startTime = bookedData?.startTime
     ? new Date(bookedData.startTime).toLocaleString("en-US", {
-        weekday:      "long",
-        month:        "long",
-        day:          "numeric",
-        hour:         "numeric",
-        minute:       "2-digit",
-        hour12:       true,
+        weekday: "long", month: "long", day: "numeric",
+        hour: "numeric", minute: "2-digit", hour12: true,
         timeZoneName: "short",
       })
     : null;
@@ -424,16 +442,14 @@ function ConfirmedStep({ bookedData }) {
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
         className="relative inline-flex items-center justify-center w-24 h-24 rounded-full"
-        style={{
-          background: "radial-gradient(circle, color-mix(in oklab, var(--gold) 40%, transparent), transparent 70%)",
-        }}
+        style={{ background: "radial-gradient(circle, color-mix(in oklab, var(--gold) 40%, transparent), transparent 70%)" }}
       >
         <CheckCircle2 className="w-14 h-14 text-gold" />
       </motion.div>
 
       <motion.h2
         initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-        className="mt-8 text-4xl md:text-5xl bg-gradient-gold"
+        className="mt-8 text-4xl md:text-5xl bg-gradient-gold bg-clip-text text-transparent"
       >
         Your Session is Confirmed
       </motion.h2>
@@ -443,8 +459,7 @@ function ConfirmedStep({ bookedData }) {
         className="mt-4 text-muted-foreground max-w-md mx-auto"
       >
         {firstName !== "friend" ? `Thank you, ${firstName}.` : "Thank you."} Your private
-        consultation is booked. A calendar invite and meeting link are on
-        their way to your inbox.
+        consultation is booked. A calendar invite and meeting link are on their way to your inbox.
       </motion.p>
 
       <motion.div
@@ -455,9 +470,7 @@ function ConfirmedStep({ bookedData }) {
         {name      && <SummaryRow label="Name"        value={name} />}
         {email     && <SummaryRow label="Confirmation sent to" value={email} last />}
         {!startTime && !name && !email && (
-          <p className="text-sm text-muted-foreground text-center py-4">
-            Check your email for booking details.
-          </p>
+          <p className="text-sm text-muted-foreground text-center py-4">Check your email for booking details.</p>
         )}
       </motion.div>
 

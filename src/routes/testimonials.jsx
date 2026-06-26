@@ -1,13 +1,56 @@
 import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useState } from "react";
-import { ArrowLeft, ArrowRight, Star, Quote, PlayCircle } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { Reveal } from "@/components/site/Reveal";
 import { TESTIMONIALS } from "@/utils/constants";
 import { useSanity } from "@/lib/useSanity";
 import { useSiteSettings } from "@/lib/useSiteSettings";
 import { TESTIMONIALS_QUERY } from "@/lib/sanityQueries";
 import { sanityImage, preloadImage } from "@/lib/sanityImage";
+
+// ── Inline SVG icons — removes lucide-react dependency ────────────────────
+function ArrowLeftIcon({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      className={className} aria-hidden="true">
+      <path d="m12 19-7-7 7-7" />
+      <path d="M19 12H5" />
+    </svg>
+  );
+}
+
+function ArrowRightIcon({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      className={className} aria-hidden="true">
+      <path d="M5 12h14" />
+      <path d="m12 5 7 7-7 7" />
+    </svg>
+  );
+}
+
+function StarIcon({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+      fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      className={className} aria-hidden="true">
+      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+    </svg>
+  );
+}
+
+function QuoteIcon({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      className={className} aria-hidden="true">
+      <path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z" />
+      <path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z" />
+    </svg>
+  );
+}
 
 const CAROUSEL_COUNT = 5;
 const SLIDE_INTERVAL = 6000;
@@ -33,7 +76,7 @@ function normalise(t) {
   };
 }
 
-/* ─── SHARED PRIMITIVES ─────────────────────────────────────────────────── */
+/* ─── SHARED PRIMITIVES ──────────────────────────────────────────────── */
 
 function NavBtn({ onClick, label, children }) {
   return (
@@ -57,17 +100,47 @@ function Dots({ total, current, onDot }) {
   );
 }
 
+function useScrollPassthrough(ref) {
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    function onWheel(e) {
+      const atTop    = el.scrollTop === 0;
+      const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1;
+
+      if ((e.deltaY < 0 && atTop) || (e.deltaY > 0 && atBottom)) {
+        e.preventDefault();
+        window.dispatchEvent(new WheelEvent("wheel", {
+          deltaY:    e.deltaY,
+          deltaMode: e.deltaMode,
+          bubbles:   true,
+          cancelable: true,
+        }));
+      }
+    }
+
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, [ref]);
+}
+
 function ScreenshotCard({ r, cardH, stripH, isActive = false, showControls = false, onPrev, onNext, total, current, onDot }) {
+  const scrollRef = useRef(null);
+  useScrollPassthrough(scrollRef);
+
   return (
     <div className="glass-card rounded-3xl overflow-hidden relative" style={{ height: `${cardH}px` }}>
-
-      {/* Scrollable image zone */}
-      <div style={{
-        position: "absolute", top: 0, left: 0, right: 0,
-        bottom: `${stripH}px`,
-        overflowY: "auto", overflowX: "hidden",
-        scrollbarWidth: "none",
-      }}>
+      <div
+        ref={scrollRef}
+        style={{
+          position: "absolute", top: 0, left: 0, right: 0,
+          bottom: `${stripH}px`,
+          overflowY: "auto", overflowX: "hidden",
+          scrollbarWidth: "none",
+          overscrollBehavior: "contain",
+        }}
+      >
         <style>{`.ss-scroll::-webkit-scrollbar{display:none}`}</style>
         <div className="ss-scroll" style={{ overflowY: "auto", scrollbarWidth: "none" }}>
           <img
@@ -81,14 +154,12 @@ function ScreenshotCard({ r, cardH, stripH, isActive = false, showControls = fal
         </div>
       </div>
 
-      {/* Top fade */}
       <div style={{
         position: "absolute", top: 0, left: 0, right: 0, height: "56px",
         background: "linear-gradient(to bottom, rgba(0,0,0,0.35), transparent)",
         pointerEvents: "none", zIndex: 1,
       }} />
 
-      {/* Bottom gradient */}
       <div style={{
         position: "absolute", left: 0, right: 0, bottom: 0,
         height: `${stripH + 56}px`,
@@ -96,7 +167,6 @@ function ScreenshotCard({ r, cardH, stripH, isActive = false, showControls = fal
         pointerEvents: "none", zIndex: 1,
       }} />
 
-      {/* Name + controls strip */}
       <div style={{
         position: "absolute", bottom: 0, left: 0, right: 0,
         height: `${stripH}px`,
@@ -128,9 +198,9 @@ function ScreenshotCard({ r, cardH, stripH, isActive = false, showControls = fal
 
         {showControls ? (
           <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
-            <NavBtn onClick={onPrev} label="Previous"><ArrowLeft className="w-4 h-4" /></NavBtn>
+            <NavBtn onClick={onPrev} label="Previous"><ArrowLeftIcon className="w-4 h-4" /></NavBtn>
             <Dots total={total} current={current} onDot={onDot} />
-            <NavBtn onClick={onNext} label="Next"><ArrowRight className="w-4 h-4" /></NavBtn>
+            <NavBtn onClick={onNext} label="Next"><ArrowRightIcon className="w-4 h-4" /></NavBtn>
           </div>
         ) : r.service ? (
           <span className="text-[10px] uppercase tracking-widest text-white/50 border border-white/20 rounded-full px-2.5 py-1 shrink-0 bg-black/40">
@@ -150,13 +220,13 @@ function TextCard({ r, cardH, showControls = false, onPrev, onNext, total, curre
     >
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,oklch(0.82_0.12_85_/_0.07),transparent_40%)] pointer-events-none" />
       <div className="p-10 relative z-10 h-full flex flex-col justify-center">
-        <Quote className="w-9 h-9 text-gold/30 mx-auto" />
+        <QuoteIcon className="w-9 h-9 text-gold/30 mx-auto" />
         <p className="mt-5 font-serif text-xl md:text-2xl leading-relaxed">
           &ldquo;{r.text}&rdquo;
         </p>
         <div className="mt-6 flex justify-center gap-1">
           {[...Array(r.rating ?? 5)].map((_, k) => (
-            <Star key={k} className="w-4 h-4 fill-gold text-gold" />
+            <StarIcon key={k} className="w-4 h-4 fill-gold text-gold" />
           ))}
         </div>
         <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -166,9 +236,9 @@ function TextCard({ r, cardH, showControls = false, onPrev, onNext, total, curre
           </div>
           {showControls && (
             <div className="flex items-center gap-3">
-              <NavBtn onClick={onPrev} label="Previous"><ArrowLeft className="w-4 h-4" /></NavBtn>
+              <NavBtn onClick={onPrev} label="Previous"><ArrowLeftIcon className="w-4 h-4" /></NavBtn>
               <Dots total={total} current={current} onDot={onDot} />
-              <NavBtn onClick={onNext} label="Next"><ArrowRight className="w-4 h-4" /></NavBtn>
+              <NavBtn onClick={onNext} label="Next"><ArrowRightIcon className="w-4 h-4" /></NavBtn>
             </div>
           )}
         </div>
@@ -177,7 +247,7 @@ function TextCard({ r, cardH, showControls = false, onPrev, onNext, total, curre
   );
 }
 
-/* ─── PAGE ───────────────────────────────────────────────────────────────── */
+/* ─── PAGE ───────────────────────────────────────────────────── */
 export default function TestimonialsPage() {
   const { data: cmsTestimonials } = useSanity(TESTIMONIALS_QUERY, null);
   const { settings }              = useSiteSettings();
@@ -196,7 +266,6 @@ export default function TestimonialsPage() {
 
   useEffect(() => { setActiveIndex(0); }, [reviews.length]);
 
-  // ── Preload adjacent carousel images ──
   useEffect(() => {
     if (featuredReviews.length < 2) return;
     const nextIdx = (activeIndex + 1) % featuredReviews.length;
@@ -205,7 +274,6 @@ export default function TestimonialsPage() {
     preloadImage(featuredReviews[prevIdx]?.screenshotUrl);
   }, [activeIndex, featuredReviews]);
 
-  // ── Auto-advance ──
   useEffect(() => {
     if (!featuredReviews.length) return;
     const timer = window.setInterval(
@@ -231,7 +299,6 @@ export default function TestimonialsPage() {
       <div className="bg-hero starfield min-h-screen">
         <section className="max-w-7xl mx-auto px-6 lg:px-10 py-20 lg:py-28">
 
-          {/* Hero heading */}
           <Reveal className="text-center max-w-3xl mx-auto">
             <span className="text-xs uppercase tracking-[0.3em] text-gold">
               {settings?.testimonialsSectionLabel ?? "Testimonials"}
@@ -242,7 +309,6 @@ export default function TestimonialsPage() {
             <p className="mt-5 text-muted-foreground">Trust earned, one consultation at a time.</p>
           </Reveal>
 
-          {/* ── Featured carousel ── */}
           {featuredReviews.length > 0 && (
             <div className="mt-20">
               <Reveal>
@@ -291,7 +357,6 @@ export default function TestimonialsPage() {
             </div>
           )}
 
-          {/* ── More reviews grid ── */}
           {moreReviews.length > 0 && (
             <div className="mt-16">
               <Reveal className="text-center max-w-3xl mx-auto">
@@ -311,23 +376,6 @@ export default function TestimonialsPage() {
               </div>
             </div>
           )}
-
-          {/* ── Video testimonials placeholder ── */}
-          <Reveal>
-            <div className="mt-24 text-center">
-              <span className="text-xs uppercase tracking-[0.3em] text-gold">Video Stories</span>
-              <h2 className="mt-4 text-4xl md:text-5xl">Hear it in their words.</h2>
-            </div>
-          </Reveal>
-          <div className="mt-12 grid md:grid-cols-3 gap-6">
-            {[1, 2, 3].map((n) => (
-              <Reveal key={n} delay={n * 0.05}>
-                <div className="aspect-video glass-card rounded-3xl flex items-center justify-center hover:shadow-gold transition cursor-pointer group">
-                  <PlayCircle className="w-14 h-14 text-gold group-hover:scale-110 transition" />
-                </div>
-              </Reveal>
-            ))}
-          </div>
 
         </section>
       </div>

@@ -133,8 +133,8 @@ export const SERVICES = [
   },
 ];
 
-/** First 4 services shown on the home page */
-export const HOME_SERVICES = SERVICES.slice(0, 4);
+/** First 5 services shown on the home page (was 4) */
+export const HOME_SERVICES = SERVICES.slice(0, 5);
 
 export const TESTIMONIALS = [
   {
@@ -179,7 +179,7 @@ export const ACHIEVEMENTS = [
 export const FAQS = [
   {
     q: "How does an online astrology consultation work?",
-    a: "Sessions are conducted over a private video call. You receive a calendar invite, an intake form, and a recording afterwards.",
+    a: "Sessions are conducted over a private video call. You receive a calendar invite and an intake form before the session.",
   },
   {
     q: "What details are required to book?",
@@ -195,7 +195,7 @@ export const FAQS = [
   },
   {
     q: "Are sessions private and confidential?",
-    a: "Yes. Every conversation is held in complete confidence. Recordings are shared only with you.",
+    a: "Yes. Every conversation is held in complete confidence.",
   },
   {
     q: "What is your cancellation policy?",

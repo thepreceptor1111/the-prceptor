@@ -1,8 +1,40 @@
 import { motion } from "framer-motion";
 import { useMemo, useState } from "react";
-import { ArrowRight, Star, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useSiteSettings } from "@/lib/useSiteSettings";
+
+// ── Inline SVG icons — removes lucide-react dependency ────────────────────
+function ArrowRight({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      className={className} aria-hidden="true">
+      <path d="M5 12h14" />
+      <path d="m12 5 7 7-7 7" />
+    </svg>
+  );
+}
+
+function Star({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+      fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      className={className} aria-hidden="true">
+      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+    </svg>
+  );
+}
+
+function Sparkles({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      className={className} aria-hidden="true">
+      <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z" />
+      <path d="M5 3v4" /><path d="M19 17v4" /><path d="M3 5h4" /><path d="M17 19h4" />
+    </svg>
+  );
+}
 
 // Hero image lives in /public — no Vite hash, matches the <link rel="preload"> in index.html exactly.
 const heroImg = "/hero-section.webp";
@@ -40,7 +72,7 @@ function Particle({ x, y, size, delay, duration, drift }) {
   );
 }
 
-// Word-by-word staggered heading
+// Word-by-word staggered heading — slowed down per client request
 function StaggeredHeading({ line1, line2Gold, delay = 0 }) {
   const words1 = line1.split(" ");
   const words2 = line2Gold.split(" ");
@@ -49,7 +81,7 @@ function StaggeredHeading({ line1, line2Gold, delay = 0 }) {
     hidden: { opacity: 0, x: -22, filter: "blur(4px)" },
     visible: (i) => ({
       opacity: 1, x: 0, filter: "blur(0px)",
-      transition: { delay: delay + i * 0.09, duration: 0.75, ease: [0.22, 1, 0.36, 1] },
+      transition: { delay: delay + i * 0.13, duration: 1.1, ease: [0.22, 1, 0.36, 1] },
     }),
   };
 
@@ -167,9 +199,9 @@ export function HeroSection() {
 
       {/* Hero figure */}
       <motion.div
-        initial={{ opacity: 0.88, y: 18, scale: 1.04 }}
+        initial={{ opacity: 0.88, y: 28, scale: 1.04 }}
         animate={{ opacity: 0.88, y: 0, scale: 1 }}
-        transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 2.2, ease: [0.22, 1, 0.36, 1] }}
         className="absolute inset-y-0 right-0 w-full lg:w-[68%] xl:w-[62%] pointer-events-none"
         style={{
           WebkitMaskImage: [
@@ -186,7 +218,6 @@ export function HeroSection() {
           maskComposite: "intersect, intersect",
         }}
       >
-        {/* Hero float animation deferred to after paint */}
         <motion.div
           className="absolute inset-0"
           animate={{ y: [0, -16, 0] }}
@@ -301,7 +332,7 @@ export function HeroSection() {
                 </motion.span>
               ))}
             </div>
-            <span>Trusted by {clientCount} {clientLabel} across {countryCount} countries</span>
+            <span>{clientCount} {clientLabel} across {countryCount} countries</span>
           </motion.div>
 
         </div>

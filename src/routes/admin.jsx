@@ -1,13 +1,81 @@
 // src/routes/admin.jsx
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Lock, Eye, EyeOff, Shield, ExternalLink, Calendar, LayoutDashboard,
-} from "lucide-react";
 import BlockTimePanel    from "@/components/BlockTimePanel";
 import RestrictHoursPanel from "@/components/RestrictHoursPanel";
 
-// ── Auth ────────────────────────────────────────────────────────────────────────────
+// ── Inline SVG icons — removes lucide-react dependency ────────────────────
+function LockIcon({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      className={className} aria-hidden="true">
+      <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+    </svg>
+  );
+}
+
+function EyeIcon({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      className={className} aria-hidden="true">
+      <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  );
+}
+
+function EyeOffIcon({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      className={className} aria-hidden="true">
+      <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
+      <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
+      <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" />
+      <line x1="2" x2="22" y1="2" y2="22" />
+    </svg>
+  );
+}
+
+function ShieldIcon({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      className={className} aria-hidden="true">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+    </svg>
+  );
+}
+
+function ExternalLinkIcon({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      className={className} aria-hidden="true">
+      <path d="M15 3h6v6" />
+      <path d="M10 14 21 3" />
+      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+    </svg>
+  );
+}
+
+function CalendarIcon({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      className={className} aria-hidden="true">
+      <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
+      <line x1="16" x2="16" y1="2" y2="6" />
+      <line x1="8" x2="8" y1="2" y2="6" />
+      <line x1="3" x2="21" y1="10" y2="10" />
+    </svg>
+  );
+}
+
+// ── Auth ────────────────────────────────────────────────────────────────────────────────────
 const SESSION_KEY  = "tp_admin_unlocked";
 const CORRECT_PASS = import.meta.env.VITE_ADMIN_PASS ?? "preceptor-admin-2024";
 
@@ -30,7 +98,7 @@ function useAdminAuth() {
   return { unlocked, unlock, lock };
 }
 
-// ── Lock Screen ─────────────────────────────────────────────────────────────────────
+// ── Lock Screen ─────────────────────────────────────────────────────────────────────────────────────
 function LockScreen({ onUnlock }) {
   const [pass, setPass]   = useState("");
   const [show, setShow]   = useState(false);
@@ -62,7 +130,7 @@ function LockScreen({ onUnlock }) {
         <div className="glass-card rounded-3xl p-10 shadow-elegant border border-gold/20">
           <div className="flex justify-center mb-8">
             <div className="w-16 h-16 rounded-full bg-gold/10 border border-gold/30 flex items-center justify-center">
-              <Shield className="w-7 h-7 text-gold" />
+              <ShieldIcon className="w-7 h-7 text-gold" />
             </div>
           </div>
 
@@ -93,7 +161,7 @@ function LockScreen({ onUnlock }) {
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-gold transition"
                 aria-label={show ? "Hide passphrase" : "Show passphrase"}
               >
-                {show ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                {show ? <EyeOffIcon className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}
               </button>
             </div>
 
@@ -111,7 +179,7 @@ function LockScreen({ onUnlock }) {
             </AnimatePresence>
 
             <button type="submit" className="w-full btn-primary justify-center flex items-center gap-2">
-              <Lock className="w-4 h-4" /> Unlock
+              <LockIcon className="w-4 h-4" /> Unlock
             </button>
           </form>
         </div>
@@ -120,17 +188,16 @@ function LockScreen({ onUnlock }) {
   );
 }
 
-// ── Dashboard ─────────────────────────────────────────────────────────────────────
+// ── Dashboard ─────────────────────────────────────────────────────────────────────────────────────
 const SANITY_URL = "https://thepreceptor.sanity.studio";
 const CAL_URL    = "https://app.cal.com/event-types";
 
 function AdminDashboard({ onLock }) {
   return (
     <div className="min-h-screen flex flex-col bg-hero relative overflow-hidden">
-      {/* Top bar */}
       <header className="sticky top-0 z-50 flex items-center justify-between px-6 py-4 border-b border-gold/15 bg-background/80 backdrop-blur-xl">
         <div className="flex items-center gap-3">
-          <Shield className="w-5 h-5 text-gold" />
+          <ShieldIcon className="w-5 h-5 text-gold" />
           <span className="text-sm font-serif text-gold tracking-wide">Command Centre</span>
           <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground px-2 py-0.5 rounded-full border border-border">
             Private
@@ -140,11 +207,10 @@ function AdminDashboard({ onLock }) {
           onClick={onLock}
           className="flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs border border-border text-muted-foreground hover:border-red-400/50 hover:text-red-400 transition"
         >
-          <Lock className="w-3.5 h-3.5" /> Lock Session
+          <LockIcon className="w-3.5 h-3.5" /> Lock Session
         </button>
       </header>
 
-      {/* Cards */}
       <div className="max-w-5xl mx-auto px-6 py-16 w-full">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -166,7 +232,7 @@ function AdminDashboard({ onLock }) {
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,oklch(0.82_0.12_85_/_0.07),transparent_55%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
               <div className="relative z-10">
                 <div className="w-12 h-12 rounded-xl bg-gold/10 border border-gold/25 flex items-center justify-center mb-6">
-                  <Shield className="w-5 h-5 text-gold" />
+                  <ShieldIcon className="w-5 h-5 text-gold" />
                 </div>
                 <h3 className="text-xl font-serif mb-3">Sanity Studio</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed mb-2">
@@ -181,7 +247,7 @@ function AdminDashboard({ onLock }) {
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gold/15 border border-gold/35 text-gold text-xs hover:bg-gold/25 transition"
                 >
-                  Open Sanity Studio <ExternalLink className="w-3.5 h-3.5" />
+                  Open Sanity Studio <ExternalLinkIcon className="w-3.5 h-3.5" />
                 </a>
               </div>
             </motion.div>
@@ -197,7 +263,7 @@ function AdminDashboard({ onLock }) {
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,oklch(0.52_0.09_280_/_0.09),transparent_55%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
               <div className="relative z-10">
                 <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-6">
-                  <Calendar className="w-5 h-5 text-gold" />
+                  <CalendarIcon className="w-5 h-5 text-gold" />
                 </div>
                 <h3 className="text-xl font-serif mb-3">Cal.com Dashboard</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed mb-2">
@@ -212,20 +278,18 @@ function AdminDashboard({ onLock }) {
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gold/15 border border-gold/35 text-gold text-xs hover:bg-gold/25 transition"
                 >
-                  Open Cal.com <ExternalLink className="w-3.5 h-3.5" />
+                  Open Cal.com <ExternalLinkIcon className="w-3.5 h-3.5" />
                 </a>
               </div>
             </motion.div>
 
-            {/* ── Availability Controls (full-width section header) ── */}
+            {/* ── Availability Controls ── */}
             <div className="sm:col-span-2">
               <p className="text-xs text-muted-foreground uppercase tracking-widest mb-4 flex items-center gap-2">
-                <Calendar className="w-3.5 h-3.5" /> Availability Controls
+                <CalendarIcon className="w-3.5 h-3.5" /> Availability Controls
               </p>
               <div className="grid sm:grid-cols-2 gap-6">
-                {/* Full-day block */}
                 <BlockTimePanel />
-                {/* Custom hour restriction */}
                 <RestrictHoursPanel />
               </div>
             </div>
@@ -252,7 +316,7 @@ function AdminDashboard({ onLock }) {
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-gold transition px-3 py-1.5 rounded-full border border-border hover:border-gold/30"
               >
-                {label} <ExternalLink className="w-3 h-3" />
+                {label} <ExternalLinkIcon className="w-3 h-3" />
               </a>
             ))}
           </motion.div>
@@ -262,7 +326,7 @@ function AdminDashboard({ onLock }) {
   );
 }
 
-// ── Page export ──────────────────────────────────────────────────────────────────────
+// ── Page export ──────────────────────────────────────────────────────────────────────────────────────
 export default function AdminPage() {
   const { unlocked, unlock, lock } = useAdminAuth();
   return unlocked

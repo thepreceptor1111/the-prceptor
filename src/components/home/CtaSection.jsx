@@ -1,41 +1,33 @@
-import { Sun, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
 import { Reveal } from "@/components/site/Reveal";
+import { useSiteSettings } from "@/lib/useSiteSettings";
+import { useLenisResize } from "@/hooks/useLenisResize";
 
 export function CtaSection() {
+  useLenisResize();
+
+  const { settings } = useSiteSettings();
+  const heading  = settings?.ctaSectionHeading  ?? "Ready for clarity?";
+  const subtext  = settings?.ctaSectionSubtext  ?? "Book a private consultation and take the first step toward understanding your chart \u2014 and yourself.";
+  const btnLabel = settings?.ctaSectionBtnLabel ?? "Book a Session";
+
   return (
-    <section className="py-32 relative overflow-hidden">
-      <div className="absolute inset-0 pointer-events-none section-glow-cta" aria-hidden />
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,oklch(0.82_0.12_85_/_0.07),transparent_60%)] blur-3xl" />
+    <section className="py-32 lg:py-40 relative">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden>
+        <div className="absolute inset-0 section-glow-cta" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[70%] aspect-square rounded-full bg-[radial-gradient(circle,oklch(0.82_0.12_85_/_0.07),transparent_65%)] blur-3xl" />
       </div>
-      <div className="max-w-5xl mx-auto px-6 lg:px-10 relative z-10">
+      <div className="max-w-3xl mx-auto px-6 lg:px-10 text-center relative z-10">
         <Reveal>
-          <div className="relative rounded-3xl overflow-hidden glass-card p-12 md:p-20 text-center">
-            <div className="absolute inset-0 bg-hero opacity-60" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,oklch(0.82_0.12_85_/_0.15),transparent_40%)]" />
-            <div className="relative z-10">
-              {/* Pure CSS rotation — no framer-motion needed for a simple spin */}
-              <Sun
-                className="w-10 h-10 text-gold mx-auto"
-                style={{ animation: "ctaSunSpin 6s ease-in-out infinite" }}
-              />
-              <style>{`
-                @keyframes ctaSunSpin {
-                  0%, 100% { transform: rotate(0deg) scale(1); }
-                  33%       { transform: rotate(15deg) scale(1.12); }
-                  66%       { transform: rotate(-10deg) scale(1); }
-                }
-              `}</style>
-              <h2 className="mt-6 text-4xl md:text-5xl">Begin your reading.</h2>
-              <p className="mt-5 text-muted-foreground max-w-xl mx-auto">
-                A single conversation can shift the trajectory of a decade. Reserve your private session today.
-              </p>
-              <Link to="/book"
-                className="mt-10 inline-flex items-center gap-2 px-8 py-4 rounded-full bg-primary text-primary-foreground font-medium shadow-gold hover:scale-[1.02] transition">
-                Book Your Session <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
+          <span className="text-xs uppercase tracking-[0.3em] text-gold">Begin</span>
+          <h2 className="mt-4 text-4xl md:text-5xl lg:text-6xl">{heading}</h2>
+          <p className="mt-6 text-muted-foreground text-lg max-w-xl mx-auto">{subtext}</p>
+          <div className="mt-10 flex flex-wrap gap-4 justify-center">
+            <Link to="/book" className="btn-primary inline-flex items-center gap-2">
+              {btnLabel} <ArrowRight className="w-4 h-4" />
+            </Link>
+            <Link to="/services" className="btn-secondary">View Services</Link>
           </div>
         </Reveal>
       </div>

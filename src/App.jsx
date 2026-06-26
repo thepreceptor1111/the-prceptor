@@ -10,10 +10,12 @@ import AdminPortal from "./components/site/AdminPortal";
 import { SITE } from "./content/seo";
 import { useLenis } from "./hooks/useLenis";
 import { SiteSettingsProvider } from "./lib/SiteSettingsContext";
+import { LenisProvider } from "./context/LenisContext";
 
-// Home is imported eagerly — entry page, must never flash on first visit
-import Home from "./routes/index";
-
+// FIX 3: Home is now lazy-loaded like every other route.
+// Previously it was the only eager import, forcing React + all home-section
+// code into the initial bundle and blocking TTI by ~3-4 seconds.
+const Home         = lazy(() => import("./routes/index"));
 const About        = lazy(() => import("./routes/about"));
 const Book         = lazy(() => import("./routes/book"));
 const Contact      = lazy(() => import("./routes/contact"));
@@ -26,7 +28,6 @@ const Terms        = lazy(() => import("./routes/terms"));
 const NotFound     = lazy(() => import("./routes/not-found"));
 const Admin        = lazy(() => import("./routes/admin"));
 
-// Pure CSS loader — no framer-motion in the critical path
 function CosmicLoader() {
   return (
     <div
@@ -100,9 +101,11 @@ const orgSchema = {
   paymentAccepted: "Online payment",
 };
 
-export default function App() {
+// Inner component so useLenis can access LenisContext
+function AppInner() {
   const location = useLocation();
   const isAdmin  = location.pathname.startsWith("/command-center");
+  const isHome   = location.pathname === "/";
 
   useLenis();
 
@@ -125,7 +128,7 @@ export default function App() {
           {!isAdmin && <AdminPortal />}
           {!isAdmin && <Nav />}
 
-          <main className={isAdmin ? "flex-1" : "flex-1 pt-20"}>
+          <main className={isAdmin ? "flex-1" : isHome ? "flex-1" : "flex-1 pt-20"}>
             <Suspense fallback={<CosmicLoader />}>
               <Routes>
                 <Route path="/"               element={<Home />} />
@@ -148,5 +151,13 @@ export default function App() {
         </div>
       </SiteSettingsProvider>
     </ErrorBoundary>
+  );
+}
+
+export default function App() {
+  return (
+    <LenisProvider>
+      <AppInner />
+    </LenisProvider>
   );
 }
