@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { siteConfig, footerLinks } from "@/content/site";
 
-// ── Inline SVG icons — replaces lucide-react entirely ─────────────────────
+// ── Inline SVG icons — replaces lucide-react entirely ────────────────────
 function InstagramIcon({ className }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -71,4 +71,69 @@ export default function Footer() {
                 href={href}
                 aria-label={label}
                 target={label !== "Email" ? "_blank" : undefined}
-                rel={label !== "Email" ? "noopener nor
+                rel={label !== "Email" ? "noopener noreferrer" : undefined}
+                className="w-10 h-10 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-gold hover:border-gold/50 transition"
+              >
+                <Icon className="w-4 h-4" />
+              </a>
+            ))}
+          </div>
+        </div>
+
+        <div className="md:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-8">
+          {footerLinks.map((group) => (
+            <div key={group.heading}>
+              <h3 className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-5">
+                {group.heading}
+              </h3>
+              <ul className="space-y-3">
+                {group.links.map((l) => (
+                  <li key={l.to}>
+                    <Link
+                      to={l.to}
+                      className="text-sm text-muted-foreground hover:text-foreground transition"
+                    >
+                      {l.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+
+          <div>
+            <h3 className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-5">Contact</h3>
+            <ul className="space-y-3">
+              <li className="flex items-center gap-2 text-sm text-muted-foreground">
+                <MailIcon className="w-3.5 h-3.5 text-gold shrink-0" />
+                <a href={`mailto:${siteConfig.email}`} className="hover:text-gold transition break-all">
+                  {siteConfig.email}
+                </a>
+              </li>
+              <li className="flex items-center gap-2 text-sm text-muted-foreground">
+                <MapPinIcon className="w-3.5 h-3.5 text-gold shrink-0" />
+                India — Worldwide
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div className="relative border-t border-border/40">
+        <div className="max-w-7xl mx-auto px-6 lg:px-10 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-muted-foreground">
+            &copy; {new Date().getFullYear()} {siteConfig.name}. All rights reserved.
+          </p>
+          <div className="flex items-center gap-6">
+            <Link to="/privacy" className="text-xs text-muted-foreground hover:text-foreground transition">
+              Privacy Policy
+            </Link>
+            <Link to="/terms" className="text-xs text-muted-foreground hover:text-foreground transition">
+              Terms &amp; Conditions
+            </Link>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
