@@ -1,18 +1,6 @@
 /**
  * SelectField — custom styled dropdown with type-to-filter search.
- *
- * Props:
- *   value        {string}          — controlled value
- *   onChange     {(val) => void}   — called with the selected string
- *   options      {string[]}        — list of option strings
- *   placeholder  {string}          — shown when value is ""
- *   label        {string}          — field label above the trigger
- *   error        {string}          — inline validation message
- *   className    {string}          — extra class on the outer wrapper
- *   id           {string}          — for label htmlFor
- *
- * Keyboard: Arrow Up/Down navigate, Enter selects, Escape clears search
- * then closes, Click outside closes.
+ * DEBUG BUILD — console logs active for scroll diagnosis.
  */
 
 import { useEffect, useRef, useState } from "react";
@@ -35,12 +23,51 @@ export function SelectField({
   const listRef               = useRef(null);
   const searchRef             = useRef(null);
 
-  // Filtered options based on search query
   const filtered = query.trim()
     ? options.filter((o) => o.toLowerCase().includes(query.toLowerCase()))
     : options;
 
-  // Auto-focus the search input when panel opens
+  // ── DEBUG: native wheel listener to check if passive is the issue ──
+  useEffect(() => {
+    const el = listRef.current;
+    if (!el || !open) return;
+
+    function nativeWheelHandler(e) {
+      const atTop    = el.scrollTop === 0;
+      const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1;
+
+      console.log("[SelectField] ── wheel event ──");
+      console.log("  scrollTop before:", el.scrollTop);
+      console.log("  deltaY:", e.deltaY);
+      console.log("  atTop:", atTop, " | atBottom:", atBottom);
+      console.log("  scrollHeight:", el.scrollHeight, " clientHeight:", el.clientHeight);
+      console.log("  canScrollInternally:", el.scrollHeight > el.clientHeight);
+
+      // Try calling preventDefault — if this throws a console warning
+      // 'Unable to preventDefault inside passive event listener' then
+      // the passive listener theory is CONFIRMED.
+      try {
+        e.preventDefault();
+        console.log("  preventDefault: ✅ SUCCEEDED (non-passive)");
+      } catch (err) {
+        console.warn("  preventDefault: ❌ FAILED —", err.message);
+      }
+
+      e.stopPropagation();
+      el.scrollTop += e.deltaY;
+      console.log("  scrollTop after:", el.scrollTop);
+    }
+
+    // Attach as NON-passive so preventDefault works
+    el.addEventListener("wheel", nativeWheelHandler, { passive: false });
+    console.log("[SelectField] Native wheel listener attached (passive: false)");
+
+    return () => {
+      el.removeEventListener("wheel", nativeWheelHandler);
+      console.log("[SelectField] Native wheel listener removed");
+    };
+  }, [open]);
+
   useEffect(() => {
     if (open) {
       setFocused(value ? Math.max(filtered.indexOf(value), 0) : 0);
@@ -50,18 +77,13 @@ export function SelectField({
     }
   }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Reset focused index when query changes
-  useEffect(() => {
-    setFocused(0);
-  }, [query]);
+  useEffect(() => { setFocused(0); }, [query]);
 
-  // Scroll focused item into view
   useEffect(() => {
     if (!open || focused < 0) return;
     listRef.current?.children?.[focused]?.scrollIntoView({ block: "nearest" });
   }, [focused, open]);
 
-  // Close on outside click
   useEffect(() => {
     if (!open) return;
     function handleClick(e) {
@@ -75,67 +97,21 @@ export function SelectField({
     setOpen(true);
     setFocused(value ? Math.max(options.indexOf(value), 0) : 0);
   }
-
-  function closePanel() {
-    setOpen(false);
-    setQuery("");
-  }
-
-  function select(opt) {
-    onChange(opt);
-    closePanel();
-  }
-
-  function clearSelection(e) {
-    e.stopPropagation();
-    onChange("");
-  }
+  function closePanel() { setOpen(false); setQuery(""); }
+  function select(opt) { onChange(opt); closePanel(); }
+  function clearSelection(e) { e.stopPropagation(); onChange(""); }
 
   function onTriggerKeyDown(e) {
     if (!open && ["Enter", " ", "ArrowDown", "ArrowUp"].includes(e.key)) {
-      e.preventDefault();
-      openPanel();
+      e.preventDefault(); openPanel();
     }
   }
 
   function onSearchKeyDown(e) {
-    if (e.key === "Escape") {
-      if (query) { setQuery(""); }
-      else { closePanel(); }
-      return;
-    }
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      setFocused((f) => Math.min(f + 1, filtered.length - 1));
-      return;
-    }
-    if (e.key === "ArrowUp") {
-      e.preventDefault();
-      setFocused((f) => Math.max(f - 1, 0));
-      return;
-    }
-    if (e.key === "Enter") {
-      e.preventDefault();
-      if (focused >= 0 && filtered[focused]) select(filtered[focused]);
-      return;
-    }
-  }
-
-  // Prevent the page from scrolling when the mouse wheel is used
-  // inside the options list. Must be a non-passive listener so
-  // preventDefault() is honoured by the browser.
-  function onListWheel(e) {
-    const el = listRef.current;
-    if (!el) return;
-    const atTop    = el.scrollTop === 0;
-    const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1;
-    // Only block propagation when there is still room to scroll inside the list
-    if (!(atTop && e.deltaY < 0) && !(atBottom && e.deltaY > 0)) {
-      e.stopPropagation();
-    }
-    // Always prevent default so the page never scrolls while pointer is over list
-    e.preventDefault();
-    el.scrollTop += e.deltaY;
+    if (e.key === "Escape") { if (query) setQuery(""); else closePanel(); return; }
+    if (e.key === "ArrowDown") { e.preventDefault(); setFocused((f) => Math.min(f + 1, filtered.length - 1)); return; }
+    if (e.key === "ArrowUp")   { e.preventDefault(); setFocused((f) => Math.max(f - 1, 0)); return; }
+    if (e.key === "Enter")     { e.preventDefault(); if (focused >= 0 && filtered[focused]) select(filtered[focused]); return; }
   }
 
   const displayValue = value || "";
@@ -143,85 +119,59 @@ export function SelectField({
   return (
     <div className={`block ${className}`}>
       {label && (
-        <span
-          id={id ? `${id}-label` : undefined}
-          className="block text-[0.7rem] uppercase tracking-[0.22em] text-muted-foreground mb-2"
-        >
+        <span id={id ? `${id}-label` : undefined}
+          className="block text-[0.7rem] uppercase tracking-[0.22em] text-muted-foreground mb-2">
           {label}
         </span>
       )}
 
       <div ref={containerRef} className="relative" onKeyDown={onTriggerKeyDown}>
-        {/* ── Trigger ── */}
+        {/* Trigger */}
         <button
-          type="button"
-          role="combobox"
-          aria-haspopup="listbox"
-          aria-expanded={open}
+          type="button" role="combobox"
+          aria-haspopup="listbox" aria-expanded={open}
           aria-labelledby={id ? `${id}-label` : undefined}
           onClick={openPanel}
           className={[
             "w-full flex items-center justify-between gap-3",
-            "bg-secondary/40 border rounded-xl px-4 py-3.5 text-sm text-left",
-            "transition-all duration-300",
-            open
-              ? "border-gold bg-secondary/60 ring-2 ring-gold/20"
-              : "border-border hover:border-gold/50 hover:bg-secondary/50",
+            "bg-secondary/40 border rounded-xl px-4 py-3.5 text-sm text-left transition-all duration-300",
+            open ? "border-gold bg-secondary/60 ring-2 ring-gold/20" : "border-border hover:border-gold/50 hover:bg-secondary/50",
             displayValue ? "text-foreground" : "text-muted-foreground/60",
           ].join(" ")}
         >
           <span className="truncate">{displayValue || placeholder}</span>
           <div className="flex items-center gap-1.5 shrink-0">
             {value && (
-              <span
-                role="button"
-                tabIndex={-1}
-                aria-label="Clear selection"
-                onClick={clearSelection}
-                className="w-4 h-4 rounded-full flex items-center justify-center text-muted-foreground hover:text-gold transition-colors"
-              >
+              <span role="button" tabIndex={-1} aria-label="Clear selection" onClick={clearSelection}
+                className="w-4 h-4 rounded-full flex items-center justify-center text-muted-foreground hover:text-gold transition-colors">
                 <X className="w-3 h-3" />
               </span>
             )}
-            <ChevronDown
-              className={`w-4 h-4 text-gold transition-transform duration-300 ${
-                open ? "rotate-180" : ""
-              }`}
-            />
+            <ChevronDown className={`w-4 h-4 text-gold transition-transform duration-300 ${open ? "rotate-180" : ""}`} />
           </div>
         </button>
 
-        {/* ── Dropdown panel ──
-              NOTE: NO overflow-hidden on this wrapper — it was clipping
-              the inner scrollable list and causing page scroll instead.
-        */}
+        {/* Dropdown panel */}
         {open && (
           <div
-            role="listbox"
-            aria-label={label || placeholder}
+            role="listbox" aria-label={label || placeholder}
             className="absolute z-50 mt-2 w-full rounded-2xl flex flex-col"
             style={{
-              background:
-                "linear-gradient(160deg, oklch(0.22 0.030 270 / 0.97), oklch(0.16 0.025 270 / 0.97))",
+              background: "linear-gradient(160deg, oklch(0.22 0.030 270 / 0.97), oklch(0.16 0.025 270 / 0.97))",
               backdropFilter: "blur(24px) saturate(1.4)",
               WebkitBackdropFilter: "blur(24px) saturate(1.4)",
               border: "1px solid oklch(1 0 0 / 0.09)",
-              boxShadow:
-                "0 1px 0 oklch(1 0 0 / 0.06) inset, 0 24px 64px -12px oklch(0 0 0 / 0.60)",
-              // Clip children to rounded corners without using overflow-hidden
-              // which would interfere with internal scrolling
+              boxShadow: "0 1px 0 oklch(1 0 0 / 0.06) inset, 0 24px 64px -12px oklch(0 0 0 / 0.60)",
               borderRadius: "1rem",
               overflow: "clip",
             }}
           >
-            {/* ── Search input ── */}
+            {/* Search input */}
             <div className="px-3 pt-3 pb-2 border-b border-white/[0.06] shrink-0">
               <div className="flex items-center gap-2 bg-white/[0.05] border border-white/[0.08] rounded-xl px-3 py-2">
                 <Search className="w-3.5 h-3.5 text-gold/60 shrink-0" />
                 <input
-                  ref={searchRef}
-                  type="text"
-                  value={query}
+                  ref={searchRef} type="text" value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   onKeyDown={onSearchKeyDown}
                   placeholder="Type to search…"
@@ -229,28 +179,21 @@ export function SelectField({
                   aria-label="Search options"
                 />
                 {query && (
-                  <button
-                    type="button"
-                    onClick={() => setQuery("")}
-                    className="text-muted-foreground hover:text-gold transition-colors"
-                    aria-label="Clear search"
-                  >
+                  <button type="button" onClick={() => setQuery("")}
+                    className="text-muted-foreground hover:text-gold transition-colors" aria-label="Clear search">
                     <X className="w-3.5 h-3.5" />
                   </button>
                 )}
               </div>
             </div>
 
-            {/* ── Options list — scrollable, isolated from page scroll ── */}
+            {/* Options list — native wheel listener handles scroll isolation */}
             <div
               ref={listRef}
-              onWheel={onListWheel}
               style={{
                 maxHeight: "220px",
                 overflowY: "auto",
-                // iOS momentum scrolling
                 WebkitOverflowScrolling: "touch",
-                // Prevent scroll chain to page on touch devices
                 overscrollBehavior: "contain",
                 scrollbarWidth: "thin",
                 scrollbarColor: "oklch(0.82 0.12 85 / 0.40) transparent",
@@ -266,25 +209,19 @@ export function SelectField({
                 const isFocused = i === focused;
                 return (
                   <button
-                    key={opt}
-                    type="button"
-                    role="option"
-                    aria-selected={isActive}
+                    key={opt} type="button" role="option" aria-selected={isActive}
                     onMouseEnter={() => setFocused(i)}
                     onClick={() => select(opt)}
                     className={[
                       "w-full flex items-center justify-between gap-3",
-                      "px-4 py-3 text-sm text-left transition-all duration-150",
-                      "border-b last:border-b-0",
+                      "px-4 py-3 text-sm text-left transition-all duration-150 border-b last:border-b-0",
                       isFocused || isActive
                         ? "bg-gold/10 text-gold border-gold/10"
                         : "text-foreground/80 border-white/5 hover:bg-white/5",
                     ].join(" ")}
                   >
                     <span className="flex items-center gap-2.5">
-                      {isActive && (
-                        <span className="w-1 h-4 rounded-full bg-gold shrink-0" />
-                      )}
+                      {isActive  && <span className="w-1 h-4 rounded-full bg-gold shrink-0" />}
                       {!isActive && <span className="w-1 shrink-0" />}
                       {opt}
                     </span>
@@ -297,9 +234,7 @@ export function SelectField({
         )}
       </div>
 
-      {error && (
-        <span className="block mt-2 text-xs text-destructive">{error}</span>
-      )}
+      {error && <span className="block mt-2 text-xs text-destructive">{error}</span>}
     </div>
   );
 }
