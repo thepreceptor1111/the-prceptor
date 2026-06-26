@@ -1,10 +1,144 @@
 import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { Mail, MapPin, Send, Instagram, Youtube, Linkedin, Clock, Globe2, ShieldCheck, Sparkles, ChevronDown, ArrowRight } from "lucide-react";
 import { Reveal } from "@/components/site/Reveal";
 import { siteConfig } from "@/content/site";
 import contactHeroImg from "@/assets/contact-hero.png";
+
+// ── Inline SVG icons — removes lucide-react dependency ────────────────────
+function MailIcon({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      className={className} aria-hidden="true">
+      <rect width="20" height="16" x="2" y="4" rx="2" />
+      <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+    </svg>
+  );
+}
+
+function MapPinIcon({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      className={className} aria-hidden="true">
+      <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+      <circle cx="12" cy="10" r="3" />
+    </svg>
+  );
+}
+
+function SendIcon({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      className={className} aria-hidden="true">
+      <path d="m22 2-7 20-4-9-9-4Z" />
+      <path d="M22 2 11 13" />
+    </svg>
+  );
+}
+
+function InstagramIcon({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      className={className} aria-hidden="true">
+      <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+      <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+    </svg>
+  );
+}
+
+function YoutubeIcon({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      className={className} aria-hidden="true">
+      <path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17" />
+      <path d="m10 15 5-3-5-3z" />
+    </svg>
+  );
+}
+
+function LinkedinIcon({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      className={className} aria-hidden="true">
+      <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+      <rect width="4" height="12" x="2" y="9" />
+      <circle cx="4" cy="4" r="2" />
+    </svg>
+  );
+}
+
+function ClockIcon({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      className={className} aria-hidden="true">
+      <circle cx="12" cy="12" r="10" />
+      <polyline points="12 6 12 12 16 14" />
+    </svg>
+  );
+}
+
+function Globe2Icon({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      className={className} aria-hidden="true">
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+      <path d="M2 12h20" />
+    </svg>
+  );
+}
+
+function ShieldCheckIcon({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      className={className} aria-hidden="true">
+      <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+      <path d="m9 12 2 2 4-4" />
+    </svg>
+  );
+}
+
+function SparklesIcon({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      className={className} aria-hidden="true">
+      <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z" />
+      <path d="M5 3v4" /><path d="M19 17v4" /><path d="M3 5h4" /><path d="M17 19h4" />
+    </svg>
+  );
+}
+
+function ChevronDownIcon({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      className={className} aria-hidden="true">
+      <path d="m6 9 6 6 6-6" />
+    </svg>
+  );
+}
+
+function ArrowRightIcon({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      className={className} aria-hidden="true">
+      <path d="M5 12h14" />
+      <path d="m12 5 7 7-7 7" />
+    </svg>
+  );
+}
 
 export default function ContactPageWrapper() {
   return (
@@ -91,7 +225,7 @@ function ContactPage() {
         <div className="relative max-w-4xl mx-auto px-6 lg:px-10 text-center">
           <Reveal>
             <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-card text-xs uppercase tracking-[0.25em] text-gold">
-              <Sparkles className="w-3 h-3" /> Private Consultation
+              <SparklesIcon className="w-3 h-3" /> Private Consultation
             </span>
           </Reveal>
           <Reveal delay={0.1}>
@@ -107,9 +241,9 @@ function ContactPage() {
           </Reveal>
           <Reveal delay={0.3}>
             <div className="mt-10 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-xs uppercase tracking-[0.2em] text-muted-foreground">
-              <span className="inline-flex items-center gap-2"><Clock className="w-3.5 h-3.5 text-gold" /> 24h response</span>
-              <span className="inline-flex items-center gap-2"><Globe2 className="w-3.5 h-3.5 text-gold" /> All timezones</span>
-              <span className="inline-flex items-center gap-2"><ShieldCheck className="w-3.5 h-3.5 text-gold" /> Strictly confidential</span>
+              <span className="inline-flex items-center gap-2"><ClockIcon className="w-3.5 h-3.5 text-gold" /> 24h response</span>
+              <span className="inline-flex items-center gap-2"><Globe2Icon className="w-3.5 h-3.5 text-gold" /> All timezones</span>
+              <span className="inline-flex items-center gap-2"><ShieldCheckIcon className="w-3.5 h-3.5 text-gold" /> Strictly confidential</span>
             </div>
           </Reveal>
 
@@ -142,8 +276,8 @@ function ContactPage() {
             <Reveal delay={0.1}>
               <ul className="space-y-6">
                 {[
-                  { Icon: Mail,    label: "Email",  value: siteConfig.email, href: `mailto:${siteConfig.email}` },
-                  { Icon: MapPin,  label: "Studio", value: "Worldwide · Online consultations" },
+                  { Icon: MailIcon,   label: "Email",  value: siteConfig.email, href: `mailto:${siteConfig.email}` },
+                  { Icon: MapPinIcon, label: "Studio", value: "Worldwide · Online consultations" },
                 ].map(({ Icon, label, value, href }) => (
                   <li key={label} className="flex items-start gap-4">
                     <span className="w-11 h-11 rounded-full glass-card flex items-center justify-center text-gold shrink-0">
@@ -167,9 +301,9 @@ function ContactPage() {
                 <p className="text-[0.7rem] uppercase tracking-[0.25em] text-muted-foreground mb-4">Follow the practice</p>
                 <div className="flex gap-3">
                   {[
-                    { Icon: Instagram, href: siteConfig.social.instagram, label: "Instagram" },
-                    { Icon: Youtube,   href: siteConfig.social.youtube,   label: "YouTube" },
-                    { Icon: Linkedin,  href: siteConfig.social.linkedin,  label: "LinkedIn" },
+                    { Icon: InstagramIcon, href: siteConfig.social.instagram, label: "Instagram" },
+                    { Icon: YoutubeIcon,   href: siteConfig.social.youtube,   label: "YouTube" },
+                    { Icon: LinkedinIcon,  href: siteConfig.social.linkedin,  label: "LinkedIn" },
                   ].map(({ Icon, href, label }) => (
                     <a
                       key={label}
@@ -219,7 +353,7 @@ function ContactPage() {
                       <option value="">Select a focus (optional)</option>
                       {consultationTypes.map((t) => <option key={t} value={t}>{t}</option>)}
                     </select>
-                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gold pointer-events-none" />
+                    <ChevronDownIcon className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gold pointer-events-none" />
                   </div>
                 </Field>
                 <Field label="Subject" error={errors.subject} className="sm:col-span-2">
@@ -236,7 +370,7 @@ function ContactPage() {
                 </p>
                 <button type="submit" className="btn-primary group">
                   Send Message
-                  <Send className="w-4 h-4 group-hover:translate-x-0.5 transition" />
+                  <SendIcon className="w-4 h-4 group-hover:translate-x-0.5 transition" />
                 </button>
               </div>
             </form>
@@ -261,7 +395,7 @@ function ContactPage() {
                     className="w-full p-6 flex items-center justify-between text-left"
                   >
                     <span className="font-serif text-lg">{f.q}</span>
-                    <ChevronDown className={`w-5 h-5 text-gold transition-transform duration-500 ${openFaq === i ? "rotate-180" : ""}`} />
+                    <ChevronDownIcon className={`w-5 h-5 text-gold transition-transform duration-500 ${openFaq === i ? "rotate-180" : ""}`} />
                   </button>
                   <motion.div
                     initial={false}
@@ -279,7 +413,7 @@ function ContactPage() {
           <Reveal delay={0.2}>
             <div className="mt-16 text-center">
               <a href="/book" className="inline-flex items-center gap-2 text-gold hover:gap-3 transition-all">
-                Or skip ahead — book a session <ArrowRight className="w-4 h-4" />
+                Or skip ahead — book a session <ArrowRightIcon className="w-4 h-4" />
               </a>
             </div>
           </Reveal>
