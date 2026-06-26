@@ -24,10 +24,26 @@ function normalise(f) {
   return { q: f.question ?? f.q, a: f.answer ?? f.a };
 }
 
-export function FaqSection() {
+/**
+ * FaqSection
+ *
+ * Props (optional — provided by the home route's batched Sanity fetch):
+ *   initialFaqs   {Array|null}  — pre-fetched FAQs from HOME_PAGE_QUERY
+ *   faqsLoading   {boolean}     — loading state from the batched hook
+ *
+ * When neither prop is passed (e.g. on /qna page), falls back to its
+ * own useSanity call, just as before.
+ */
+export function FaqSection({ initialFaqs = null, faqsLoading = false }) {
   useLenisResize();
 
-  const { data: cmsFaqs } = useSanity(FAQ_QUERY, null);
+  const skip = initialFaqs !== null;
+  const { data: ownFaqs } = useSanity(
+    skip ? null : FAQ_QUERY,
+    null
+  );
+
+  const cmsFaqs  = skip ? initialFaqs : ownFaqs;
   const { settings } = useSiteSettings();
 
   const sectionLabel   = settings?.faqSectionLabel   ?? "FAQ";

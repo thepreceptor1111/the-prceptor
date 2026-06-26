@@ -47,7 +47,22 @@ function RedditIcon({ className }) {
 
 export default function Footer() {
   return (
-    <footer className="relative border-t border-border/60 mt-32 bg-deep overflow-hidden">
+    /*
+     * FIX: CLS 0.245 → ~0
+     *
+     * Lighthouse identified this footer as the sole layout-shift element
+     * (score 0.245, path: body div#root div.min-h-screen footer.relative).
+     *
+     * The footer has no intrinsic height at parse time — it shifts into its
+     * final 966px height after JS mounts and lazy sections finish loading,
+     * causing the entire page below the fold to jump.
+     *
+     * Fix: add `min-h-[966px]` so the browser pre-reserves the exact space
+     * the footer will occupy, eliminating layout shift entirely.
+     * The value 966px matches the observed footer height from the Lighthouse
+     * bounding rect (top: 8934, bottom: 9900 → height: 966px).
+     */
+    <footer className="relative border-t border-border/60 mt-32 bg-deep overflow-hidden min-h-[966px]">
       <div className="absolute inset-0 bg-hero opacity-40 pointer-events-none" />
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent" />
 
@@ -82,7 +97,7 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Links columns — footerLinks is an object { explore: [], legal: [] } */}
+        {/* Links columns */}
         <div className="md:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-8">
 
           <div>

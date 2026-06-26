@@ -150,18 +150,18 @@ function SearchIcon({ className }) {
 }
 
 const ICON_MAP = {
-  Star:          StarIcon,
-  BookOpen:      BookOpenIcon,
-  Heart:         HeartIcon,
+  Star:           StarIcon,
+  BookOpen:       BookOpenIcon,
+  Heart:          HeartIcon,
   HeartHandshake: HeartIcon,
-  Rings:         MoonIcon,
-  Briefcase:     BriefcaseIcon,
-  Saturn:        SparklesIcon,
-  Hourglass:     MoonIcon,
-  Orbit:         SparklesIcon,
-  Compass:       CompassIcon,
-  Moon:          MoonIcon,
-  Sparkles:      SparklesIcon,
+  Rings:          MoonIcon,
+  Briefcase:      BriefcaseIcon,
+  Saturn:         SparklesIcon,
+  Hourglass:      MoonIcon,
+  Orbit:          SparklesIcon,
+  Compass:        CompassIcon,
+  Moon:           MoonIcon,
+  Sparkles:       SparklesIcon,
 };
 
 const DEFAULT_HOME_SERVICES_LIMIT = 6;
@@ -240,10 +240,30 @@ function ServiceCard({ s, i }) {
   );
 }
 
-export function ServicesSection() {
+/**
+ * ServicesSection
+ *
+ * Props (optional — provided by the home route's batched Sanity fetch):
+ *   initialServices   {Array|null}  — pre-fetched services from HOME_PAGE_QUERY
+ *   servicesLoading   {boolean}     — loading state from the batched hook
+ *
+ * When used on non-home pages (e.g. /services), neither prop is passed and
+ * the component falls back to its own useSanity call, just as before.
+ */
+export function ServicesSection({ initialServices = null, servicesLoading = false }) {
   useLenisResize();
 
-  const { data: allServices, loading } = useSanity(SERVICES_QUERY, null);
+  // Only fire own fetch if the home route didn't pass pre-fetched data.
+  // This eliminates the duplicate Sanity request + CORS preflight on home.
+  const skip = initialServices !== null;
+  const { data: ownServices, loading: ownLoading } = useSanity(
+    skip ? null : SERVICES_QUERY,
+    null
+  );
+
+  const allServices = skip ? initialServices : ownServices;
+  const loading     = skip ? servicesLoading  : ownLoading;
+
   const { settings } = useSiteSettings();
   const [activeTab, setActiveTab] = useState('all');
 

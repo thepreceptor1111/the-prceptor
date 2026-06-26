@@ -73,11 +73,27 @@ function normalise(t) {
 const CARD_HEIGHT = 520;
 const STRIP_H    = 72;
 
-export function TestimonialsSection() {
+/**
+ * TestimonialsSection
+ *
+ * Props (optional — provided by the home route's batched Sanity fetch):
+ *   initialTestimonials  {Array|null}  — pre-fetched testimonials
+ *   testimonialsLoading  {boolean}     — loading state from the batched hook
+ *
+ * When neither prop is passed (e.g. on /testimonials page), falls back
+ * to its own useSanity call.
+ */
+export function TestimonialsSection({ initialTestimonials = null, testimonialsLoading = false }) {
   useLenisResize();
 
-  const { data: cmsTestimonials } = useSanity(TESTIMONIALS_QUERY, null);
-  const { settings }              = useSiteSettings();
+  const skip = initialTestimonials !== null;
+  const { data: ownTestimonials } = useSanity(
+    skip ? null : TESTIMONIALS_QUERY,
+    null
+  );
+
+  const cmsTestimonials = skip ? initialTestimonials : ownTestimonials;
+  const { settings } = useSiteSettings();
 
   const sectionLabel   = settings?.testimonialsSectionLabel   ?? "Testimonials";
   const sectionHeading = settings?.testimonialsSectionHeading ?? "Voices from across the world.";
