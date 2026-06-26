@@ -2,12 +2,67 @@ import SEO from "@/components/site/SEO";
 import { PAGE_SEO } from "@/content/seo";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Minus, Sparkles, MessageCircleQuestion, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import Reveal from "@/components/site/Reveal";
 import { useSanity } from "@/lib/useSanity";
 import { useSiteSettings } from "@/lib/useSiteSettings";
 import { FAQ_QUERY } from "@/lib/sanityQueries";
+
+// ── Inline SVG icons — removes lucide-react dependency ────────────────────
+function PlusIcon({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      className={className} aria-hidden="true">
+      <path d="M5 12h14" />
+      <path d="M12 5v14" />
+    </svg>
+  );
+}
+
+function MinusIcon({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      className={className} aria-hidden="true">
+      <path d="M5 12h14" />
+    </svg>
+  );
+}
+
+function SparklesIcon({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      className={className} aria-hidden="true">
+      <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z" />
+      <path d="M5 3v4" /><path d="M19 17v4" /><path d="M3 5h4" /><path d="M17 19h4" />
+    </svg>
+  );
+}
+
+function MessageCircleQuestionIcon({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      className={className} aria-hidden="true">
+      <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
+      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+      <path d="M12 17h.01" />
+    </svg>
+  );
+}
+
+function ArrowRightIcon({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      className={className} aria-hidden="true">
+      <path d="M5 12h14" />
+      <path d="m12 5 7 7-7 7" />
+    </svg>
+  );
+}
 
 const STATIC_CATEGORIES = [
   {
@@ -164,7 +219,7 @@ export default function QnAPage() {
               transition={{ delay: 0.2 }}
               className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.35em] text-gold"
             >
-              <Sparkles className="w-3.5 h-3.5" /> Questions &amp; Answers
+              <SparklesIcon className="w-3.5 h-3.5" /> Questions &amp; Answers
             </motion.span>
             <h1 className="mt-6 text-5xl md:text-7xl leading-[1.05] bg-gradient-gold bg-clip-text text-transparent">
               {settings?.faqSectionHeading ?? "Everything you want to know."}
@@ -177,7 +232,7 @@ export default function QnAPage() {
 
           <Reveal delay={0.15}>
             <div className="mt-12 inline-flex items-center justify-center w-20 h-20 rounded-full gold-border shadow-gold">
-              <MessageCircleQuestion className="w-9 h-9 text-gold" />
+              <MessageCircleQuestionIcon className="w-9 h-9 text-gold" />
             </div>
           </Reveal>
         </section>
@@ -243,9 +298,9 @@ export default function QnAPage() {
                           }`}
                         >
                           {isOpen ? (
-                            <Minus className="w-4 h-4" />
+                            <MinusIcon className="w-4 h-4" />
                           ) : (
-                            <Plus className="w-4 h-4" />
+                            <PlusIcon className="w-4 h-4" />
                           )}
                         </span>
                       </button>
@@ -299,7 +354,7 @@ export default function QnAPage() {
                   href="mailto:thepreceptor1111@gmail.com"
                   className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-primary text-primary-foreground font-medium shadow-gold hover:scale-[1.03] transition"
                 >
-                  Ask a Question <ArrowRight className="w-4 h-4" />
+                  Ask a Question <ArrowRightIcon className="w-4 h-4" />
                 </a>
                 <Link
                   to="/book"
