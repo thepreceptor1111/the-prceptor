@@ -1,12 +1,22 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown } from "lucide-react";
 import { Reveal } from "@/components/site/Reveal";
 import { FAQS } from "@/utils/constants";
 import { useSanity } from "@/lib/useSanity";
 import { useSiteSettings } from "@/lib/useSiteSettings";
 import { FAQ_QUERY } from "@/lib/sanityQueries";
 import { useLenisResize } from "@/hooks/useLenisResize";
+
+// ── Inline SVG icon — removes lucide-react dependency ────────────────────
+function ChevronDownIcon({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      className={className} aria-hidden="true">
+      <path d="m6 9 6 6 6-6" />
+    </svg>
+  );
+}
 
 const HOME_FAQ_LIMIT = 5;
 
@@ -49,7 +59,7 @@ export function FaqSection() {
                     transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
                     className="shrink-0 text-gold"
                   >
-                    <ChevronDown className="w-5 h-5" />
+                    <ChevronDownIcon className="w-5 h-5" />
                   </motion.div>
                 </button>
                 <AnimatePresence initial={false}>
