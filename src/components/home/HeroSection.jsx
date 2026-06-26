@@ -1,4 +1,4 @@
-import { motion } from "motion/react";
+import { motion } from "framer-motion/react";
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useSiteSettings } from "@/lib/useSiteSettings";
@@ -38,8 +38,7 @@ function Sparkles({ className }) {
 
 // Hero image: /public dir → no Vite hash → always /hero-section.webp.
 // Absolute path (leading /) MUST match the <link rel="preload"> href in
-// index.html so both share the same browser cache entry. Relative path
-// resolves to a different key → preload wasted → double fetch.
+// index.html so both share the same browser cache entry.
 const heroImg = "/hero-section.webp";
 
 // 6 particles (was 18) — fewer RAF loops on mount
@@ -76,13 +75,8 @@ function Particle({ x, y, size, delay, duration, drift }) {
 }
 
 // Word-by-word staggered heading.
-//
-// PERF: filter:blur REMOVED.
-// blur is non-composited — forces a main-thread paint + composite on
-// every animation frame. With 9 word spans simultaneously animating
-// filter, Lighthouse flagged 6 non-composited animations and recorded
-// ~100ms extra Style/Layout cost on mobile.
-// opacity + transform are GPU-composited → zero main-thread cost.
+// PERF: filter:blur REMOVED — non-composited, forces main-thread paint
+// every frame. opacity+transform are GPU-composited, zero main-thread cost.
 function StaggeredHeading({ line1, line2Gold, delay = 0 }) {
   const words1 = line1.split(" ");
   const words2 = line2Gold.split(" ");
