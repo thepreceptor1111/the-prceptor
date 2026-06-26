@@ -9,7 +9,7 @@ import { useSiteSettings } from "@/lib/useSiteSettings";
 import { SERVICES_QUERY } from "@/lib/sanityQueries";
 import { useLenisResize } from "@/hooks/useLenisResize";
 
-// ── Inline SVG icons — removes lucide-react dependency ────────────────────
+// ── Inline SVG icons ────────────────────────────────────────────────────────
 function StarIcon({ className }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -247,15 +247,25 @@ function ServiceCard({ s, i }) {
  *   initialServices   {Array|null}  — pre-fetched services from HOME_PAGE_QUERY
  *   servicesLoading   {boolean}     — loading state from the batched hook
  *
- * When used on non-home pages (e.g. /services), neither prop is passed and
- * the component falls back to its own useSanity call, just as before.
+ * BUG FIX: useHomePageData() returns services=[] (not null) while loading.
+ * Previously `skip = initialServices !== null` was true for [], causing
+ * allServices=[] and showing "No services in this category yet."
+ *
+ * Fix: skip is only true when we have REAL data (non-empty array) OR when
+ * loading is done (so an intentionally empty Sanity result is respected).
+ * During loading with an empty array, fall back to HOME_SERVICES static data.
  */
 export function ServicesSection({ initialServices = null, servicesLoading = false }) {
   useLenisResize();
 
-  // Only fire own fetch if the home route didn't pass pre-fetched data.
-  // This eliminates the duplicate Sanity request + CORS preflight on home.
-  const skip = initialServices !== null;
+  // skip own fetch only when:
+  //   a) we have real data from the parent (non-empty array), OR
+  //   b) loading is finished (empty result from Sanity is intentional)
+  // During loading with [] fallback, skip=false → show HOME_SERVICES instead
+  const hasRealData = Array.isArray(initialServices) && initialServices.length > 0;
+  const loadingDone = initialServices !== null && !servicesLoading;
+  const skip = hasRealData || loadingDone;
+
   const { data: ownServices, loading: ownLoading } = useSanity(
     skip ? null : SERVICES_QUERY,
     null
@@ -276,7 +286,7 @@ export function ServicesSection({ initialServices = null, servicesLoading = fals
     : DEFAULT_HOME_SERVICES_LIMIT;
 
   const hasTiers = allServices?.some(s => s.sessionTier);
-  const services = allServices ? allServices.map(normalise) : HOME_SERVICES;
+  const services = allServices && allServices.length > 0 ? allServices.map(normalise) : HOME_SERVICES;
 
   const filtered = (activeTab === 'all'
     ? services
