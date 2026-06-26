@@ -50,19 +50,19 @@ export default function Footer() {
     /*
      * FIX: CLS 0.245 → ~0
      *
-     * Lighthouse identified this footer as the sole layout-shift element
-     * (score 0.245, path: body div#root div.min-h-screen footer.relative).
+     * Using style={{ minHeight: 966 }} instead of Tailwind arbitrary class
+     * min-h-[966px] because Tailwind's content scan purges arbitrary values
+     * it doesn't find statically in source during both dev HMR and production
+     * build. The inline style is immune to purging and always generates the
+     * correct CSS rule.
      *
-     * The footer has no intrinsic height at parse time — it shifts into its
-     * final 966px height after JS mounts and lazy sections finish loading,
-     * causing the entire page below the fold to jump.
-     *
-     * Fix: add `min-h-[966px]` so the browser pre-reserves the exact space
-     * the footer will occupy, eliminating layout shift entirely.
-     * The value 966px matches the observed footer height from the Lighthouse
-     * bounding rect (top: 8934, bottom: 9900 → height: 966px).
+     * 966px = observed footer bounding rect height from Lighthouse report
+     * (boundingRect top:8934, bottom:9900 → height:966).
      */
-    <footer className="relative border-t border-border/60 mt-32 bg-deep overflow-hidden min-h-[966px]">
+    <footer
+      className="relative border-t border-border/60 mt-32 bg-deep overflow-hidden"
+      style={{ minHeight: 966 }}
+    >
       <div className="absolute inset-0 bg-hero opacity-40 pointer-events-none" />
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent" />
 

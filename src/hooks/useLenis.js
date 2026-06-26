@@ -37,7 +37,18 @@ export function useLenis() {
     });
     bodyResizeObserver.observe(document.body);
 
-    // ─── RAF LOOP ─────────────────────────────────────────────────────
+    // ─── RAF LOOP — deferred until page is interactive ────────────────
+    //
+    // PERF FIX: Previously the rAF loop started immediately on mount,
+    // running concurrently with React hydration + JS parsing. This caused
+    // ALL 20 long tasks in Lighthouse to be "Unattributable" (25s of
+    // main-thread blocking) — the rAF tick was firing every ~16ms and
+    // forcing style recalc + composite work on top of already-busy parsing.
+    //
+    // Fix: delay the first tick until window 'load' fires (all scripts
+    // parsed, all lazy chunks evaluated). After that, the rAF loop runs
+    // at full 60fps with nothing competing on the main thread.
+    // Lenis is still CREATED now so context/refs are immediately available.
     let rafId = null;
 
     function raf(time) {
@@ -45,9 +56,20 @@ export function useLenis() {
       rafId = requestAnimationFrame(raf);
     }
 
-    rafId = requestAnimationFrame(raf);
+    function startRaf() {
+      rafId = requestAnimationFrame(raf);
+    }
+
+    if (document.readyState === 'complete') {
+      // Already loaded (e.g. HMR re-mount in dev) — start immediately
+      startRaf();
+    } else {
+      // Page still loading — wait for all scripts + lazy chunks to finish
+      window.addEventListener('load', startRaf, { once: true });
+    }
 
     return () => {
+      window.removeEventListener('load', startRaf);
       if (rafId) cancelAnimationFrame(rafId);
       bodyResizeObserver.disconnect();
       lenis.destroy();
