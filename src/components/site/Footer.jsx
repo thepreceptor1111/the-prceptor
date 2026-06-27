@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { siteConfig, footerLinks } from "@/content/site";
 
-// ── Inline SVG icons ───────────────────────────────────────────────────────────────────────────────────
+// ── Inline SVG icons ──────────────────────────────────────────────────────────
 function InstagramIcon({ className }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -47,7 +47,8 @@ function RedditIcon({ className }) {
 
 export default function Footer() {
   return (
-    <footer className="relative border-t border-border/60 mt-32 bg-deep overflow-hidden">
+    // fix: was mt-32 — removed to prevent double-gap stacking with CtaSection's pb-16
+    <footer className="relative border-t border-border/60 bg-deep overflow-hidden">
       <div className="absolute inset-0 bg-hero opacity-40 pointer-events-none" />
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent" />
 
