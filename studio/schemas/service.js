@@ -102,6 +102,23 @@ export const serviceSchema = defineType({
       description: 'Lower number = shown first within its tier. Use 1, 2, 3 …',
       validation: (R) => R.required().integer().positive(),
     }),
+
+    // ── Deprecated fields ──────────────────────────────────────────────────
+    // These were renamed: badge → tagline, duration → sessionDuration.
+    // Kept here as hidden so Sanity does not show "Unknown fields" warnings
+    // for documents that still carry the old values in the dataset.
+    defineField({
+      name: 'badge',
+      title: 'Badge (deprecated — use Badge / Tagline above)',
+      type: 'string',
+      hidden: true,
+    }),
+    defineField({
+      name: 'duration',
+      title: 'Duration (deprecated — use Session Duration above)',
+      type: 'string',
+      hidden: true,
+    }),
   ],
   orderings: [
     { title: 'Tier then Order', name: 'tierOrder', by: [{ field: 'sessionTier', direction: 'asc' }, { field: 'order', direction: 'asc' }] },
