@@ -190,12 +190,26 @@ export function HeroSection() {
         style={{ background: "radial-gradient(ellipse at center, oklch(0.38 0.10 38 / 0.22), transparent 60%)" }}
       />
 
-      {/* Hero figure — on mobile push it to cover full bg, on lg+ keep right-positioned */}
-      <motion.div
-        initial={{ opacity: 0.88, y: 28, scale: 1.04 }}
-        animate={{ opacity: 0.88, y: 0, scale: 1 }}
-        transition={{ duration: 2.2, ease: [0.22, 1, 0.36, 1] }}
-        className="absolute inset-y-0 right-0 w-full lg:w-[68%] xl:w-[62%] pointer-events-none"
+      {/*
+        Hero figure — LCP element.
+
+        BEFORE: two nested <motion.div> wrappers.
+          Outer: initial={{ opacity: 0.88, y: 28, scale: 1.04 }}
+          Inner: animate={{ y: [0, -16, 0] }} repeat:Infinity
+
+        Framer Motion sets opacity:0 on motion elements until its JS chunk
+        (vendor-motion, ~350KB) downloads, parses, and hydrates. That kept
+        the hero image invisible for ~18s — the entire LCP penalty.
+
+        AFTER: two plain <div>s with CSS keyframe classes.
+          .hero-image-enter  → same entrance (opacity 0.3→0.88, y 28→0, scale 1.04→1)
+          .hero-float        → same infinite float (y 0→-16→0, 13s)
+
+        All masks, gradients, image attributes, and every other motion.*
+        in this file are completely untouched.
+      */}
+      <div
+        className="hero-image-enter absolute inset-y-0 right-0 w-full lg:w-[68%] xl:w-[62%] pointer-events-none"
         style={{
           WebkitMaskImage: [
             "linear-gradient(to right, transparent 0%, black 30%, black 80%, transparent 100%)",
@@ -211,11 +225,7 @@ export function HeroSection() {
           maskComposite: "intersect, intersect",
         }}
       >
-        <motion.div
-          className="absolute inset-0"
-          animate={{ y: [0, -16, 0] }}
-          transition={{ duration: 13, repeat: Infinity, ease: "easeInOut", delay: 3 }}
-        >
+        <div className="hero-float absolute inset-0">
           <img
             src={heroImg}
             alt="The Preceptor — celestial guide"
@@ -229,11 +239,11 @@ export function HeroSection() {
               imgReady ? "opacity-[0.88]" : "opacity-0"
             }`}
           />
-        </motion.div>
+        </div>
         <div className="absolute inset-0" style={{ background: "linear-gradient(to right, oklch(0.10 0.025 270) 0%, oklch(0.10 0.025 270 / 0.55) 22%, transparent 55%)" }} />
         <div className="absolute inset-0" style={{ background: "linear-gradient(to top, oklch(0.10 0.025 270) 0%, oklch(0.10 0.025 270 / 0.45) 15%, transparent 45%)" }} />
         <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, oklch(0.10 0.025 270 / 0.6) 0%, transparent 30%)" }} />
-      </motion.div>
+      </div>
 
       {/* Left readability gradient */}
       <div

@@ -275,3 +275,48 @@ img, video { max-width: 100%; height: auto; }
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ── Hero image: CSS-only entrance + float (LCP fix) ────────────────────
+ *
+ * Previously the hero image wrapper was a <motion.div initial={opacity:0.88,
+ * y:28, scale:1.04}> — Framer Motion holds the element at opacity:0 until
+ * vendor-motion.js downloads, parses, and runs (~18s on a slow connection).
+ * That was the single cause of the 21.9s LCP.
+ *
+ * These two keyframes replace both motion.div wrappers with plain divs:
+ *   .hero-image-enter  — replicates the one-shot entrance (opacity + y + scale)
+ *   .hero-float        — replicates the infinite vertical float
+ *
+ * Identical easing curve (cubic-bezier(0.22,1,0.36,1) ≈ ease-out-expo),
+ * identical timing (2.2s entrance, 13s float), identical amplitude (16px).
+ * Zero design change.
+ */
+@keyframes heroEnter {
+  from {
+    opacity: 0.3;
+    transform: translateY(28px) scale(1.04);
+  }
+  to {
+    opacity: 0.88;
+    transform: translateY(0px) scale(1);
+  }
+}
+
+@keyframes heroFloat {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-16px); }
+}
+
+.hero-image-enter {
+  animation: heroEnter 2.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.hero-float {
+  /* Float starts after the entrance finishes (delay 3s matches original) */
+  animation: heroFloat 13s ease-in-out 3s infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-image-enter { animation: none; opacity: 0.88; }
+  .hero-float       { animation: none; }
+}
