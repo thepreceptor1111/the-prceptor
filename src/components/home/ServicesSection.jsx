@@ -6,10 +6,11 @@ import { OfferTimer } from "@/components/site/OfferTimer";
 import { HOME_SERVICES } from "@/utils/constants";
 import { useSanity } from "@/lib/useSanity";
 import { useSiteSettings } from "@/lib/useSiteSettings";
+import { useOfferActive } from "@/lib/useOfferActive";
 import { SERVICES_QUERY } from "@/lib/sanityQueries";
 import { useLenisResize } from "@/hooks/useLenisResize";
 
-// ── Inline SVG icons — removes lucide-react dependency ────────────────────
+// ── Inline SVG icons ───────────────────────────────────────────────────
 function StarIcon({ className }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -167,10 +168,10 @@ const ICON_MAP = {
 const DEFAULT_HOME_SERVICES_LIMIT = 6;
 
 const TABS = [
-  { key: 'all',     label: 'All',           icon: null },
-  { key: 'quick',   label: 'Quick Guidance', icon: ZapIcon },
-  { key: 'mid',     label: 'Mid Level',      icon: LayersIcon },
-  { key: 'indepth', label: 'In-depth',       icon: SearchIcon },
+  { key: 'all',     label: 'All',            icon: null },
+  { key: 'quick',   label: 'Quick Guidance',  icon: ZapIcon },
+  { key: 'mid',     label: 'Mid Level',       icon: LayersIcon },
+  { key: 'indepth', label: 'In-depth',        icon: SearchIcon },
 ];
 
 function normalise(s) {
@@ -191,6 +192,11 @@ function normalise(s) {
 
 function ServiceCard({ s, i }) {
   const Icon = ICON_MAP[s.icon] || StarIcon;
+  // Only show the crossed-out original price while the offer is live.
+  // When the offer expires the strikethrough disappears automatically
+  // and only the single current price is shown.
+  const offerActive = useOfferActive();
+
   return (
     <motion.div
       key={s.slug}
@@ -204,7 +210,7 @@ function ServiceCard({ s, i }) {
         <motion.div
           whileHover={{ y: -6 }}
           transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-          className="glass-card rounded-2xl p-8 h-full group cursor-pointer hover:border-primary/40 relative overflow-hidden"
+          className="glass-card glow-gold-hover rounded-2xl p-8 h-full group cursor-pointer hover:border-primary/40 relative overflow-hidden"
         >
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,oklch(0.82_0.12_85_/_0.07),transparent_40%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           <div className="relative z-10 flex flex-col h-full gap-3">
@@ -229,7 +235,9 @@ function ServiceCard({ s, i }) {
                 <ClockIcon className="w-3 h-3" />{s.duration}
               </span>
               <div className="flex items-baseline gap-2">
-                {s.originalPrice && <span className="text-xs text-muted-foreground line-through">{s.originalPrice}</span>}
+                {offerActive && s.originalPrice && (
+                  <span className="text-xs text-muted-foreground line-through">{s.originalPrice}</span>
+                )}
                 <span className="font-semibold text-gold text-lg">{s.price}</span>
               </div>
             </div>
@@ -240,21 +248,9 @@ function ServiceCard({ s, i }) {
   );
 }
 
-/**
- * ServicesSection
- *
- * Props (optional — provided by the home route's batched Sanity fetch):
- *   initialServices   {Array|null}  — pre-fetched services from HOME_PAGE_QUERY
- *   servicesLoading   {boolean}     — loading state from the batched hook
- *
- * When used on non-home pages (e.g. /services), neither prop is passed and
- * the component falls back to its own useSanity call, just as before.
- */
 export function ServicesSection({ initialServices = null, servicesLoading = false }) {
   useLenisResize();
 
-  // Only fire own fetch if the home route didn't pass pre-fetched data.
-  // This eliminates the duplicate Sanity request + CORS preflight on home.
   const skip = initialServices !== null;
   const { data: ownServices, loading: ownLoading } = useSanity(
     skip ? null : SERVICES_QUERY,

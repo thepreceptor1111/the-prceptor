@@ -24,7 +24,8 @@ export function CtaSection() {
   const btnLabel = settings?.ctaSectionBtnLabel ?? "Book a Session";
 
   return (
-    <section className="py-32 lg:py-40 relative">
+    // fix: was py-32 lg:py-40 — bottom padding cut to pb-16 to reduce gap before footer
+    <section className="pt-32 lg:pt-40 pb-16 relative">
       <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden>
         <div className="absolute inset-0 section-glow-cta" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[70%] aspect-square rounded-full bg-[radial-gradient(circle,oklch(0.82_0.12_85_/_0.07),transparent_65%)] blur-3xl" />

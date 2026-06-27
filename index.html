@@ -4,48 +4,24 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- ── FIX: Hero LCP image — preload + fetchpriority=high ──────────── -->
-    <!--
-      hero-section.webp lives in /public/ — Vite copies public/ files as-is
-      to dist/ without hashing. So the path is ALWAYS /hero-section.webp in
-      both dev (localhost:5173) and prod (localhost:4173 / thepreceptorglobal.com).
-
-      The browser warning "preloaded but not used" appeared because the <img>
-      in HeroSection.jsx used src="hero-section.webp" (relative, no leading
-      slash). The preload href="/hero-section.webp" (absolute) and the image
-      src resolved to different cache keys — browser fetched it twice.
-
-      Fix applied in HeroSection.jsx: src changed to "/hero-section.webp".
-      This preload is now correctly matched and the warning is gone.
-    -->
+    <!-- ── FIX: Hero LCP image — preload + fetchpriority=high ──────────────────── -->
     <link rel="preload" as="image" href="/hero-section.webp" fetchpriority="high" type="image/webp">
 
-    <!-- ── Preconnect to external origins ────────────────────────────── -->
+    <!-- ── Preconnect to external origins ───────────────────────────────────── -->
     <link rel="dns-prefetch"  href="https://cdn.sanity.io" />
     <link rel="preconnect"   href="https://cdn.sanity.io"           crossorigin />
     <link rel="preconnect"   href="https://9w7fo0ix.api.sanity.io" crossorigin />
 
-    <!-- ── Google Fonts (non-blocking) ───────────────────────────────── -->
-    <link rel="preconnect"   href="https://fonts.googleapis.com" />
-    <link rel="preconnect"   href="https://fonts.gstatic.com"    crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,400&family=Inter:wght@200;300;400;500;600&display=swap"
-      rel="stylesheet"
-      media="print"
-      onload="this.media='all'"
-    />
-    <noscript>
-      <link
-        href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,400&family=Inter:wght@200;300;400;500;600&display=swap"
-        rel="stylesheet"
-      />
-    </noscript>
+    <!-- Google Fonts removed — fonts are now self-hosted via @fontsource
+         and served from the Vercel CDN edge. Zero external RTT.
+         Packages: @fontsource-variable/inter  @fontsource/fraunces
+         Imports: src/styles.css -->
 
-    <!-- ── Favicon ──────────────────────────────────────────────────────────── -->
+    <!-- ── Favicon ──────────────────────────────────────────────────────────────── -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="google-site-verification" content="-ppSJQ86nfQyg4_noRGe1XvQ9elyoSM_O1A-0pLF6FU" />
 
-    <!-- ── Primary Meta ──────────────────────────────────────────────────────── -->
+    <!-- ── Primary Meta ──────────────────────────────────────────────────────────────── -->
     <title>The Preceptor — Vedic Astrology Readings &amp; Spiritual Consultations Online</title>
     <meta
       name="description"
@@ -54,12 +30,12 @@
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://www.thepreceptorglobal.com/" />
 
-    <!-- ── Theme color ──────────────────────────────────────────────────────── -->
+    <!-- ── Theme color ──────────────────────────────────────────────────────────────── -->
     <meta name="theme-color" content="#0a0818" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-    <!-- ── Open Graph ────────────────────────────────────────────────────── -->
+    <!-- ── Open Graph ──────────────────────────────────────────────────────────────── -->
     <meta property="og:type"        content="website" />
     <meta property="og:url"         content="https://www.thepreceptorglobal.com/" />
     <meta property="og:site_name"   content="The Preceptor" />
@@ -72,7 +48,7 @@
     <meta property="og:image:alt"    content="The Preceptor — For those who seek clarity." />
     <meta property="og:image:type"   content="image/webp" />
 
-    <!-- ── Twitter / X Card ──────────────────────────────────────────────────── -->
+    <!-- ── Twitter / X Card ──────────────────────────────────────────────────────────────── -->
     <meta name="twitter:card"        content="summary_large_image" />
     <meta name="twitter:site"        content="@thepreceptorglobal" />
     <meta name="twitter:title"       content="The Preceptor — Vedic Astrology Readings &amp; Spiritual Consultations Online" />
@@ -89,12 +65,6 @@
         background-color: #0a0818;
       }
       #root { isolation: isolate; }
-      /*
-       * CLS FIX: pre-reserve footer height before React mounts.
-       * Applied here (in HTML) so it takes effect before any JS runs.
-       * The JSX style={{ minHeight: 966 }} is a no-op after hydration.
-       */
-      footer.relative { min-height: 966px; }
     </style>
   </head>
   <body>

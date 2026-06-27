@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { OFFER_END_DATE } from "@/utils/constants";
 import { useSiteSettings } from "@/lib/useSiteSettings";
+import { useOfferActive } from "@/lib/useOfferActive";
 
-// ── Inline SVG icon — removes lucide-react dependency ─────────────────────
+// ── Inline SVG icon ───────────────────────────────────────────────────
 function ClockIcon({ className }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -48,11 +49,30 @@ function Digit({ value, label }) {
   );
 }
 
+function ExpiredBadge({ label }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+      className="flex flex-col items-center gap-4 py-4"
+    >
+      <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-gold/20 bg-black/20 text-xs uppercase tracking-[0.25em] text-gold/60">
+        <ClockIcon className="w-3.5 h-3.5 shrink-0" />
+        <span>{label}</span>
+      </div>
+    </motion.div>
+  );
+}
+
 export function OfferTimer() {
   const { settings } = useSiteSettings();
+  const offerActive  = useOfferActive();
 
-  const deadline   = settings?.offerDeadline ?? OFFER_END_DATE;
-  const timerLabel = settings?.offerLabel?.trim() || "Introductory offer ends in";
+  const deadline     = settings?.offerDeadline ?? OFFER_END_DATE;
+  const timerLabel   = settings?.offerLabel?.trim() || "Introductory offer ends in";
+  const expiredLabel = settings?.offerExpiredLabel?.trim()
+    || "Introductory offer has ended \u2014 standard pricing now applies";
 
   const [timeLeft, setTimeLeft] = useState(() => getTimeLeft(deadline));
 
@@ -62,7 +82,7 @@ export function OfferTimer() {
     return () => clearInterval(id);
   }, [deadline]);
 
-  if (!timeLeft) return null;
+  if (!offerActive) return <ExpiredBadge label={expiredLabel} />;
 
   return (
     <div className="flex flex-col items-center gap-4 py-4">

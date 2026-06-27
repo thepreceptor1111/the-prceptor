@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { navLinks, siteConfig } from "@/content/site";
 
-// ── Inline SVG icons — replaces lucide-react (874 KB) entirely ────────────
+// ── Inline SVG icons ───────────────────────────────────────────────────────────
 function MenuIcon({ className }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -32,16 +32,10 @@ const mobileFooterLinks = [
   { to: "/terms",   label: "Terms & Conditions" },
 ];
 
-// ── Animation variants ─────────────────────────────────────────────────────
-const headerVariants = {
-  hidden:  { y: -8, opacity: 0 },
-  visible: {
-    y: 0,
-    opacity: 1,
-    transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] },
-  },
-};
-
+// ── Mobile overlay animation variants (framer-motion — off critical path) ─────
+// These variants only run when the user opens the hamburger menu.
+// The header itself now uses a pure CSS animation (nav-in keyframe in styles.css)
+// so framer-motion is NOT executed on the critical rendering path.
 const overlayVariants = {
   hidden:  { opacity: 0 },
   visible: { opacity: 1, transition: { duration: 0.3, ease: "easeOut" } },
@@ -56,9 +50,24 @@ const itemVariants = {
   }),
 };
 
+// ── Hook: track whether viewport is lg+ (≥1024px) ──────────────────────
+function useIsDesktop() {
+  const [isDesktop, setIsDesktop] = useState(() => window.innerWidth >= 1024);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const handler = (e) => setIsDesktop(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
+  return isDesktop;
+}
+
 export default function Nav() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const isDesktop = useIsDesktop();
   const location = useLocation();
 
   useEffect(() => {
@@ -77,10 +86,17 @@ export default function Nav() {
 
   return (
     <>
-      <motion.header
-        variants={headerVariants}
-        initial="hidden"
-        animate="visible"
+      {/*
+        PERF: header no longer uses motion.header.
+        Previously: motion.header triggered framer-motion layout tracking and
+        the JS animation engine on every page load, even before any interaction.
+        Now: pure CSS animation via `animation: nav-in 0.55s ...` defined in
+        styles.css. Zero JS execution cost on the critical path.
+        framer-motion is only imported/used for the mobile overlay below,
+        which is off-screen and loaded lazily by React.lazy(Nav).
+      */}
+      <header
+        style={{ animation: "nav-in 0.55s cubic-bezier(0.22,1,0.36,1) both" }}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
           scrolled
             ? "backdrop-blur-xl bg-background/70 border-b border-border/60 shadow-elegant"
@@ -89,6 +105,7 @@ export default function Nav() {
       >
         <div className="max-w-7xl mx-auto px-6 lg:px-10 h-20 flex items-center justify-between">
 
+          {/* Logo */}
           <Link to="/" className="flex items-center gap-2.5 group">
             <span className="text-gold font-serif text-2xl group-hover:rotate-12 transition-transform duration-500">
               ✦
@@ -96,6 +113,7 @@ export default function Nav() {
             <span className="font-serif text-xl tracking-wide">{siteConfig.name}</span>
           </Link>
 
+          {/* Desktop nav links — only visible lg+ */}
           <nav className="hidden lg:flex items-center gap-10" aria-label="Primary navigation">
             {navLinks.map((l) => (
               <NavLink
@@ -120,13 +138,22 @@ export default function Nav() {
             ))}
           </nav>
 
-          <Link
-            to="/book"
-            className="hidden lg:inline-flex items-center px-6 py-2.5 rounded-full bg-primary text-primary-foreground btn-text hover:scale-[1.03] hover:shadow-gold transition-all duration-300"
-          >
-            Book a Session
-          </Link>
+          {/*
+            Desktop CTA — rendered ONLY when viewport is lg+ (≥1024px).
+            Using JS-driven conditional render instead of Tailwind hidden/lg:inline-flex
+            because .btn-primary sets display:inline-flex in CSS, which has higher
+            specificity than the Tailwind `hidden` utility and overrides it on mobile.
+          */}
+          {isDesktop && (
+            <Link
+              to="/book"
+              className="btn-primary"
+            >
+              Book a Session
+            </Link>
+          )}
 
+          {/* Hamburger — only on < lg */}
           <button
             className="lg:hidden text-foreground relative w-10 h-10 flex items-center justify-center"
             onClick={() => setOpen((v) => !v)}
@@ -150,8 +177,9 @@ export default function Nav() {
             </motion.span>
           </button>
         </div>
-      </motion.header>
+      </header>
 
+      {/* Mobile fullscreen overlay */}
       <AnimatePresence>
         {open && (
           <motion.div
@@ -199,12 +227,13 @@ export default function Nav() {
                 <Link
                   to="/book"
                   onClick={() => setOpen(false)}
-                  className="inline-flex items-center px-8 py-4 rounded-full bg-primary text-primary-foreground font-medium shadow-gold"
+                  className="btn-primary px-8 py-4 text-base"
                 >
                   Book a Session
                 </Link>
               </motion.div>
 
+              {/* Legal links at bottom */}
               <motion.div
                 custom={navLinks.length + 1}
                 variants={itemVariants}

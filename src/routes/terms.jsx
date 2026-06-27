@@ -155,7 +155,11 @@ export default function TermsPage() {
               </span>
             </Reveal>
             <Reveal delay={0.1}>
-              <h1 className="mt-8 text-balance">
+              {/* FIX: added fluid clamp() size to match all other page heroes */}
+              <h1
+                className="mt-8 text-balance"
+                style={{ fontFamily: "var(--font-serif)", fontSize: "clamp(2.5rem, 5vw, 4.5rem)", fontWeight: 400 }}
+              >
                 Clear terms,
                 <span className="display-italic text-gold"> honestly stated.</span>
               </h1>

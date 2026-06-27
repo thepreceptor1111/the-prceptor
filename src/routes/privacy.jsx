@@ -134,7 +134,11 @@ export default function PrivacyPage() {
               </span>
             </Reveal>
             <Reveal delay={0.1}>
-              <h1 className="mt-8 text-balance">
+              {/* FIX: added fluid clamp() size to match services.jsx / about.jsx / contact.jsx hero headings */}
+              <h1
+                className="mt-8 text-balance"
+                style={{ fontFamily: "var(--font-serif)", fontSize: "clamp(2.5rem, 5vw, 4.5rem)", fontWeight: 400 }}
+              >
                 Your privacy is
                 <span className="display-italic text-gold"> sacred.</span>
               </h1>

@@ -24,9 +24,9 @@ export const faqSchema = defineType({
       type: 'string',
       options: {
         list: [
-          { title: 'Sessions',        value: 'sessions' },
-          { title: 'Astrology',       value: 'astrology' },
-          { title: 'Logistics',       value: 'logistics' },
+          { title: 'Sessions',          value: 'sessions' },
+          { title: 'Astrology',         value: 'astrology' },
+          { title: 'Logistics',         value: 'logistics' },
           { title: 'Types of Readings', value: 'readings' },
         ],
       },
@@ -40,11 +40,24 @@ export const faqSchema = defineType({
       description: 'Lower number = shown first',
       validation: (R) => R.required().integer().positive(),
     }),
+    defineField({
+      name: 'featured',
+      title: 'Show on Home page?',
+      type: 'boolean',
+      initialValue: false,
+      description: 'Tick to include this FAQ in the home page FAQ section. Leave unticked to show only on the full /qna page.',
+    }),
   ],
   orderings: [
     { title: 'Display Order', name: 'orderAsc', by: [{ field: 'order', direction: 'asc' }] },
   ],
   preview: {
-    select: { title: 'question', subtitle: 'category' },
+    select: { title: 'question', subtitle: 'category', featured: 'featured' },
+    prepare({ title, subtitle, featured }) {
+      return {
+        title,
+        subtitle: `${subtitle ?? ''}${featured ? ' ★ Home' : ''}`,
+      };
+    },
   },
 });

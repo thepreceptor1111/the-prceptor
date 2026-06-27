@@ -8,9 +8,10 @@ import { OfferTimer } from "@/components/site/OfferTimer";
 import { SERVICES, SITE } from "@/utils/constants";
 import { useSanity } from "@/lib/useSanity";
 import { useSiteSettings } from "@/lib/useSiteSettings";
+import { useOfferActive } from "@/lib/useOfferActive";
 import { SERVICES_QUERY } from "@/lib/sanityQueries";
 
-// ── Inline SVG icons — removes lucide-react dependency ────────────────────
+// ── Inline SVG icons ───────────────────────────────────────────────────
 function ArrowRightIcon({ className }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -207,6 +208,8 @@ export default function ServicesPage() {
   const { data: cmsServices, loading } = useSanity(SERVICES_QUERY, null);
   const { settings } = useSiteSettings();
   const [activeTab, setActiveTab] = useState('all');
+  // Only show the crossed-out original price while the offer is live.
+  const offerActive = useOfferActive();
 
   const raw = cmsServices && cmsServices.length > 0 ? cmsServices : SERVICES;
   const services = raw.map(normaliseService);
@@ -323,7 +326,7 @@ export default function ServicesPage() {
                         <motion.div
                           whileHover={{ y: -6 }}
                           transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                          className="glass-card rounded-2xl p-8 flex flex-col gap-3 group hover:border-primary/40 relative overflow-hidden"
+                          className="glass-card glow-gold-hover rounded-2xl p-8 flex flex-col gap-3 group hover:border-primary/40 relative overflow-hidden"
                         >
                           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,oklch(0.82_0.12_85_/_0.06),transparent_40%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                           <div className="relative z-10 flex flex-col gap-3 h-full">
@@ -350,7 +353,7 @@ export default function ServicesPage() {
                                 <ClockIcon className="w-3 h-3" />{s.duration}
                               </span>
                               <div className="flex items-baseline gap-2">
-                                {s.originalPrice && (
+                                {offerActive && s.originalPrice && (
                                   <span className="text-sm text-muted-foreground line-through">{s.originalPrice}</span>
                                 )}
                                 <span className="font-serif text-xl text-gold">{s.price}</span>

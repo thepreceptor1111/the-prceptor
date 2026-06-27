@@ -123,7 +123,7 @@ export default function ShopPage() {
               <button
                 type="submit"
                 disabled={done || submitting}
-                className="px-6 py-3 rounded-full bg-primary text-primary-foreground text-sm font-medium hover:scale-[1.02] transition disabled:opacity-60 disabled:cursor-not-allowed disabled:scale-100"
+                className="btn-primary disabled:opacity-60 disabled:cursor-not-allowed disabled:scale-100"
               >
                 {done ? "On the list ✓" : submitting ? "Adding…" : "Notify Me"}
               </button>
