@@ -48,7 +48,11 @@ export const HOME_PAGE_QUERY = groq`
         alt
       }
     },
-    "faqs": *[_type == "faq"] | order(order asc) {
+    // Home FAQ section: featured only.
+    // To control which FAQs appear here, tick
+    // "Show on Home page?" on the document in Sanity Studio.
+    // The full /qna page (FAQ_QUERY) is unaffected.
+    "faqs": *[_type == "faq" && featured == true] | order(order asc) {
       _id,
       question,
       answer,
@@ -99,6 +103,8 @@ export const SERVICES_QUERY = groq`
   }
 `;
 
+// Full FAQ list — NO featured filter.
+// Used on the /qna page to show every FAQ.
 export const FAQ_QUERY = groq`
   *[_type == "faq"] | order(order asc) {
     _id,
