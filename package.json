@@ -12,6 +12,7 @@
     "@calcom/embed-react": "^1.5.0",
     "@fontsource-variable/inter": "^5.0.0",
     "@fontsource/fraunces": "^5.0.0",
+    "@radix-ui/react-select": "^2.3.1",
     "@sanity/client": "^6.22.0",
     "clsx": "^2.1.1",
     "framer-motion": "^11.15.0",
