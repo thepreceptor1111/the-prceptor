@@ -192,9 +192,6 @@ function normalise(s) {
 
 function ServiceCard({ s, i }) {
   const Icon = ICON_MAP[s.icon] || StarIcon;
-  // Only show the crossed-out original price while the offer is live.
-  // When the offer expires the strikethrough disappears automatically
-  // and only the single current price is shown.
   const offerActive = useOfferActive();
 
   return (
@@ -289,8 +286,8 @@ export function ServicesSection({ initialServices = null, servicesLoading = fals
       <div className="cosmic-stars absolute inset-0 pointer-events-none" aria-hidden />
       <div className="max-w-7xl mx-auto px-6 lg:px-10 relative z-10">
         <Reveal className="text-center max-w-2xl mx-auto">
-          <span className="text-xs uppercase tracking-[0.3em] text-gold">{sectionLabel}</span>
-          <h2 className="mt-4 text-4xl md:text-5xl">{sectionHeading}</h2>
+          <span className="text-sm uppercase tracking-[0.3em] text-gold">{sectionLabel}</span>
+          <h2 className="mt-4 text-5xl md:text-6xl">{sectionHeading}</h2>
           {sectionSubtitle && <p className="mt-5 text-muted-foreground">{sectionSubtitle}</p>}
         </Reveal>
         <Reveal className="mt-10">

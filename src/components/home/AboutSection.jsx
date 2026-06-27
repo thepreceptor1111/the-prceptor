@@ -13,7 +13,7 @@ export function AboutSection() {
   const heading2Gold = settings?.aboutHeading2Gold ?? "for a modern world.";
   const paragraph1   = settings?.aboutParagraph1   ?? "For over twelve years, The Preceptor has guided executives, artists, and seekers through life\u2019s most pivotal chapters \u2014 translating classical Vedic and Western astrology into language that is grounded, modern, and quietly powerful.";
   const paragraph2   = settings?.aboutParagraph2   ?? "Our philosophy is simple: the stars do not predict your fate \u2014 they reveal your design. We help you read it.";
-  const stat1        = settings?.stat1 ?? { value: "12+",   label: "Years of practice" };
+  const stat1        = settings?.stat1 ?? { value: "6+",   label: "Years of practice" };
   const stat4        = settings?.stat4 ?? { value: "4.98\u2605", label: "Average rating" };
 
   const imageSrc = settings?.aboutImage?.asset?.url ?? aboutImg;

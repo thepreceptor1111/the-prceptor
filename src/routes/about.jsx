@@ -102,7 +102,7 @@ function AboutContent() {
         <Reveal>
           <p className="text-lg text-muted-foreground leading-relaxed">
             {settings?.aboutParagraph1 ??
-              "The Preceptor began as a small private practice for friends seeking real answers. Over 7 years, it has grown into a global consultation studio serving founders, artists, healers, and high-intention seekers across 18+ countries."}
+              "The Preceptor began as a small private practice for friends seeking real answers. Over 6 years, it has grown into a global consultation studio serving founders, artists, healers, and high-intention seekers across 27+ countries."}
           </p>
           <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
             {settings?.aboutParagraph2 ??

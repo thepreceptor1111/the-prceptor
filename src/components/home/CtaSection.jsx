@@ -24,7 +24,6 @@ export function CtaSection() {
   const btnLabel = settings?.ctaSectionBtnLabel ?? "Book a Session";
 
   return (
-    // fix: was py-32 lg:py-40 — bottom padding cut to pb-16 to reduce gap before footer
     <section className="pt-32 lg:pt-40 pb-16 relative">
       <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden>
         <div className="absolute inset-0 section-glow-cta" />
@@ -32,8 +31,8 @@ export function CtaSection() {
       </div>
       <div className="max-w-3xl mx-auto px-6 lg:px-10 text-center relative z-10">
         <Reveal>
-          <span className="text-xs uppercase tracking-[0.3em] text-gold">Begin</span>
-          <h2 className="mt-4 text-4xl md:text-5xl lg:text-6xl">{heading}</h2>
+          <span className="text-sm uppercase tracking-[0.3em] text-gold">Begin</span>
+          <h2 className="mt-4 text-5xl md:text-6xl lg:text-7xl">{heading}</h2>
           <p className="mt-6 text-muted-foreground text-lg max-w-xl mx-auto">{subtext}</p>
           <div className="mt-10 flex flex-wrap gap-4 justify-center">
             <Link to="/book" className="btn-primary inline-flex items-center gap-2">

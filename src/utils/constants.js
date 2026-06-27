@@ -170,10 +170,10 @@ export const TESTIMONIALS = [
 ];
 
 export const ACHIEVEMENTS = [
-  { value: "12+", label: "Years of Practice" },
-  { value: "8,400", label: "Sessions Delivered" },
-  { value: "47", label: "Countries Served" },
-  { value: "4.98", label: "Average Rating" },
+  { value: "6+",    label: "Years of Practice" },
+  { value: "6,000+", label: "Sessions Delivered" },
+  { value: "27+",   label: "Countries Served" },
+  { value: "4.98",  label: "Average Rating" },
 ];
 
 export const FAQS = [
@@ -205,8 +205,8 @@ export const FAQS = [
 
 export const ASTROLOGER = {
   name: "The Preceptor",
-  yearsExperience: 12,
-  bio: "For over twelve years, The Preceptor has guided executives, artists, and seekers through life's most pivotal chapters — translating classical Vedic and Western astrology into language that is grounded, modern, and quietly powerful.",
+  yearsExperience: 6,
+  bio: "For over six years, The Preceptor has guided executives, artists, and seekers through life's most pivotal chapters — translating classical Vedic and Western astrology into language that is grounded, modern, and quietly powerful.",
   philosophy:
     "Our philosophy is simple: the stars do not predict your fate — they reveal your design. We help you read it.",
 };
