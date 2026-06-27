@@ -140,6 +140,8 @@ function ArrowRightIcon({ className }) {
   );
 }
 
+const FORMSPREE_ENDPOINT = "https://formspree.io/f/xaqgogwj";
+
 export default function ContactPageWrapper() {
   return (
     <>
@@ -186,13 +188,15 @@ function ContactPage() {
   const [data, setData] = useState(initial);
   const [errors, setErrors] = useState({});
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [submitError, setSubmitError] = useState(false);
   const [openFaq, setOpenFaq] = useState(0);
 
   const update = (k) => (e) => {
     setData((prev) => ({ ...prev, [k]: e.target.value }));
   };
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
     const fieldErrors = validateForm(data);
     if (Object.keys(fieldErrors).length > 0) {
@@ -200,8 +204,27 @@ function ContactPage() {
       return;
     }
     setErrors({});
-    setSent(true);
-    setData(initial);
+    setSubmitError(false);
+    setSending(true);
+
+    try {
+      const res = await fetch(FORMSPREE_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (res.ok) {
+        setSent(true);
+        setData(initial);
+      } else {
+        setSubmitError(true);
+      }
+    } catch {
+      setSubmitError(true);
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -229,7 +252,6 @@ function ContactPage() {
             </span>
           </Reveal>
           <Reveal delay={0.1}>
-            {/* FIX: added fluid clamp() size to match services.jsx / about.jsx hero headings */}
             <h1
               className="mt-8 text-balance"
               style={{ fontFamily: "var(--font-serif)", fontSize: "clamp(2.5rem, 5vw, 4.5rem)", fontWeight: 400 }}
@@ -337,7 +359,18 @@ function ContactPage() {
                   animate={{ opacity: 1, y: 0 }}
                   className="relative mb-6 p-4 rounded-xl border border-gold/40 bg-gold/10 text-sm text-foreground"
                 >
-                  Thank you — your message has reached the studio. We respond personally within 24 hours.
+                  ✨ Thank you — your message has reached the studio. We respond personally within 24 hours.
+                </motion.div>
+              )}
+
+              {submitError && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="relative mb-6 p-4 rounded-xl border border-red-500/40 bg-red-500/10 text-sm text-foreground"
+                >
+                  Something went wrong — please try again or email us directly at{" "}
+                  <a href={`mailto:${siteConfig.email}`} className="text-gold underline">{siteConfig.email}</a>.
                 </motion.div>
               )}
 
@@ -372,9 +405,13 @@ function ContactPage() {
                 <p className="text-xs text-muted-foreground max-w-sm">
                   Your details remain strictly confidential. Used only to respond to your inquiry.
                 </p>
-                <button type="submit" className="btn-primary group">
-                  Send Message
-                  <SendIcon className="w-4 h-4 group-hover:translate-x-0.5 transition" />
+                <button
+                  type="submit"
+                  disabled={sending || sent}
+                  className="btn-primary group disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {sending ? "Sending…" : sent ? "Message Sent" : "Send Message"}
+                  {!sending && !sent && <SendIcon className="w-4 h-4 group-hover:translate-x-0.5 transition" />}
                 </button>
               </div>
             </form>
