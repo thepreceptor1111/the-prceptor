@@ -47,22 +47,7 @@ function RedditIcon({ className }) {
 
 export default function Footer() {
   return (
-    /*
-     * FIX: CLS 0.245 → ~0
-     *
-     * Using style={{ minHeight: 966 }} instead of Tailwind arbitrary class
-     * min-h-[966px] because Tailwind's content scan purges arbitrary values
-     * it doesn't find statically in source during both dev HMR and production
-     * build. The inline style is immune to purging and always generates the
-     * correct CSS rule.
-     *
-     * 966px = observed footer bounding rect height from Lighthouse report
-     * (boundingRect top:8934, bottom:9900 → height:966).
-     */
-    <footer
-      className="relative border-t border-border/60 mt-32 bg-deep overflow-hidden"
-      style={{ minHeight: 966 }}
-    >
+    <footer className="relative border-t border-border/60 mt-32 bg-deep overflow-hidden">
       <div className="absolute inset-0 bg-hero opacity-40 pointer-events-none" />
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent" />
 
