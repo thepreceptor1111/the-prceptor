@@ -5,19 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <!-- ── FIX: Hero LCP image — preload + fetchpriority=high ──────────── -->
-    <!--
-      hero-section.webp lives in /public/ — Vite copies public/ files as-is
-      to dist/ without hashing. So the path is ALWAYS /hero-section.webp in
-      both dev (localhost:5173) and prod (localhost:4173 / thepreceptorglobal.com).
-
-      The browser warning "preloaded but not used" appeared because the <img>
-      in HeroSection.jsx used src="hero-section.webp" (relative, no leading
-      slash). The preload href="/hero-section.webp" (absolute) and the image
-      src resolved to different cache keys — browser fetched it twice.
-
-      Fix applied in HeroSection.jsx: src changed to "/hero-section.webp".
-      This preload is now correctly matched and the warning is gone.
-    -->
     <link rel="preload" as="image" href="/hero-section.webp" fetchpriority="high" type="image/webp">
 
     <!-- ── Preconnect to external origins ────────────────────────────── -->
@@ -90,11 +77,12 @@
       }
       #root { isolation: isolate; }
       /*
-       * CLS FIX: pre-reserve footer height before React mounts.
-       * Applied here (in HTML) so it takes effect before any JS runs.
-       * The JSX style={{ minHeight: 966 }} is a no-op after hydration.
+       * REMOVED: footer.relative { min-height: 966px; }
+       * This rule was a misguided CLS fix that forced the footer to always
+       * be 966px tall regardless of content, causing ~500px of blank
+       * scrollable space below the footer on every viewport.
+       * The correct approach is to let the footer size to its content.
        */
-      footer.relative { min-height: 966px; }
     </style>
   </head>
   <body>
