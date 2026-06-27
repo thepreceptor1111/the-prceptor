@@ -204,7 +204,7 @@ function ServiceCard({ s, i }) {
         <motion.div
           whileHover={{ y: -6 }}
           transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-          className="glass-card rounded-2xl p-8 h-full group cursor-pointer hover:border-primary/40 relative overflow-hidden"
+          className="glass-card glow-gold-hover rounded-2xl p-8 h-full group cursor-pointer hover:border-primary/40 relative overflow-hidden"
         >
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,oklch(0.82_0.12_85_/_0.07),transparent_40%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           <div className="relative z-10 flex flex-col h-full gap-3">
