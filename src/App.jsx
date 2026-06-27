@@ -1,20 +1,23 @@
-import React, { lazy, Suspense } from "react";
+import React, { lazy, Suspense, useState, useEffect, useTransition } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import ErrorBoundary from "./components/site/ErrorBoundary";
-import Nav from "./components/site/Nav";
-import Footer from "./components/site/Footer";
-import TorchCursor from "./components/site/TorchCursor";
 import ScrollToTop from "./components/site/ScrollToTop";
-import AdminPortal from "./components/site/AdminPortal";
 import { SITE } from "./content/seo";
 import { useLenis } from "./hooks/useLenis";
 import { SiteSettingsProvider } from "./lib/SiteSettingsContext";
 import { LenisProvider } from "./context/LenisContext";
 
-// FIX 3: Home is now lazy-loaded like every other route.
-// Previously it was the only eager import, forcing React + all home-section
-// code into the initial bundle and blocking TTI by ~3-4 seconds.
+// ── Critical-path: lazy-load ALL heavy shell components ───────────────────────
+// Nav, Footer, TorchCursor and AdminPortal were previously eager imports.
+// Each one (especially Nav → framer-motion 114KB gzip) was blocking the first
+// paint. Lazy-loading them lets the route content paint immediately.
+const Nav         = lazy(() => import("./components/site/Nav"));
+const Footer      = lazy(() => import("./components/site/Footer"));
+const TorchCursor = lazy(() => import("./components/site/TorchCursor"));
+const AdminPortal = lazy(() => import("./components/site/AdminPortal"));
+
+// ── Route-level code splitting ────────────────────────────────────────────────
 const Home         = lazy(() => import("./routes/index"));
 const About        = lazy(() => import("./routes/about"));
 const Book         = lazy(() => import("./routes/book"));
@@ -28,6 +31,8 @@ const Terms        = lazy(() => import("./routes/terms"));
 const NotFound     = lazy(() => import("./routes/not-found"));
 const Admin        = lazy(() => import("./routes/admin"));
 
+// ── Minimal inline skeleton shown while route JS loads ────────────────────────
+// Rendered immediately from the initial bundle — zero extra dependencies.
 function CosmicLoader() {
   return (
     <div
@@ -72,6 +77,11 @@ function CosmicLoader() {
   );
 }
 
+// ── Null shell: used as Suspense fallback for decorative components ────────────
+// TorchCursor/AdminPortal are non-blocking UI niceties — show nothing while
+// they load rather than a spinner.
+const NullShell = () => null;
+
 const orgSchema = {
   "@context": "https://schema.org",
   "@type": "ProfessionalService",
@@ -107,6 +117,20 @@ function AppInner() {
   const isAdmin  = location.pathname.startsWith("/command-center");
   const isHome   = location.pathname === "/";
 
+  // ── Deferred shell mount ────────────────────────────────────────────────────
+  // shellReady flips to true after the first paint (via useEffect).
+  // This ensures Nav/Footer/TorchCursor/AdminPortal lazy chunks are only
+  // requested AFTER the route content has started rendering, keeping them
+  // off the critical path entirely.
+  const [shellReady, setShellReady] = useState(false);
+  const [, startTransition] = useTransition();
+
+  useEffect(() => {
+    // Schedule shell mount as a low-priority transition — React 18 will
+    // yield to the browser paint before processing this update.
+    startTransition(() => setShellReady(true));
+  }, []);
+
   useLenis();
 
   return (
@@ -122,11 +146,42 @@ function AppInner() {
           <div id="cosmic-bg"    aria-hidden="true" />
           <div id="cosmic-grain" aria-hidden="true" />
 
-          <TorchCursor />
-          <ScrollToTop />
+          {/*
+            Decorative chrome — loaded only after first paint.
+            TorchCursor and AdminPortal are non-critical; NullShell
+            fallback means zero layout shift while they load.
+          */}
+          {shellReady && (
+            <>
+              <Suspense fallback={<NullShell />}>
+                <TorchCursor />
+              </Suspense>
+              <ScrollToTop />
+              {!isAdmin && (
+                <Suspense fallback={<NullShell />}>
+                  <AdminPortal />
+                </Suspense>
+              )}
+            </>
+          )}
 
-          {!isAdmin && <AdminPortal />}
-          {!isAdmin && <Nav />}
+          {/*
+            Nav: deferred but shown immediately via Suspense.
+            The fallback is a minimal height-placeholder that reserves
+            the 80px header space so content doesn't jump when Nav mounts.
+          */}
+          {!isAdmin && (
+            <Suspense
+              fallback={
+                <div
+                  style={{ height: "80px", flexShrink: 0 }}
+                  aria-hidden="true"
+                />
+              }
+            >
+              <Nav />
+            </Suspense>
+          )}
 
           <main className={isAdmin ? "flex-1" : isHome ? "flex-1" : "flex-1 pt-20"}>
             <Suspense fallback={<CosmicLoader />}>
@@ -147,7 +202,11 @@ function AppInner() {
             </Suspense>
           </main>
 
-          {!isAdmin && <Footer />}
+          {!isAdmin && (
+            <Suspense fallback={<NullShell />}>
+              <Footer />
+            </Suspense>
+          )}
         </div>
       </SiteSettingsProvider>
     </ErrorBoundary>

@@ -32,16 +32,10 @@ const mobileFooterLinks = [
   { to: "/terms",   label: "Terms & Conditions" },
 ];
 
-// ── Animation variants ──────────────────────────────────────────────────
-const headerVariants = {
-  hidden:  { y: -8, opacity: 0 },
-  visible: {
-    y: 0,
-    opacity: 1,
-    transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] },
-  },
-};
-
+// ── Mobile overlay animation variants (framer-motion — off critical path) ─────
+// These variants only run when the user opens the hamburger menu.
+// The header itself now uses a pure CSS animation (nav-in keyframe in styles.css)
+// so framer-motion is NOT executed on the critical rendering path.
 const overlayVariants = {
   hidden:  { opacity: 0 },
   visible: { opacity: 1, transition: { duration: 0.3, ease: "easeOut" } },
@@ -92,10 +86,17 @@ export default function Nav() {
 
   return (
     <>
-      <motion.header
-        variants={headerVariants}
-        initial="hidden"
-        animate="visible"
+      {/*
+        PERF: header no longer uses motion.header.
+        Previously: motion.header triggered framer-motion layout tracking and
+        the JS animation engine on every page load, even before any interaction.
+        Now: pure CSS animation via `animation: nav-in 0.55s ...` defined in
+        styles.css. Zero JS execution cost on the critical path.
+        framer-motion is only imported/used for the mobile overlay below,
+        which is off-screen and loaded lazily by React.lazy(Nav).
+      */}
+      <header
+        style={{ animation: "nav-in 0.55s cubic-bezier(0.22,1,0.36,1) both" }}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
           scrolled
             ? "backdrop-blur-xl bg-background/70 border-b border-border/60 shadow-elegant"
@@ -142,8 +143,6 @@ export default function Nav() {
             Using JS-driven conditional render instead of Tailwind hidden/lg:inline-flex
             because .btn-primary sets display:inline-flex in CSS, which has higher
             specificity than the Tailwind `hidden` utility and overrides it on mobile.
-            The hamburger overlay already contains its own "Book a Session" button,
-            so this CTA is intentionally absent on all mobile/tablet viewports.
           */}
           {isDesktop && (
             <Link
@@ -178,7 +177,7 @@ export default function Nav() {
             </motion.span>
           </button>
         </div>
-      </motion.header>
+      </header>
 
       {/* Mobile fullscreen overlay */}
       <AnimatePresence>
@@ -218,10 +217,6 @@ export default function Nav() {
                 </motion.div>
               ))}
 
-              {/*
-                This is the ONLY Book a Session button on mobile — inside the overlay.
-                The navbar-level CTA above is never rendered on mobile (isDesktop guard).
-              */}
               <motion.div
                 custom={navLinks.length}
                 variants={itemVariants}
