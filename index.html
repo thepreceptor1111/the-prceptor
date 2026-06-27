@@ -4,35 +4,24 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- ── FIX: Hero LCP image — preload + fetchpriority=high ──────────── -->
+    <!-- ── FIX: Hero LCP image — preload + fetchpriority=high ──────────────────── -->
     <link rel="preload" as="image" href="/hero-section.webp" fetchpriority="high" type="image/webp">
 
-    <!-- ── Preconnect to external origins ────────────────────────────── -->
+    <!-- ── Preconnect to external origins ───────────────────────────────────── -->
     <link rel="dns-prefetch"  href="https://cdn.sanity.io" />
     <link rel="preconnect"   href="https://cdn.sanity.io"           crossorigin />
     <link rel="preconnect"   href="https://9w7fo0ix.api.sanity.io" crossorigin />
 
-    <!-- ── Google Fonts (non-blocking) ───────────────────────────────── -->
-    <link rel="preconnect"   href="https://fonts.googleapis.com" />
-    <link rel="preconnect"   href="https://fonts.gstatic.com"    crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,400&family=Inter:wght@200;300;400;500;600&display=swap"
-      rel="stylesheet"
-      media="print"
-      onload="this.media='all'"
-    />
-    <noscript>
-      <link
-        href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,400&family=Inter:wght@200;300;400;500;600&display=swap"
-        rel="stylesheet"
-      />
-    </noscript>
+    <!-- Google Fonts removed — fonts are now self-hosted via @fontsource
+         and served from the Vercel CDN edge. Zero external RTT.
+         Packages: @fontsource-variable/inter  @fontsource/fraunces
+         Imports: src/styles.css -->
 
-    <!-- ── Favicon ──────────────────────────────────────────────────────────── -->
+    <!-- ── Favicon ──────────────────────────────────────────────────────────────── -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="google-site-verification" content="-ppSJQ86nfQyg4_noRGe1XvQ9elyoSM_O1A-0pLF6FU" />
 
-    <!-- ── Primary Meta ──────────────────────────────────────────────────────── -->
+    <!-- ── Primary Meta ──────────────────────────────────────────────────────────────── -->
     <title>The Preceptor — Vedic Astrology Readings &amp; Spiritual Consultations Online</title>
     <meta
       name="description"
@@ -41,12 +30,12 @@
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://www.thepreceptorglobal.com/" />
 
-    <!-- ── Theme color ──────────────────────────────────────────────────────── -->
+    <!-- ── Theme color ──────────────────────────────────────────────────────────────── -->
     <meta name="theme-color" content="#0a0818" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-    <!-- ── Open Graph ────────────────────────────────────────────────────── -->
+    <!-- ── Open Graph ──────────────────────────────────────────────────────────────── -->
     <meta property="og:type"        content="website" />
     <meta property="og:url"         content="https://www.thepreceptorglobal.com/" />
     <meta property="og:site_name"   content="The Preceptor" />
@@ -59,7 +48,7 @@
     <meta property="og:image:alt"    content="The Preceptor — For those who seek clarity." />
     <meta property="og:image:type"   content="image/webp" />
 
-    <!-- ── Twitter / X Card ──────────────────────────────────────────────────── -->
+    <!-- ── Twitter / X Card ──────────────────────────────────────────────────────────────── -->
     <meta name="twitter:card"        content="summary_large_image" />
     <meta name="twitter:site"        content="@thepreceptorglobal" />
     <meta name="twitter:title"       content="The Preceptor — Vedic Astrology Readings &amp; Spiritual Consultations Online" />
@@ -76,13 +65,6 @@
         background-color: #0a0818;
       }
       #root { isolation: isolate; }
-      /*
-       * REMOVED: footer.relative { min-height: 966px; }
-       * This rule was a misguided CLS fix that forced the footer to always
-       * be 966px tall regardless of content, causing ~500px of blank
-       * scrollable space below the footer on every viewport.
-       * The correct approach is to let the footer size to its content.
-       */
     </style>
   </head>
   <body>

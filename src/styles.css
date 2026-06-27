@@ -10,26 +10,20 @@
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   FIX 3: Self-hosted fonts via @fontsource
+   FIX: Self-hosted fonts via @fontsource
    ─────────────────────────────────────────────────────────────────────────────
-   SETUP (one-time):
-     npm install @fontsource-variable/inter @fontsource/fraunces
-
-   These packages are served from YOUR Vercel CDN edge — zero external RTT,
+   Fonts now served from YOUR Vercel CDN edge — zero external RTT,
    no CORS preflight, no render-blocking Google Fonts stylesheet.
-   Saves ~78ms RTT per visit and removes 2 TCP connections on first load.
-
-   Once installed, uncomment the @import lines below and remove the Google Fonts
-   <link> block from index.html (the fallback block marked for removal).
+   Packages: @fontsource-variable/inter  @fontsource/fraunces
    ─────────────────────────────────────────────────────────────────────────────
 */
-/* @import '@fontsource-variable/inter';                         */
-/* @import '@fontsource/fraunces/300.css';                       */
-/* @import '@fontsource/fraunces/400.css';                       */
-/* @import '@fontsource/fraunces/500.css';                       */
-/* @import '@fontsource/fraunces/600.css';                       */
-/* @import '@fontsource/fraunces/300-italic.css';                */
-/* @import '@fontsource/fraunces/400-italic.css';                */
+@import '@fontsource-variable/inter';
+@import '@fontsource/fraunces/300.css';
+@import '@fontsource/fraunces/400.css';
+@import '@fontsource/fraunces/500.css';
+@import '@fontsource/fraunces/600.css';
+@import '@fontsource/fraunces/300-italic.css';
+@import '@fontsource/fraunces/400-italic.css';
 
 @import "tailwindcss";
 
