@@ -4,6 +4,13 @@ import { useState } from "react";
 import { Reveal } from "@/components/site/Reveal";
 import { siteConfig } from "@/content/site";
 import contactHeroImg from "@/assets/contact-hero.png";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 
 // ── Inline SVG icons — no lucide-react dependency ──────────────────────
 function MailIcon({ className }) {
@@ -385,13 +392,19 @@ function ContactPage() {
                   <input value={data.country} onChange={update("country")} className={inputCls} placeholder="United States" />
                 </Field>
                 <Field label="Consultation Type" error={errors.consultationType} className="sm:col-span-2">
-                  <div className="relative">
-                    <select value={data.consultationType} onChange={update("consultationType")} className={`${inputCls} appearance-none pr-10`}>
-                      <option value="">Select a focus (optional)</option>
-                      {consultationTypes.map((t) => <option key={t} value={t}>{t}</option>)}
-                    </select>
-                    <ChevronDownIcon className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gold pointer-events-none" />
-                  </div>
+                  <Select
+                    value={data.consultationType}
+                    onValueChange={(v) => setData((prev) => ({ ...prev, consultationType: v }))}
+                  >
+                    <SelectTrigger className={inputCls}>
+                      <SelectValue placeholder="Select a focus (optional)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {consultationTypes.map((t) => (
+                        <SelectItem key={t} value={t}>{t}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </Field>
                 <Field label="Subject" error={errors.subject} className="sm:col-span-2">
                   <input value={data.subject} onChange={update("subject")} className={inputCls} placeholder="What can we help you with?" />
