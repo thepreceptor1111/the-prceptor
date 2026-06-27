@@ -1,18 +1,11 @@
 import { Helmet } from "react-helmet-async";
-import { motion } from "framer-motion";
-import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState, useRef, useEffect } from "react";
 import { Reveal } from "@/components/site/Reveal";
 import { siteConfig } from "@/content/site";
 import contactHeroImg from "@/assets/contact-hero.png";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
 
-// ── Inline SVG icons — no lucide-react dependency ──────────────────────
+// ── Inline SVG icons ─────────────────────────────────────────
 function MailIcon({ className }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -23,7 +16,6 @@ function MailIcon({ className }) {
     </svg>
   );
 }
-
 function MapPinIcon({ className }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -34,7 +26,6 @@ function MapPinIcon({ className }) {
     </svg>
   );
 }
-
 function SendIcon({ className }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -45,7 +36,6 @@ function SendIcon({ className }) {
     </svg>
   );
 }
-
 function InstagramIcon({ className }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -57,7 +47,6 @@ function InstagramIcon({ className }) {
     </svg>
   );
 }
-
 function YoutubeIcon({ className }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -68,7 +57,6 @@ function YoutubeIcon({ className }) {
     </svg>
   );
 }
-
 function LinkedinIcon({ className }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -80,7 +68,6 @@ function LinkedinIcon({ className }) {
     </svg>
   );
 }
-
 function ClockIcon({ className }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -91,7 +78,6 @@ function ClockIcon({ className }) {
     </svg>
   );
 }
-
 function Globe2Icon({ className }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -103,7 +89,6 @@ function Globe2Icon({ className }) {
     </svg>
   );
 }
-
 function ShieldCheckIcon({ className }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -114,7 +99,6 @@ function ShieldCheckIcon({ className }) {
     </svg>
   );
 }
-
 function SparklesIcon({ className }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -125,7 +109,6 @@ function SparklesIcon({ className }) {
     </svg>
   );
 }
-
 function ChevronDownIcon({ className }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -135,7 +118,6 @@ function ChevronDownIcon({ className }) {
     </svg>
   );
 }
-
 function ArrowRightIcon({ className }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -146,9 +128,153 @@ function ArrowRightIcon({ className }) {
     </svg>
   );
 }
+function CheckIcon({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+      className={className} aria-hidden="true">
+      <path d="M20 6 9 17l-5-5" />
+    </svg>
+  );
+}
 
+// ── Combobox ─────────────────────────────────────────────
+function Combobox({ options, value, onChange, placeholder }) {
+  const [query, setQuery]     = useState("");
+  const [open, setOpen]       = useState(false);
+  const [active, setActive]   = useState(-1);
+  const wrapRef               = useRef(null);
+  const listRef               = useRef(null);
+
+  const filtered = query.trim() === ""
+    ? options
+    : options.filter((o) => o.toLowerCase().includes(query.toLowerCase()));
+
+  // close on outside click
+  useEffect(() => {
+    function handler(e) {
+      if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false);
+    }
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  // scroll active item into view
+  useEffect(() => {
+    if (active >= 0 && listRef.current) {
+      const el = listRef.current.children[active];
+      el?.scrollIntoView({ block: "nearest" });
+    }
+  }, [active]);
+
+  function select(opt) {
+    onChange(opt);
+    setQuery("");
+    setOpen(false);
+    setActive(-1);
+  }
+
+  function handleKey(e) {
+    if (!open) { if (e.key === "ArrowDown" || e.key === "Enter") setOpen(true); return; }
+    if (e.key === "ArrowDown")  { e.preventDefault(); setActive((p) => Math.min(p + 1, filtered.length - 1)); }
+    if (e.key === "ArrowUp")    { e.preventDefault(); setActive((p) => Math.max(p - 1, 0)); }
+    if (e.key === "Enter")      { e.preventDefault(); if (active >= 0 && filtered[active]) select(filtered[active]); }
+    if (e.key === "Escape")     { setOpen(false); setActive(-1); }
+  }
+
+  const displayValue = value || "";
+
+  return (
+    <div ref={wrapRef} className="relative w-full">
+      <div className={`${inputCls} flex items-center gap-2 cursor-text`}
+        onClick={() => { setOpen(true); }}
+      >
+        <input
+          type="text"
+          className="flex-1 bg-transparent outline-none text-sm text-foreground placeholder:text-muted-foreground/60 min-w-0"
+          placeholder={value ? value : placeholder}
+          value={open ? query : displayValue}
+          onChange={(e) => { setQuery(e.target.value); setOpen(true); setActive(-1); }}
+          onFocus={() => setOpen(true)}
+          onKeyDown={handleKey}
+          autoComplete="off"
+        />
+        <ChevronDownIcon className={`w-4 h-4 text-muted-foreground/50 shrink-0 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+      </div>
+
+      <AnimatePresence>
+        {open && (
+          <motion.ul
+            ref={listRef}
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.15, ease: "easeOut" }}
+            role="listbox"
+            className="absolute z-50 top-[calc(100%+6px)] left-0 right-0 max-h-56 overflow-y-auto rounded-xl border border-border bg-background shadow-lg py-1"
+          >
+            {filtered.length === 0 && (
+              <li className="px-4 py-3 text-sm text-muted-foreground">No match — try another term</li>
+            )}
+            {filtered.map((opt, i) => (
+              <li
+                key={opt}
+                role="option"
+                aria-selected={opt === value}
+                onMouseDown={(e) => { e.preventDefault(); select(opt); }}
+                onMouseEnter={() => setActive(i)}
+                className={`flex items-center justify-between px-4 py-2.5 text-sm cursor-pointer transition-colors
+                  ${ i === active ? "bg-gold/10 text-foreground" : "text-foreground hover:bg-gold/5" }
+                `}
+              >
+                <span>{opt}</span>
+                {opt === value && <CheckIcon className="w-3.5 h-3.5 text-gold" />}
+              </li>
+            ))}
+          </motion.ul>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+// ── Data ───────────────────────────────────────────────
 const FORMSPREE_ENDPOINT = "https://formspree.io/f/xaqgogwj";
 
+const consultationTypes = [
+  "Quick Personal Insights",
+  "General Birth Chart Reading",
+  "Detailed Birth Chart Reading",
+  "Relationship Guidance",
+  "Partner Compatibility",
+  "Career Consultation",
+  "Marriage Consultation",
+  "Current Situation Guidance",
+  "Later Life Reading",
+  "Mahadasha Guidance",
+  "Saturn\u2019s Seven and a Half Guidance",
+  "Birth Time Rectification",
+  "Not sure yet",
+];
+
+const faqs = [
+  { q: "How quickly will I receive a response?", a: "Within 24 hours on business days. Urgent inquiries from international clients are prioritized across timezones." },
+  { q: "Are conversations confidential?", a: "Always. Every exchange is treated with the discretion of a private practice. Recordings are shared only with you." },
+  { q: "Do you accept international clients?", a: "Yes — we serve seekers across 47 countries with white-glove scheduling and timezone-aware sessions." },
+];
+
+const initial = { name: "", email: "", country: "", consultationType: "", subject: "", message: "" };
+
+function validateForm(data) {
+  const errors = {};
+  if (!data.name || data.name.trim().length < 2) errors.name = "Please enter your full name";
+  if (!data.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email.trim())) errors.email = "Enter a valid email";
+  if (!data.subject || data.subject.trim().length < 2) errors.subject = "Please add a subject";
+  if (!data.message || data.message.trim().length < 10) errors.message = "Please share a few sentences";
+  return errors;
+}
+
+// ── Page wrapper ────────────────────────────────────────
 export default function ContactPageWrapper() {
   return (
     <>
@@ -164,74 +290,34 @@ export default function ContactPageWrapper() {
   );
 }
 
-function validateForm(data) {
-  const errors = {};
-  if (!data.name || data.name.trim().length < 2) errors.name = "Please enter your full name";
-  if (!data.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email.trim())) errors.email = "Enter a valid email";
-  if (!data.subject || data.subject.trim().length < 2) errors.subject = "Please add a subject";
-  if (!data.message || data.message.trim().length < 10) errors.message = "Please share a few sentences";
-  return errors;
-}
-
-const initial = { name: "", email: "", country: "", consultationType: "", subject: "", message: "" };
-
-const consultationTypes = [
-  "Birth Chart Reading",
-  "Career Guidance",
-  "Relationship Consultation",
-  "Tarot Reading",
-  "Spiritual Consultation",
-  "Kundli Analysis",
-  "Not sure yet",
-];
-
-const faqs = [
-  { q: "How quickly will I receive a response?", a: "Within 24 hours on business days. Urgent inquiries from international clients are prioritized across timezones." },
-  { q: "Are conversations confidential?", a: "Always. Every exchange is treated with the discretion of a private practice. Recordings are shared only with you." },
-  { q: "Do you accept international clients?", a: "Yes — we serve seekers across 47 countries with white-glove scheduling and timezone-aware sessions." },
-];
-
+// ── Main page ─────────────────────────────────────────
 function ContactPage() {
-  const [data, setData] = useState(initial);
-  const [errors, setErrors] = useState({});
-  const [sent, setSent] = useState(false);
-  const [sending, setSending] = useState(false);
+  const [data, setData]               = useState(initial);
+  const [errors, setErrors]           = useState({});
+  const [sent, setSent]               = useState(false);
+  const [sending, setSending]         = useState(false);
   const [submitError, setSubmitError] = useState(false);
-  const [openFaq, setOpenFaq] = useState(0);
+  const [openFaq, setOpenFaq]         = useState(0);
 
-  const update = (k) => (e) => {
-    setData((prev) => ({ ...prev, [k]: e.target.value }));
-  };
+  const update = (k) => (e) => setData((prev) => ({ ...prev, [k]: e.target.value }));
 
   const submit = async (e) => {
     e.preventDefault();
     const fieldErrors = validateForm(data);
-    if (Object.keys(fieldErrors).length > 0) {
-      setErrors(fieldErrors);
-      return;
-    }
+    if (Object.keys(fieldErrors).length > 0) { setErrors(fieldErrors); return; }
     setErrors({});
     setSubmitError(false);
     setSending(true);
-
     try {
       const res = await fetch(FORMSPREE_ENDPOINT, {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify(data),
       });
-
-      if (res.ok) {
-        setSent(true);
-        setData(initial);
-      } else {
-        setSubmitError(true);
-      }
-    } catch {
-      setSubmitError(true);
-    } finally {
-      setSending(false);
-    }
+      if (res.ok) { setSent(true); setData(initial); }
+      else setSubmitError(true);
+    } catch { setSubmitError(true); }
+    finally { setSending(false); }
   };
 
   return (
@@ -259,17 +345,15 @@ function ContactPage() {
             </span>
           </Reveal>
           <Reveal delay={0.1}>
-            <h1
-              className="mt-8 text-balance"
-              style={{ fontFamily: "var(--font-serif)", fontSize: "clamp(2.5rem, 5vw, 4.5rem)", fontWeight: 400 }}
-            >
+            <h1 className="mt-8 text-balance"
+              style={{ fontFamily: "var(--font-serif)", fontSize: "clamp(2.5rem, 5vw, 4.5rem)", fontWeight: 400 }}>
               Begin your journey<br />
               <span className="display-italic text-gold">toward clarity.</span>
             </h1>
           </Reveal>
           <Reveal delay={0.2}>
             <p className="mt-8 lead mx-auto">
-              A quiet conversation can shift the trajectory of a decade. Share what's on your mind — we respond personally within 24 hours.
+              A quiet conversation can shift the trajectory of a decade. Share what’s on your mind — we respond personally within 24 hours.
             </p>
           </Reveal>
           <Reveal delay={0.3}>
@@ -279,15 +363,9 @@ function ContactPage() {
               <span className="inline-flex items-center gap-2"><ShieldCheckIcon className="w-3.5 h-3.5 text-gold" /> Strictly confidential</span>
             </div>
           </Reveal>
-
-          {/* ── Contact Hero Image ── */}
           <Reveal delay={0.4}>
             <div className="mt-12 mx-auto max-w-2xl rounded-2xl overflow-hidden ring-1 ring-gold/20">
-              <img
-                src={contactHeroImg}
-                alt="The Preceptor — Private Consultation"
-                className="w-full h-auto object-cover"
-              />
+              <img src={contactHeroImg} alt="The Preceptor — Private Consultation" className="w-full h-auto object-cover" />
             </div>
           </Reveal>
         </div>
@@ -302,10 +380,9 @@ function ContactPage() {
               <span className="eyebrow">— Direct Channels</span>
               <h2 className="mt-5 text-4xl md:text-5xl text-balance">A private line to the studio.</h2>
               <p className="mt-6 text-muted-foreground leading-relaxed max-w-md">
-                Whether you're booking a session, planning a partnership, or seeking press — the inbox below reaches us personally.
+                Whether you’re booking a session, planning a partnership, or seeking press — the inbox below reaches us personally.
               </p>
             </Reveal>
-
             <Reveal delay={0.1}>
               <ul className="space-y-6">
                 {[
@@ -318,32 +395,26 @@ function ContactPage() {
                     </span>
                     <div>
                       <p className="text-[0.7rem] uppercase tracking-[0.25em] text-muted-foreground">{label}</p>
-                      {href ? (
-                        <a href={href} className="mt-1 block text-foreground hover:text-gold transition">{value}</a>
-                      ) : (
-                        <p className="mt-1 text-foreground">{value}</p>
-                      )}
+                      {href
+                        ? <a href={href} className="mt-1 block text-foreground hover:text-gold transition">{value}</a>
+                        : <p className="mt-1 text-foreground">{value}</p>
+                      }
                     </div>
                   </li>
                 ))}
               </ul>
             </Reveal>
-
             <Reveal delay={0.2}>
               <div>
                 <p className="text-[0.7rem] uppercase tracking-[0.25em] text-muted-foreground mb-4">Follow the practice</p>
                 <div className="flex gap-3">
                   {[
                     { Icon: InstagramIcon, href: siteConfig.social.instagram, label: "Instagram" },
-                    { Icon: YoutubeIcon,   href: siteConfig.social.youtube,   label: "YouTube" },
-                    { Icon: LinkedinIcon,  href: siteConfig.social.linkedin,  label: "LinkedIn" },
+                    { Icon: YoutubeIcon,   href: siteConfig.social.youtube,   label: "YouTube"   },
+                    { Icon: LinkedinIcon,  href: siteConfig.social.linkedin,  label: "LinkedIn"  },
                   ].map(({ Icon, href, label }) => (
-                    <a
-                      key={label}
-                      href={href}
-                      aria-label={label}
-                      className="w-11 h-11 rounded-full glass-card flex items-center justify-center text-muted-foreground hover:text-gold hover:scale-110 hover:shadow-gold transition-all duration-300"
-                    >
+                    <a key={label} href={href} aria-label={label}
+                      className="w-11 h-11 rounded-full glass-card flex items-center justify-center text-muted-foreground hover:text-gold hover:scale-110 hover:shadow-gold transition-all duration-300">
                       <Icon className="w-4 h-4" />
                     </a>
                   ))}
@@ -354,28 +425,18 @@ function ContactPage() {
 
           {/* Form column */}
           <Reveal delay={0.15} className="lg:col-span-7">
-            <form
-              onSubmit={submit}
-              className="relative glass-card rounded-3xl p-8 md:p-10 shadow-elegant"
-            >
+            <form onSubmit={submit} className="relative glass-card rounded-3xl p-8 md:p-10 shadow-elegant">
               <div className="absolute -inset-px rounded-3xl bg-gradient-to-br from-gold/20 via-transparent to-transparent opacity-30 pointer-events-none" />
 
               {sent && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="relative mb-6 p-4 rounded-xl border border-gold/40 bg-gold/10 text-sm text-foreground"
-                >
+                <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+                  className="relative mb-6 p-4 rounded-xl border border-gold/40 bg-gold/10 text-sm text-foreground">
                   ✨ Thank you — your message has reached the studio. We respond personally within 24 hours.
                 </motion.div>
               )}
-
               {submitError && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="relative mb-6 p-4 rounded-xl border border-red-500/40 bg-red-500/10 text-sm text-foreground"
-                >
+                <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+                  className="relative mb-6 p-4 rounded-xl border border-red-500/40 bg-red-500/10 text-sm text-foreground">
                   Something went wrong — please try again or email us directly at{" "}
                   <a href={`mailto:${siteConfig.email}`} className="text-gold underline">{siteConfig.email}</a>.
                 </motion.div>
@@ -392,25 +453,18 @@ function ContactPage() {
                   <input value={data.country} onChange={update("country")} className={inputCls} placeholder="United States" />
                 </Field>
                 <Field label="Consultation Type" error={errors.consultationType} className="sm:col-span-2">
-                  <Select
+                  <Combobox
+                    options={consultationTypes}
                     value={data.consultationType}
-                    onValueChange={(v) => setData((prev) => ({ ...prev, consultationType: v }))}
-                  >
-                    <SelectTrigger className={inputCls}>
-                      <SelectValue placeholder="Select a focus (optional)" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {consultationTypes.map((t) => (
-                        <SelectItem key={t} value={t}>{t}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    onChange={(v) => setData((prev) => ({ ...prev, consultationType: v }))}
+                    placeholder="Type to search or scroll…"
+                  />
                 </Field>
                 <Field label="Subject" error={errors.subject} className="sm:col-span-2">
                   <input value={data.subject} onChange={update("subject")} className={inputCls} placeholder="What can we help you with?" />
                 </Field>
                 <Field label="Your Message" error={errors.message} className="sm:col-span-2">
-                  <textarea rows={6} value={data.message} onChange={update("message")} className={`${inputCls} resize-none`} placeholder="Share what's on your mind…" />
+                  <textarea rows={6} value={data.message} onChange={update("message")} className={`${inputCls} resize-none`} placeholder="Share what’s on your mind…" />
                 </Field>
               </div>
 
@@ -418,11 +472,8 @@ function ContactPage() {
                 <p className="text-xs text-muted-foreground max-w-sm">
                   Your details remain strictly confidential. Used only to respond to your inquiry.
                 </p>
-                <button
-                  type="submit"
-                  disabled={sending || sent}
-                  className="btn-primary group disabled:opacity-60 disabled:cursor-not-allowed"
-                >
+                <button type="submit" disabled={sending || sent}
+                  className="btn-primary group disabled:opacity-60 disabled:cursor-not-allowed">
                   {sending ? "Sending…" : sent ? "Message Sent" : "Send Message"}
                   {!sending && !sent && <SendIcon className="w-4 h-4 group-hover:translate-x-0.5 transition" />}
                 </button>
@@ -444,10 +495,8 @@ function ContactPage() {
             {faqs.map((f, i) => (
               <Reveal key={f.q} delay={i * 0.06}>
                 <div className="glass-card rounded-2xl overflow-hidden">
-                  <button
-                    onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                    className="w-full p-6 flex items-center justify-between text-left"
-                  >
+                  <button onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                    className="w-full p-6 flex items-center justify-between text-left">
                     <span className="font-serif text-lg">{f.q}</span>
                     <ChevronDownIcon className={`w-5 h-5 text-gold transition-transform duration-500 ${openFaq === i ? "rotate-180" : ""}`} />
                   </button>
@@ -455,15 +504,13 @@ function ContactPage() {
                     initial={false}
                     animate={{ height: openFaq === i ? "auto" : 0, opacity: openFaq === i ? 1 : 0 }}
                     transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                    className="overflow-hidden"
-                  >
+                    className="overflow-hidden">
                     <p className="px-6 pb-6 text-muted-foreground leading-relaxed">{f.a}</p>
                   </motion.div>
                 </div>
               </Reveal>
             ))}
           </div>
-
           <Reveal delay={0.2}>
             <div className="mt-16 text-center">
               <a href="/book" className="inline-flex items-center gap-2 text-gold hover:gap-3 transition-all">
