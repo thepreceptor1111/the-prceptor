@@ -8,9 +8,10 @@ import { OfferTimer } from "@/components/site/OfferTimer";
 import { SERVICES, SITE } from "@/utils/constants";
 import { useSanity } from "@/lib/useSanity";
 import { useSiteSettings } from "@/lib/useSiteSettings";
+import { useOfferActive } from "@/lib/useOfferActive";
 import { SERVICES_QUERY } from "@/lib/sanityQueries";
 
-// ── Inline SVG icons — removes lucide-react dependency ────────────────────
+// ── Inline SVG icons ───────────────────────────────────────────────────
 function ArrowRightIcon({ className }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -207,6 +208,8 @@ export default function ServicesPage() {
   const { data: cmsServices, loading } = useSanity(SERVICES_QUERY, null);
   const { settings } = useSiteSettings();
   const [activeTab, setActiveTab] = useState('all');
+  // Only show the crossed-out original price while the offer is live.
+  const offerActive = useOfferActive();
 
   const raw = cmsServices && cmsServices.length > 0 ? cmsServices : SERVICES;
   const services = raw.map(normaliseService);
@@ -350,7 +353,7 @@ export default function ServicesPage() {
                                 <ClockIcon className="w-3 h-3" />{s.duration}
                               </span>
                               <div className="flex items-baseline gap-2">
-                                {s.originalPrice && (
+                                {offerActive && s.originalPrice && (
                                   <span className="text-sm text-muted-foreground line-through">{s.originalPrice}</span>
                                 )}
                                 <span className="font-serif text-xl text-gold">{s.price}</span>

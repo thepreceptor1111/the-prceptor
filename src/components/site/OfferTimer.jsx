@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { OFFER_END_DATE } from "@/utils/constants";
 import { useSiteSettings } from "@/lib/useSiteSettings";
+import { useOfferActive } from "@/lib/useOfferActive";
 
-// ── Inline SVG icon — removes lucide-react dependency ─────────────────────
+// ── Inline SVG icon ───────────────────────────────────────────────────
 function ClockIcon({ className }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -48,8 +49,6 @@ function Digit({ value, label }) {
   );
 }
 
-// ── Expired fallback — shown instead of nothing when deadline has passed ──
-// To reactivate the timer: update offerDeadline in Sanity Studio siteSettings.
 function ExpiredBadge({ label }) {
   return (
     <motion.div
@@ -68,11 +67,10 @@ function ExpiredBadge({ label }) {
 
 export function OfferTimer() {
   const { settings } = useSiteSettings();
+  const offerActive  = useOfferActive();
 
-  const deadline    = settings?.offerDeadline ?? OFFER_END_DATE;
-  const timerLabel  = settings?.offerLabel?.trim()   || "Introductory offer ends in";
-  // Editors can customise the expired message from Sanity siteSettings too.
-  // Falls back to a sensible default if the field isn't set.
+  const deadline     = settings?.offerDeadline ?? OFFER_END_DATE;
+  const timerLabel   = settings?.offerLabel?.trim() || "Introductory offer ends in";
   const expiredLabel = settings?.offerExpiredLabel?.trim()
     || "Introductory offer has ended \u2014 standard pricing now applies";
 
@@ -84,8 +82,7 @@ export function OfferTimer() {
     return () => clearInterval(id);
   }, [deadline]);
 
-  // ── Expired: show fallback pill instead of an invisible gap ──────────────
-  if (!timeLeft) return <ExpiredBadge label={expiredLabel} />;
+  if (!offerActive) return <ExpiredBadge label={expiredLabel} />;
 
   return (
     <div className="flex flex-col items-center gap-4 py-4">
