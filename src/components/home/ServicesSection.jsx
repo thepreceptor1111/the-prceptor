@@ -286,7 +286,7 @@ export function ServicesSection({ initialServices = null, servicesLoading = fals
       <div className="cosmic-stars absolute inset-0 pointer-events-none" aria-hidden />
       <div className="max-w-7xl mx-auto px-6 lg:px-10 relative z-10">
         <Reveal className="text-center max-w-2xl mx-auto">
-          <span className="text-xs uppercase tracking-[0.3em] text-gold">{sectionLabel}</span>
+          <span className="text-sm uppercase tracking-[0.3em] text-gold">{sectionLabel}</span>
           <h2 className="mt-4 text-5xl md:text-6xl">{sectionHeading}</h2>
           {sectionSubtitle && <p className="mt-5 text-muted-foreground">{sectionSubtitle}</p>}
         </Reveal>

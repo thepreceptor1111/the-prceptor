@@ -47,7 +47,7 @@ export function FaqSection({ initialFaqs = null, faqsLoading = false }) {
     <section className="py-24 lg:py-32 relative">
       <div className="max-w-3xl mx-auto px-6 lg:px-10">
         <Reveal className="text-center">
-          <span className="text-xs uppercase tracking-[0.3em] text-gold">{sectionLabel}</span>
+          <span className="text-sm uppercase tracking-[0.3em] text-gold">{sectionLabel}</span>
           <h2 className="mt-4 text-5xl md:text-6xl">{sectionHeading}</h2>
         </Reveal>
         <div className="mt-12 space-y-3">

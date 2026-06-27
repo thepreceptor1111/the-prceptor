@@ -31,7 +31,7 @@ export function CtaSection() {
       </div>
       <div className="max-w-3xl mx-auto px-6 lg:px-10 text-center relative z-10">
         <Reveal>
-          <span className="text-xs uppercase tracking-[0.3em] text-gold">Begin</span>
+          <span className="text-sm uppercase tracking-[0.3em] text-gold">Begin</span>
           <h2 className="mt-4 text-5xl md:text-6xl lg:text-7xl">{heading}</h2>
           <p className="mt-6 text-muted-foreground text-lg max-w-xl mx-auto">{subtext}</p>
           <div className="mt-10 flex flex-wrap gap-4 justify-center">
