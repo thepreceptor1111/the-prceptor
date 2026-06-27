@@ -47,23 +47,27 @@ function RedditIcon({ className }) {
 
 export default function Footer() {
   return (
-    // fix: was mt-32 — removed to prevent double-gap stacking with CtaSection's pb-16
     <footer className="relative border-t border-border/60 bg-deep overflow-hidden">
       <div className="absolute inset-0 bg-hero opacity-40 pointer-events-none" />
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent" />
 
-      <div className="relative max-w-7xl mx-auto px-6 lg:px-10 py-24 grid grid-cols-1 md:grid-cols-12 gap-12">
+      {/*
+        Responsive grid:
+        - mobile (<md): single column, brand full-width then links stacked
+        - md+: brand takes 5 cols, links take 7 cols
+      */}
+      <div className="relative max-w-7xl mx-auto px-6 lg:px-10 py-16 md:py-24 grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-12">
 
         {/* Brand column */}
         <div className="md:col-span-5">
-          <Link to="/" className="flex items-center gap-2.5">
+          <Link to="/" className="inline-flex items-center gap-2.5">
             <span className="text-gold font-serif text-3xl">✦</span>
             <span className="font-serif text-2xl tracking-wide">{siteConfig.name}</span>
           </Link>
-          <p className="mt-6 text-muted-foreground max-w-md leading-relaxed">
+          <p className="mt-5 text-muted-foreground text-sm leading-relaxed max-w-sm">
             A modern sanctuary for spiritual clarity. Premium astrology consultations for high-intention seekers globally.
           </p>
-          <div className="flex gap-3 mt-8">
+          <div className="flex gap-3 mt-7">
             {[
               { Icon: InstagramIcon, href: siteConfig.social.instagram, label: "Instagram" },
               { Icon: RedditIcon,    href: siteConfig.social.reddit,    label: "Reddit" },
@@ -83,7 +87,11 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Links columns */}
+        {/*
+          Links columns
+          - mobile: 2-col grid (Explore + Legal side by side, Contact below spanning full width)
+          - sm+: 3-col grid (all three side by side)
+        */}
         <div className="md:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-8">
 
           <div>
@@ -112,15 +120,23 @@ export default function Footer() {
             </ul>
           </div>
 
-          <div>
+          {/* Contact — spans full width on mobile so email has room to breathe */}
+          <div className="col-span-2 sm:col-span-1">
             <h3 className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-5">Contact</h3>
             <ul className="space-y-3">
-              <li className="flex items-center gap-2 text-sm text-muted-foreground">
+
+              {/* Email — min-w-0 + truncate keeps it on one line; title shows full address on hover */}
+              <li className="flex items-center gap-2 text-sm text-muted-foreground min-w-0">
                 <MailIcon className="w-3.5 h-3.5 text-gold shrink-0" />
-                <a href={`mailto:${siteConfig.email}`} className="hover:text-gold transition break-all">
+                <a
+                  href={`mailto:${siteConfig.email}`}
+                  title={siteConfig.email}
+                  className="min-w-0 truncate hover:text-gold transition"
+                >
                   {siteConfig.email}
                 </a>
               </li>
+
               <li className="flex items-center gap-2 text-sm text-muted-foreground">
                 <MapPinIcon className="w-3.5 h-3.5 text-gold shrink-0" />
                 India — Worldwide
@@ -131,9 +147,10 @@ export default function Footer() {
         </div>
       </div>
 
+      {/* Bottom bar */}
       <div className="relative border-t border-border/40">
         <div className="max-w-7xl mx-auto px-6 lg:px-10 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-muted-foreground text-center sm:text-left">
             &copy; {new Date().getFullYear()} {siteConfig.name}. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
