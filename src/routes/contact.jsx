@@ -229,14 +229,18 @@ function ContactPage() {
             </span>
           </Reveal>
           <Reveal delay={0.1}>
-            <h1 className="mt-8 text-balance">
+            {/* FIX: added fluid clamp() size to match services.jsx / about.jsx hero headings */}
+            <h1
+              className="mt-8 text-balance"
+              style={{ fontFamily: "var(--font-serif)", fontSize: "clamp(2.5rem, 5vw, 4.5rem)", fontWeight: 400 }}
+            >
               Begin your journey<br />
               <span className="display-italic text-gold">toward clarity.</span>
             </h1>
           </Reveal>
           <Reveal delay={0.2}>
             <p className="mt-8 lead mx-auto">
-              A quiet conversation can shift the trajectory of a decade. Share what’s on your mind — we respond personally within 24 hours.
+              A quiet conversation can shift the trajectory of a decade. Share what's on your mind — we respond personally within 24 hours.
             </p>
           </Reveal>
           <Reveal delay={0.3}>
@@ -269,7 +273,7 @@ function ContactPage() {
               <span className="eyebrow">— Direct Channels</span>
               <h2 className="mt-5 text-4xl md:text-5xl text-balance">A private line to the studio.</h2>
               <p className="mt-6 text-muted-foreground leading-relaxed max-w-md">
-                Whether you’re booking a session, planning a partnership, or seeking press — the inbox below reaches us personally.
+                Whether you're booking a session, planning a partnership, or seeking press — the inbox below reaches us personally.
               </p>
             </Reveal>
 
@@ -360,7 +364,7 @@ function ContactPage() {
                   <input value={data.subject} onChange={update("subject")} className={inputCls} placeholder="What can we help you with?" />
                 </Field>
                 <Field label="Your Message" error={errors.message} className="sm:col-span-2">
-                  <textarea rows={6} value={data.message} onChange={update("message")} className={`${inputCls} resize-none`} placeholder="Share what’s on your mind…" />
+                  <textarea rows={6} value={data.message} onChange={update("message")} className={`${inputCls} resize-none`} placeholder="Share what's on your mind…" />
                 </Field>
               </div>
 
