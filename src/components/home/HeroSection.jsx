@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useSiteSettings } from "@/lib/useSiteSettings";
 
-// ── Inline SVG icons — removes lucide-react dependency ────────────────────
+// ── Inline SVG icons ──────────────────────────────────────────────────────────
 function ArrowRight({ className }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -36,10 +36,8 @@ function Sparkles({ className }) {
   );
 }
 
-// Hero image lives in /public — no Vite hash, matches the <link rel="preload"> in index.html exactly.
 const heroImg = "/hero-section.webp";
 
-// Reduced to 6 particles (was 18) — fewer RAF loops on mount
 function Particle({ x, y, size, delay, duration, drift }) {
   return (
     <motion.span
@@ -72,7 +70,6 @@ function Particle({ x, y, size, delay, duration, drift }) {
   );
 }
 
-// Word-by-word staggered heading — slowed down per client request
 function StaggeredHeading({ line1, line2Gold, delay = 0 }) {
   const words1 = line1.split(" ");
   const words2 = line2Gold.split(" ");
@@ -90,7 +87,7 @@ function StaggeredHeading({ line1, line2Gold, delay = 0 }) {
       className="mt-6 sm:mt-8 leading-[1.04]"
       style={{
         fontFamily: "var(--font-serif)",
-        fontSize: "clamp(2.25rem, 5vw + 0.75rem, 5.75rem)",
+        fontSize: "clamp(2rem, 5vw + 0.5rem, 5.75rem)",
         letterSpacing: "-0.025em",
         fontWeight: 400,
       }}
@@ -134,12 +131,12 @@ export function HeroSection() {
   const badgeText    = settings?.heroBadgeText    ?? "Premium Astrology";
   const heading1     = settings?.heroHeading1     ?? "Modern guidance,";
   const heading2Gold = settings?.heroHeading2Gold ?? "written in the stars.";
-  const bodyCopy     = settings?.heroBodyCopy     ?? "Cinematic, deeply personal astrology consultations for high-intention seekers — designed for clarity in love, career, and life's defining chapters.";
+  const bodyCopy     = settings?.heroBodyCopy     ?? "Our philosophy is simple: the stars do not predict your fate - they reveal your design. We help you understand it..";
   const cta1Label    = settings?.heroCta1Label    ?? "Book a Session";
   const cta2Label    = settings?.heroCta2Label    ?? "Explore Services";
-  const clientCount  = settings?.stat2?.value     ?? "8,400+";
-  const clientLabel  = settings?.stat2?.label     ?? "clients";
-  const countryCount = settings?.stat3?.value     ?? "47";
+  const clientCount  = settings?.stat2?.value     ?? "6000+";
+  const clientLabel  = settings?.stat2?.label     ?? "Sessions Delivered";
+  const countryCount = settings?.stat3?.value     ?? "27+";
 
   const particles = useMemo(
     () => Array.from({ length: 6 }, (_, idx) => ({
@@ -157,7 +154,7 @@ export function HeroSection() {
   return (
     <section className="relative overflow-hidden min-h-[100svh] flex items-center">
 
-      {/* Nebula gradient — static, no animation */}
+      {/* Nebula gradient */}
       <div
         className="absolute inset-0"
         style={{
@@ -169,15 +166,12 @@ export function HeroSection() {
         }}
       />
 
-      {/* Starfield */}
       <div className="absolute inset-0 starfield starfield-glow" aria-hidden />
 
-      {/* Particles — delayed 2s so hero paints first */}
       <div className="absolute inset-0 pointer-events-none" aria-hidden>
         {particles.map((p) => <Particle key={p.id} {...p} />)}
       </div>
 
-      {/* Purple nebula fog — deferred, starts after 3s */}
       <motion.div
         aria-hidden
         initial={{ opacity: 0 }}
@@ -187,7 +181,6 @@ export function HeroSection() {
         style={{ background: "radial-gradient(ellipse at center, oklch(0.52 0.09 295 / 0.30), transparent 62%)" }}
       />
 
-      {/* Amber nebula fog — deferred, starts after 3.5s */}
       <motion.div
         aria-hidden
         initial={{ opacity: 0 }}
@@ -197,7 +190,7 @@ export function HeroSection() {
         style={{ background: "radial-gradient(ellipse at center, oklch(0.38 0.10 38 / 0.22), transparent 60%)" }}
       />
 
-      {/* Hero figure */}
+      {/* Hero figure — on mobile push it to cover full bg, on lg+ keep right-positioned */}
       <motion.div
         initial={{ opacity: 0.88, y: 28, scale: 1.04 }}
         animate={{ opacity: 0.88, y: 0, scale: 1 }}
@@ -254,9 +247,15 @@ export function HeroSection() {
         style={{ background: "linear-gradient(to bottom, oklch(0.10 0.025 270 / 0.5) 0%, transparent 18%, transparent 75%, oklch(0.10 0.025 270) 100%)" }}
       />
 
-      {/* Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-5 sm:px-6 lg:px-10 pt-28 pb-20 sm:pt-32 sm:pb-24 lg:py-40 w-full">
-        <div className="max-w-full sm:max-w-[44rem] lg:max-w-[46rem]">
+      {/* Content — responsive padding: more top padding on mobile to clear the fixed navbar */}
+      <div className="relative z-10 max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 pt-32 pb-24 sm:pt-36 sm:pb-28 lg:py-40 w-full">
+        {/*
+          Content width:
+          - mobile: full width (text is readable over the dimmed bg image)
+          - sm: max 80% so text doesn't run edge-to-edge on tablets
+          - lg: capped at 46rem to keep it on the left half
+        */}
+        <div className="w-full sm:max-w-[80%] lg:max-w-[46rem]">
 
           {/* Badge */}
           <motion.span
@@ -276,23 +275,23 @@ export function HeroSection() {
 
           <StaggeredHeading line1={heading1} line2Gold={heading2Gold} delay={0.45} />
 
-          {/* Body copy */}
+          {/* Body copy — slightly smaller on mobile */}
           <motion.p
             initial={{ opacity: 0, x: -18 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 1.15, duration: 1.0, ease: [0.22, 1, 0.36, 1] }}
-            className="mt-6 sm:mt-8 text-base sm:text-lg md:text-xl max-w-xl leading-relaxed"
+            className="mt-5 sm:mt-7 text-sm sm:text-base md:text-lg max-w-lg leading-relaxed"
             style={{ color: "oklch(0.7 0.02 80)" }}
           >
             {bodyCopy}
           </motion.p>
 
-          {/* CTAs */}
+          {/* CTAs — stack on very small screens, row on sm+ */}
           <motion.div
             initial={{ opacity: 0, x: -14 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 1.4, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-            className="mt-8 sm:mt-10 flex flex-wrap items-center gap-3 sm:gap-4"
+            className="mt-7 sm:mt-10 flex flex-col xs:flex-row flex-wrap items-start xs:items-center gap-3 sm:gap-4"
           >
             <motion.div
               animate={{ boxShadow: ["0 0 0 0 oklch(0.82 0.12 85 / 0.0)", "0 0 0 10px oklch(0.82 0.12 85 / 0.12)", "0 0 0 20px oklch(0.82 0.12 85 / 0.0)"] }}
@@ -317,7 +316,7 @@ export function HeroSection() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.8, duration: 0.9 }}
-            className="mt-10 sm:mt-14 flex flex-wrap items-center gap-3 sm:gap-5 text-sm"
+            className="mt-8 sm:mt-12 flex flex-wrap items-center gap-3 sm:gap-5 text-sm"
             style={{ color: "oklch(0.7 0.02 80)" }}
           >
             <div className="flex gap-0.5">

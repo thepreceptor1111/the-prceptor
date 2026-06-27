@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { navLinks, siteConfig } from "@/content/site";
 
-// ── Inline SVG icons — replaces lucide-react (874 KB) entirely ────────────
+// ── Inline SVG icons ───────────────────────────────────────────────────────────
 function MenuIcon({ className }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -32,7 +32,7 @@ const mobileFooterLinks = [
   { to: "/terms",   label: "Terms & Conditions" },
 ];
 
-// ── Animation variants ─────────────────────────────────────────────────────
+// ── Animation variants ──────────────────────────────────────────────────
 const headerVariants = {
   hidden:  { y: -8, opacity: 0 },
   visible: {
@@ -89,6 +89,7 @@ export default function Nav() {
       >
         <div className="max-w-7xl mx-auto px-6 lg:px-10 h-20 flex items-center justify-between">
 
+          {/* Logo */}
           <Link to="/" className="flex items-center gap-2.5 group">
             <span className="text-gold font-serif text-2xl group-hover:rotate-12 transition-transform duration-500">
               ✦
@@ -96,6 +97,7 @@ export default function Nav() {
             <span className="font-serif text-xl tracking-wide">{siteConfig.name}</span>
           </Link>
 
+          {/* Desktop nav links — only visible lg+ */}
           <nav className="hidden lg:flex items-center gap-10" aria-label="Primary navigation">
             {navLinks.map((l) => (
               <NavLink
@@ -120,7 +122,13 @@ export default function Nav() {
             ))}
           </nav>
 
-          {/* Desktop CTA — now uses btn-primary to match Hero section gradient */}
+          {/*
+            Desktop CTA — ONLY show on lg+ screens.
+            On mobile/tablet the hamburger menu already contains a "Book a Session" button
+            so showing it here too is redundant and clutters the mobile navbar.
+            fix: was missing explicit sm/md hidden — added "hidden lg:inline-flex" to ensure
+            it never renders alongside the hamburger icon.
+          */}
           <Link
             to="/book"
             className="hidden lg:inline-flex btn-primary"
@@ -128,6 +136,7 @@ export default function Nav() {
             Book a Session
           </Link>
 
+          {/* Hamburger — only on < lg */}
           <button
             className="lg:hidden text-foreground relative w-10 h-10 flex items-center justify-center"
             onClick={() => setOpen((v) => !v)}
@@ -153,6 +162,7 @@ export default function Nav() {
         </div>
       </motion.header>
 
+      {/* Mobile fullscreen overlay */}
       <AnimatePresence>
         {open && (
           <motion.div
@@ -190,7 +200,11 @@ export default function Nav() {
                 </motion.div>
               ))}
 
-              {/* Mobile CTA — now uses btn-primary to match Hero section gradient */}
+              {/*
+                Single CTA inside the hamburger menu.
+                The navbar-level CTA is hidden on mobile (hidden lg:inline-flex)
+                so this is the only Book a Session button on small screens.
+              */}
               <motion.div
                 custom={navLinks.length}
                 variants={itemVariants}
@@ -207,6 +221,7 @@ export default function Nav() {
                 </Link>
               </motion.div>
 
+              {/* Legal links at bottom */}
               <motion.div
                 custom={navLinks.length + 1}
                 variants={itemVariants}
