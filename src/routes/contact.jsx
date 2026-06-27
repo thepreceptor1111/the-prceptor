@@ -47,27 +47,6 @@ function InstagramIcon({ className }) {
     </svg>
   );
 }
-function YoutubeIcon({ className }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-      className={className} aria-hidden="true">
-      <path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17" />
-      <path d="m10 15 5-3-5-3z" />
-    </svg>
-  );
-}
-function LinkedinIcon({ className }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-      className={className} aria-hidden="true">
-      <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
-      <rect width="4" height="12" x="2" y="9" />
-      <circle cx="4" cy="4" r="2" />
-    </svg>
-  );
-}
 function ClockIcon({ className }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -150,7 +129,6 @@ function Combobox({ options, value, onChange, placeholder }) {
     ? options
     : options.filter((o) => o.toLowerCase().includes(query.toLowerCase()));
 
-  // close on outside click
   useEffect(() => {
     function handler(e) {
       if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false);
@@ -159,7 +137,6 @@ function Combobox({ options, value, onChange, placeholder }) {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  // scroll active item into view
   useEffect(() => {
     if (active >= 0 && listRef.current) {
       const el = listRef.current.children[active];
@@ -259,7 +236,7 @@ const consultationTypes = [
 
 const faqs = [
   { q: "How quickly will I receive a response?", a: "Within 24 hours on business days. Urgent inquiries from international clients are prioritized across timezones." },
-  { q: "Are conversations confidential?", a: "Always. Every exchange is treated with the discretion of a private practice. Recordings are shared only with you." },
+  { q: "Are conversations confidential?", a: "Always. Every exchange is treated with the discretion of a private practice." },
   { q: "Do you accept international clients?", a: "Yes — we serve seekers across 47 countries with white-glove scheduling and timezone-aware sessions." },
 ];
 
@@ -282,7 +259,7 @@ export default function ContactPageWrapper() {
         <title>Contact — Begin Your Journey | The Preceptor</title>
         <meta name="description" content="Reach The Preceptor for premium private astrology consultations. White-glove onboarding for clients in the US and worldwide." />
         <meta property="og:title" content="Contact The Preceptor" />
-        <meta property="og:description" content="Begin your journey toward clarity with a private spiritual consultation." />
+        <meta property="og:description" content="Begin your journey towards clarity with a private spiritual consultation." />
         <link rel="canonical" href="https://www.thepreceptorglobal.com/contact" />
       </Helmet>
       <ContactPage />
@@ -348,12 +325,12 @@ function ContactPage() {
             <h1 className="mt-8 text-balance"
               style={{ fontFamily: "var(--font-serif)", fontSize: "clamp(2.5rem, 5vw, 4.5rem)", fontWeight: 400 }}>
               Begin your journey<br />
-              <span className="display-italic text-gold">toward clarity.</span>
+              <span className="display-italic text-gold">towards clarity.</span>
             </h1>
           </Reveal>
           <Reveal delay={0.2}>
-            <p className="mt-8 lead mx-auto">
-              A quiet conversation can shift the trajectory of a decade. Share what’s on your mind — we respond personally within 24 hours.
+            <p className="mt-8 lead text-lg md:text-xl mx-auto">
+              A quiet conversation can shift the trajectory of a decade. Share what&#39;s on your mind — we respond personally within 24 hours.
             </p>
           </Reveal>
           <Reveal delay={0.3}>
@@ -380,7 +357,7 @@ function ContactPage() {
               <span className="eyebrow">— Direct Channels</span>
               <h2 className="mt-5 text-4xl md:text-5xl text-balance">A private line to the studio.</h2>
               <p className="mt-6 text-muted-foreground leading-relaxed max-w-md">
-                Whether you’re booking a session, planning a partnership, or seeking press — the inbox below reaches us personally.
+                Whether you&#39;re booking a session, planning a partnership, or seeking press — the inbox below reaches us personally.
               </p>
             </Reveal>
             <Reveal delay={0.1}>
@@ -410,8 +387,6 @@ function ContactPage() {
                 <div className="flex gap-3">
                   {[
                     { Icon: InstagramIcon, href: siteConfig.social.instagram, label: "Instagram" },
-                    { Icon: YoutubeIcon,   href: siteConfig.social.youtube,   label: "YouTube"   },
-                    { Icon: LinkedinIcon,  href: siteConfig.social.linkedin,  label: "LinkedIn"  },
                   ].map(({ Icon, href, label }) => (
                     <a key={label} href={href} aria-label={label}
                       className="w-11 h-11 rounded-full glass-card flex items-center justify-center text-muted-foreground hover:text-gold hover:scale-110 hover:shadow-gold transition-all duration-300">
@@ -457,14 +432,14 @@ function ContactPage() {
                     options={consultationTypes}
                     value={data.consultationType}
                     onChange={(v) => setData((prev) => ({ ...prev, consultationType: v }))}
-                    placeholder="Type to search or scroll…"
+                    placeholder="Type to search or scroll\u2026"
                   />
                 </Field>
                 <Field label="Subject" error={errors.subject} className="sm:col-span-2">
                   <input value={data.subject} onChange={update("subject")} className={inputCls} placeholder="What can we help you with?" />
                 </Field>
                 <Field label="Your Message" error={errors.message} className="sm:col-span-2">
-                  <textarea rows={6} value={data.message} onChange={update("message")} className={`${inputCls} resize-none`} placeholder="Share what’s on your mind…" />
+                  <textarea rows={6} value={data.message} onChange={update("message")} className={`${inputCls} resize-none`} placeholder="Share what&#39;s on your mind\u2026" />
                 </Field>
               </div>
 
@@ -474,7 +449,7 @@ function ContactPage() {
                 </p>
                 <button type="submit" disabled={sending || sent}
                   className="btn-primary group disabled:opacity-60 disabled:cursor-not-allowed">
-                  {sending ? "Sending…" : sent ? "Message Sent" : "Send Message"}
+                  {sending ? "Sending\u2026" : sent ? "Message Sent" : "Send Message"}
                   {!sending && !sent && <SendIcon className="w-4 h-4 group-hover:translate-x-0.5 transition" />}
                 </button>
               </div>
