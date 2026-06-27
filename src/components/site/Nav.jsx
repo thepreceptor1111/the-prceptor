@@ -120,9 +120,10 @@ export default function Nav() {
             ))}
           </nav>
 
+          {/* Desktop CTA — now uses btn-primary to match Hero section gradient */}
           <Link
             to="/book"
-            className="hidden lg:inline-flex items-center px-6 py-2.5 rounded-full bg-primary text-primary-foreground btn-text hover:scale-[1.03] hover:shadow-gold transition-all duration-300"
+            className="hidden lg:inline-flex btn-primary"
           >
             Book a Session
           </Link>
@@ -189,6 +190,7 @@ export default function Nav() {
                 </motion.div>
               ))}
 
+              {/* Mobile CTA — now uses btn-primary to match Hero section gradient */}
               <motion.div
                 custom={navLinks.length}
                 variants={itemVariants}
@@ -199,7 +201,7 @@ export default function Nav() {
                 <Link
                   to="/book"
                   onClick={() => setOpen(false)}
-                  className="inline-flex items-center px-8 py-4 rounded-full bg-primary text-primary-foreground font-medium shadow-gold"
+                  className="btn-primary px-8 py-4 text-base"
                 >
                   Book a Session
                 </Link>
