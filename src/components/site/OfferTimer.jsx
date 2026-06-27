@@ -48,11 +48,33 @@ function Digit({ value, label }) {
   );
 }
 
+// ── Expired fallback — shown instead of nothing when deadline has passed ──
+// To reactivate the timer: update offerDeadline in Sanity Studio siteSettings.
+function ExpiredBadge({ label }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+      className="flex flex-col items-center gap-4 py-4"
+    >
+      <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-gold/20 bg-black/20 text-xs uppercase tracking-[0.25em] text-gold/60">
+        <ClockIcon className="w-3.5 h-3.5 shrink-0" />
+        <span>{label}</span>
+      </div>
+    </motion.div>
+  );
+}
+
 export function OfferTimer() {
   const { settings } = useSiteSettings();
 
-  const deadline   = settings?.offerDeadline ?? OFFER_END_DATE;
-  const timerLabel = settings?.offerLabel?.trim() || "Introductory offer ends in";
+  const deadline    = settings?.offerDeadline ?? OFFER_END_DATE;
+  const timerLabel  = settings?.offerLabel?.trim()   || "Introductory offer ends in";
+  // Editors can customise the expired message from Sanity siteSettings too.
+  // Falls back to a sensible default if the field isn't set.
+  const expiredLabel = settings?.offerExpiredLabel?.trim()
+    || "Introductory offer has ended \u2014 standard pricing now applies";
 
   const [timeLeft, setTimeLeft] = useState(() => getTimeLeft(deadline));
 
@@ -62,7 +84,8 @@ export function OfferTimer() {
     return () => clearInterval(id);
   }, [deadline]);
 
-  if (!timeLeft) return null;
+  // ── Expired: show fallback pill instead of an invisible gap ──────────────
+  if (!timeLeft) return <ExpiredBadge label={expiredLabel} />;
 
   return (
     <div className="flex flex-col items-center gap-4 py-4">
