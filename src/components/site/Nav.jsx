@@ -56,9 +56,24 @@ const itemVariants = {
   }),
 };
 
+// ── Hook: track whether viewport is lg+ (≥1024px) ──────────────────────
+function useIsDesktop() {
+  const [isDesktop, setIsDesktop] = useState(() => window.innerWidth >= 1024);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const handler = (e) => setIsDesktop(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
+  return isDesktop;
+}
+
 export default function Nav() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const isDesktop = useIsDesktop();
   const location = useLocation();
 
   useEffect(() => {
@@ -123,18 +138,21 @@ export default function Nav() {
           </nav>
 
           {/*
-            Desktop CTA — ONLY show on lg+ screens.
-            On mobile/tablet the hamburger menu already contains a "Book a Session" button
-            so showing it here too is redundant and clutters the mobile navbar.
-            fix: was missing explicit sm/md hidden — added "hidden lg:inline-flex" to ensure
-            it never renders alongside the hamburger icon.
+            Desktop CTA — rendered ONLY when viewport is lg+ (≥1024px).
+            Using JS-driven conditional render instead of Tailwind hidden/lg:inline-flex
+            because .btn-primary sets display:inline-flex in CSS, which has higher
+            specificity than the Tailwind `hidden` utility and overrides it on mobile.
+            The hamburger overlay already contains its own "Book a Session" button,
+            so this CTA is intentionally absent on all mobile/tablet viewports.
           */}
-          <Link
-            to="/book"
-            className="hidden lg:inline-flex btn-primary"
-          >
-            Book a Session
-          </Link>
+          {isDesktop && (
+            <Link
+              to="/book"
+              className="btn-primary"
+            >
+              Book a Session
+            </Link>
+          )}
 
           {/* Hamburger — only on < lg */}
           <button
@@ -201,9 +219,8 @@ export default function Nav() {
               ))}
 
               {/*
-                Single CTA inside the hamburger menu.
-                The navbar-level CTA is hidden on mobile (hidden lg:inline-flex)
-                so this is the only Book a Session button on small screens.
+                This is the ONLY Book a Session button on mobile — inside the overlay.
+                The navbar-level CTA above is never rendered on mobile (isDesktop guard).
               */}
               <motion.div
                 custom={navLinks.length}
