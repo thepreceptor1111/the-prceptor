@@ -29,7 +29,12 @@ export const HOME_PAGE_QUERY = groq`
       sessionTier,
       order
     },
-    "testimonials": *[_type == "testimonial"] | order(coalesce(order, 9999) asc, _createdAt asc) {
+    // Home carousel: featured only, max 12.
+    // To control which testimonials appear here, tick
+    // "Feature in carousel?" on the document in Sanity Studio.
+    // The full /testimonials page (TESTIMONIALS_QUERY) is unaffected.
+    "testimonials": *[_type == "testimonial" && featured == true]
+      | order(coalesce(order, 9999) asc, _createdAt asc) [0...12] {
       _id,
       name,
       "location": coalesce(location, country),
@@ -54,6 +59,9 @@ export const HOME_PAGE_QUERY = groq`
 `;
 
 // ─── Individual queries kept for non-home pages (Services page, Q&A page, etc.) ──
+
+// Full testimonials list — NO featured filter, NO limit.
+// Used on the /testimonials page to show everything.
 export const TESTIMONIALS_QUERY = groq`
   *[_type == "testimonial"] | order(coalesce(order, 9999) asc, _createdAt asc) {
     _id,
