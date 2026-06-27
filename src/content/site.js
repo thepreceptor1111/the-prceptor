@@ -8,8 +8,8 @@ export const siteConfig = {
     "Cinematic, deeply personal astrology consultations for high-intention seekers — clarity in love, career, and life's defining chapters.",
   email: "thepreceptor1111@gmail.com",
   social: {
-    instagram: "https://instagram.com/thepreceptor",
-    reddit:    "https://reddit.com/u/thepreceptor",
+    instagram: "https://www.instagram.com/thepreceptor1111/",
+    reddit:    "https://www.reddit.com/user/ThePreceptor1111/",
   },
 };
 
