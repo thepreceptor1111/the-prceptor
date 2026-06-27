@@ -24,16 +24,6 @@ function normalise(f) {
   return { q: f.question ?? f.q, a: f.answer ?? f.a };
 }
 
-/**
- * FaqSection
- *
- * Props (optional — provided by the home route's batched Sanity fetch):
- *   initialFaqs   {Array|null}  — pre-fetched FAQs from HOME_PAGE_QUERY
- *   faqsLoading   {boolean}     — loading state from the batched hook
- *
- * When neither prop is passed (e.g. on /qna page), falls back to its
- * own useSanity call, just as before.
- */
 export function FaqSection({ initialFaqs = null, faqsLoading = false }) {
   useLenisResize();
 
@@ -58,7 +48,7 @@ export function FaqSection({ initialFaqs = null, faqsLoading = false }) {
       <div className="max-w-3xl mx-auto px-6 lg:px-10">
         <Reveal className="text-center">
           <span className="text-xs uppercase tracking-[0.3em] text-gold">{sectionLabel}</span>
-          <h2 className="mt-4 text-4xl md:text-5xl">{sectionHeading}</h2>
+          <h2 className="mt-4 text-5xl md:text-6xl">{sectionHeading}</h2>
         </Reveal>
         <div className="mt-12 space-y-3">
           {faqs.map((faq, i) => (
