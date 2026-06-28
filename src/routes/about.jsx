@@ -87,12 +87,12 @@ function AboutContent() {
         <Reveal>
           <div className="relative z-10 text-center px-6 pb-28 md:pb-36">
 
-            {/* Eyebrow */}
+            {/* Eyebrow — fixed to 0.75rem minimum (12px floor) */}
             <span
               className="block uppercase text-gold mb-4"
               style={{
                 fontFamily: "var(--font-sans)",
-                fontSize: "0.7rem",
+                fontSize: "0.75rem",
                 letterSpacing: "0.38em",
                 fontWeight: 500,
               }}
@@ -100,11 +100,11 @@ function AboutContent() {
               Our Story
             </span>
 
-            {/* Line 1 — 'About The' — Cormorant Garamond 300, gold */}
+            {/* Line 1 — 'About The' — bigger, fluid, still smaller than PRECEPTOR */}
             <h1
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "clamp(2.8rem, 4.5vw, 4.2rem)",
+                fontSize: "clamp(2.2rem, 5.5vw, 5rem)",
                 fontWeight: 300,
                 color: "var(--color-gold)",
                 letterSpacing: "0.04em",
@@ -115,14 +115,14 @@ function AboutContent() {
               About The
             </h1>
 
-            {/* Line 2 — 'PRECEPTOR' — Cormorant Garamond 600, gold gradient */}
+            {/* Line 2 — 'PRECEPTOR' — reined in: max 6.5rem (was 9rem), tighter tracking */}
             <div
               className="bg-gradient-gold bg-clip-text text-transparent mx-auto"
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "clamp(4rem, 10vw, 9rem)",
+                fontSize: "clamp(3rem, 8vw, 6.5rem)",
                 fontWeight: 600,
-                letterSpacing: "0.18em",
+                letterSpacing: "0.12em",
                 lineHeight: 1,
                 marginTop: "0.06em",
                 maxWidth: "95vw",
