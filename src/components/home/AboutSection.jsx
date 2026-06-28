@@ -59,7 +59,7 @@ export function AboutSection() {
 
             {/* Heading */}
             <h2
-              className="text-3xl md:text-4xl leading-[1.08]"
+              className="text-4xl md:text-5xl leading-[1.08]"
               style={{ fontFamily: "var(--font-serif)", fontWeight: 400 }}
             >
               <span className="block">{heading1}</span>
@@ -67,18 +67,18 @@ export function AboutSection() {
             </h2>
 
             {/* Body */}
-            <p className="mt-6 text-base md:text-lg text-muted-foreground leading-relaxed">{paragraph1}</p>
-            <p className="mt-4 text-base md:text-lg text-muted-foreground leading-relaxed">{paragraph2}</p>
+            <p className="mt-6 text-muted-foreground leading-relaxed">{paragraph1}</p>
+            <p className="mt-4 text-muted-foreground leading-relaxed">{paragraph2}</p>
 
             {/* Stats with vertical divider */}
             <div className="mt-10 flex divide-x divide-gold/20">
               <div className="pr-10">
-                <p className="font-serif text-3xl md:text-4xl bg-gradient-gold">{stat1.value}</p>
-                <p className="mt-1 text-sm uppercase tracking-widest text-muted-foreground">{stat1.label}</p>
+                <p className="font-serif text-4xl bg-gradient-gold">{stat1.value}</p>
+                <p className="mt-1 text-xs uppercase tracking-widest text-muted-foreground">{stat1.label}</p>
               </div>
               <div className="pl-10">
-                <p className="font-serif text-3xl md:text-4xl bg-gradient-gold">{stat4.value}</p>
-                <p className="mt-1 text-sm uppercase tracking-widest text-muted-foreground">{stat4.label}</p>
+                <p className="font-serif text-4xl bg-gradient-gold">{stat4.value}</p>
+                <p className="mt-1 text-xs uppercase tracking-widest text-muted-foreground">{stat4.label}</p>
               </div>
             </div>
 

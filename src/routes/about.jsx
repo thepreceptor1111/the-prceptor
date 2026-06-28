@@ -1,282 +1,229 @@
-import { Helmet } from "react-helmet-async";
-import { motion } from "framer-motion";
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import SEO from "@/components/site/SEO";
+import { PAGE_SEO, SITE } from "@/content/seo";
+import aboutImg from "@/assets/about-section.jpg?format=webp&quality=80";
 import { Reveal } from "@/components/site/Reveal";
 import { useSiteSettings } from "@/lib/useSiteSettings";
-import aboutHeroImg from "@/assets/about-hero.png";
 
-function QuoteIcon({ className }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-      fill="currentColor" className={className} aria-hidden="true">
-      <path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z" />
-      <path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z" />
-    </svg>
-  );
-}
-
-function StarIcon({ className }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-      fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-      className={className} aria-hidden="true">
-      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-    </svg>
-  );
-}
-
-function CheckIcon({ className }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-      fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
-      className={className} aria-hidden="true">
-      <path d="M20 6 9 17l-5-5" />
-    </svg>
-  );
-}
-
-function SparklesIcon({ className }) {
+// ── Inline SVG icons — no lucide-react ──────────────────────────
+function MailIcon({ className }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
       fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
       className={className} aria-hidden="true">
-      <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z" />
-      <path d="M5 3v4" /><path d="M19 17v4" /><path d="M3 5h4" /><path d="M17 19h4" />
+      <rect width="20" height="16" x="2" y="4" rx="2" />
+      <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
     </svg>
   );
 }
-
-function ArrowRightIcon({ className }) {
+function MapPinIcon({ className }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
       fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
       className={className} aria-hidden="true">
-      <path d="M5 12h14" />
-      <path d="m12 5 7 7-7 7" />
+      <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+      <circle cx="12" cy="10" r="3" />
+    </svg>
+  );
+}
+function SendIcon({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      className={className} aria-hidden="true">
+      <path d="m22 2-7 20-4-9-9-4Z" />
+      <path d="M22 2 11 13" />
     </svg>
   );
 }
 
-const milestones = [
-  { year: "2012", title: "The Foundation", body: "Began studying Vedic and Western astrology under two senior practitioners in Pune, immersing in classical texts and modern psychological frameworks." },
-  { year: "2015", title: "First Private Practice", body: "Opened a small private practice serving referred clients. Word spread quietly through professional networks in Mumbai and Singapore." },
-  { year: "2018", title: "International Reach", body: "Expanded to serve clients in the United States, UK, and UAE. Developed a proprietary framework bridging Jyotish and contemporary life coaching." },
-  { year: "2021", title: "The Preceptor Studio", body: "Formally established The Preceptor as a dedicated consultancy. Introduced structured programmes — from single sessions to year-long guidance partnerships." },
-  { year: "2024", title: "6000+ Sessions", body: "Surpassed 6,000 private sessions across 27 countries. Recognised in two independent spiritual wellness publications for consistent client outcomes." },
-];
-
-const beliefs = [
-  "The chart is a map, not a sentence.",
-  "Clarity is more valuable than prediction.",
-  "Every client deserves rigour, not generalisation.",
-  "The work is deeply personal and demands discretion.",
-  "Ancient wisdom is most powerful when translated into modern context.",
-];
-
-const testimonials = [
-  { quote: "Working with The Preceptor changed how I understand my own patterns. Not mystical — precise and grounded.", name: "Priya S.", location: "Singapore", rating: 5 },
-  { quote: "I came sceptical and left with a framework for the next three years of my life. Extraordinary.", name: "Marcus T.", location: "London, UK", rating: 5 },
-  { quote: "The level of preparation and care that goes into each session is unlike anything I've experienced.", name: "Anika R.", location: "New York, USA", rating: 5 },
-];
-
-export default function AboutPageWrapper() {
+export default function AboutWrapper() {
   return (
     <>
-      <Helmet>
-        <title>About — The Preceptor | Vedic & Western Astrology</title>
-        <meta name="description" content="Meet The Preceptor — a modern astrologer with over 12 years of practice, 6000+ sessions, and clients across 27 countries." />
-        <meta property="og:title" content="About The Preceptor" />
-        <meta property="og:description" content="Modern guidance rooted in classical wisdom. Private consultations for those who seek clarity." />
-        <link rel="canonical" href="https://www.thepreceptorglobal.com/about" />
-      </Helmet>
-      <AboutPage />
+      <SEO {...PAGE_SEO.about} />
+      <AboutContent />
     </>
   );
 }
 
-function AboutPage() {
+function AboutContent() {
   const { settings } = useSiteSettings();
-  const [activeYear, setActiveYear] = useState(null);
+
+  const email = settings?.email ?? SITE.email;
+
+  function handleContactSubmit(e) {
+    e.preventDefault();
+    const fd   = new FormData(e.currentTarget);
+    const name = fd.get("name")    || "";
+    const subj = fd.get("subject") || "Enquiry";
+    const body = fd.get("message") || "";
+    const mailto = `mailto:${email}?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(`Hi,\n\nName: ${name}\n\n${body}`)}`;
+    window.location.href = mailto;
+  }
 
   return (
-    <div className="relative">
+    <div className="bg-hero starfield">
 
-      {/* ── Hero ── */}
-      <section className="relative overflow-hidden pt-40 pb-28 md:pt-52 md:pb-36">
-        <div className="absolute inset-0 bg-hero" />
-        <div className="absolute inset-0 starfield" />
-        <motion.div
-          animate={{ opacity: [0.3, 0.55, 0.3] }}
-          transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[55%] aspect-square rounded-full bg-[radial-gradient(circle,oklch(0.82_0.12_85_/_0.15),transparent_65%)] blur-3xl pointer-events-none"
+      {/* Hero */}
+      <section
+        className="relative w-full min-h-[60vh] flex items-center justify-center overflow-hidden"
+        style={{
+          backgroundImage: `url(${aboutImg})`,
+          backgroundPosition: "50% 50%",
+          backgroundSize: "cover",
+          backgroundRepeat: "no-repeat",
+        }}
+      >
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(to bottom, rgba(10,8,18,0.9) 0%, rgba(10,8,18,0.4) 40%, rgba(10,8,18,0.9) 100%)",
+          }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background pointer-events-none" />
-
-        <div className="relative max-w-4xl mx-auto px-6 lg:px-10 text-center">
-          <Reveal>
-            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-card text-xs uppercase tracking-[0.25em] text-gold">
-              <SparklesIcon className="w-3 h-3" /> Our Story
+        <Reveal>
+          <div className="relative z-10 text-center px-6 py-20">
+            <span className="block text-xs uppercase tracking-[0.4em] text-gold mb-6">
+              Our Story
             </span>
-          </Reveal>
-          <Reveal delay={0.1}>
             <h1
-              className="mt-8 text-balance"
-              style={{ fontFamily: "var(--font-serif)", fontSize: "clamp(2.5rem, 5vw, 4.5rem)", fontWeight: 400 }}
+              className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-light leading-[1.05] text-white"
+              style={{ fontFamily: "var(--font-serif)" }}
             >
-              Ancient wisdom,
+              About The
               <br />
-              <span className="display-italic text-gold">modern clarity.</span>
+              <span className="tracking-[0.15em] font-semibold">PRECEPTOR</span>
             </h1>
-          </Reveal>
-          <Reveal delay={0.2}>
-            <p className="mt-8 lead text-lg md:text-xl mx-auto">
-              Twelve years. Six thousand sessions. Twenty-seven countries. One unwavering belief: that the stars reveal design, not destiny.
-            </p>
-          </Reveal>
-          <Reveal delay={0.4}>
-            <div className="mt-12 mx-auto max-w-2xl rounded-2xl overflow-hidden ring-1 ring-gold/20">
-              <img src={aboutHeroImg} alt="The Preceptor — astrology practice" className="w-full h-auto object-cover" />
-            </div>
-          </Reveal>
+          </div>
+        </Reveal>
+      </section>
+
+      {/* Short intro paragraphs */}
+      <section className="max-w-3xl mx-auto px-6 lg:px-10 py-20">
+        <Reveal>
+          <p className="text-lg text-muted-foreground leading-relaxed">
+            {settings?.aboutParagraph1 ??
+              "The Preceptor began as a small private practice for friends seeking real answers. Over 6 years, it has grown into a global consultation studio serving founders, artists, healers, and high-intention seekers across 27+ countries."}
+          </p>
+          <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
+            {settings?.aboutParagraph2 ??
+              "Our approach blends classical Vedic astrology, Western tropical analysis, and intuitive symbolic work, translated into clean, modern language you can act on."}
+          </p>
+        </Reveal>
+      </section>
+
+      {/* How The Preceptor Was Born */}
+      <section className="max-w-3xl mx-auto px-6 lg:px-10 pb-24">
+        <Reveal>
+          <h2
+            className="text-3xl md:text-4xl text-center bg-gradient-gold"
+            style={{ fontFamily: "var(--font-serif)", fontWeight: 400 }}
+          >
+            How The Preceptor Was Born
+          </h2>
+        </Reveal>
+
+        <div className="mt-12 space-y-6 text-base text-muted-foreground leading-[1.85]">
+          <Reveal><p>I completed my Bachelor&apos;s degree with Honors in Psychology, and I have been learning and practicing astrology since August 2019, approaching seven years of dedicated study and experience this coming August.</p></Reveal>
+          <Reveal><p>My approach to interpreting birth charts is rooted in a unique blend of astrological knowledge and psychological cause-and-effect reasoning, allowing me to derive deeply accurate insights and offer meaningful guidance.</p></Reveal>
+          <Reveal><p>But this journey did not begin as a passion. It began as a search for answers.</p></Reveal>
+          <Reveal><p>Growing up, life was not easy. In March 2014, I went through one of the most difficult phases of my life, losing someone very close in my family. My paternal uncle, who was my closest companion and the primary caretaker since childhood while both of my parents worked full-time jobs. Loss of a family member, constant bullying at school, feeling lonely all the time, completely unmotivated and unwilling to do anything. That period left me feeling broken, searching desperately for support, understanding, and direction. I needed someone who could guide me, someone who could help me make sense of it all, but no such person appeared. Life, at that time, felt like a constant struggle. (Astrologically, I was approaching the middle of my Saturn seven-and-a-half-year period.)</p></Reveal>
+          <Reveal><p>What followed shaped everything.</p></Reveal>
+          <Reveal><p>Fast forward to mid August 2019.</p></Reveal>
+          <Reveal><p>One day, I came across my printed horoscope in a briefcase in my room, which one of my parents had obtained for me when I was born. At first, I didn&apos;t even understand what I was looking at. In fact, I had always disliked astrology. I had seen how it was often used to instill fear in people and exploit blind faith. That contradiction sparked something in me. Curiosity mixed with skepticism. I decided to study it, not to believe in it, but to disprove it.</p></Reveal>
+          <Reveal><p>I began reading my own chart, searching online, watching videos, driven by the intention to expose its flaws. But the deeper I went, the more something unexpected happened.</p></Reveal>
+          <Reveal><p className="text-lg text-foreground font-medium">It started making sense.</p></Reveal>
+          <Reveal><p>Not in vague terms, but in ways that felt precise and personal. It described my life patterns, my experiences, my nature, my family dynamics, things only I knew. What began as doubt slowly transformed into fascination. I found myself investing all my free time into understanding it, exploring my placements, and uncovering both strengths and challenges within my chart.</p></Reveal>
+          <Reveal><p>By the end of August, I was studying astrology every single day. I began analyzing charts of others, diving deeper into planets, their aspects, zodiac signs, nakshatras, dashas, divisional charts, transits and much more. I explored Vedic mythology, the stories, the deities, their symbolism, and the themes they carried&hellip; And I realized something profound.</p></Reveal>
+          <Reveal><p className="text-lg text-foreground font-medium">The very thing I had set out to disprove had become a path I could not ignore.</p></Reveal>
+          <Reveal><p>In October 2020, after graduating earlier that year, I made the decision to pursue Vedic Astrology formally. I began learning under a renowned astrologer online and committed myself fully to this discipline.</p></Reveal>
+          <Reveal><p>As I continued to study and practice, often giving guidance for free, I found myself reflecting on my younger years. I remembered the confusion, the pain, and the deep need for someone wise, honest, and understanding. I didn&apos;t just want guidance back then. I needed a true Preceptor. But I couldn&apos;t find one.</p></Reveal>
+          <Reveal><p className="text-lg text-foreground font-medium">So I chose to become one.</p></Reveal>
+          <Reveal><p>For every person who comes to me, I carry that intention. I speak honestly, because I know what it feels like to be misled. I guide with sincerity, because I know what it means to search for truth. In every individual I meet, I see a reflection of my past self, seeking clarity, regardless of how complex or simple their situation may be.</p></Reveal>
+          <Reveal><p>This is how I stepped into Vedic astrology.</p></Reveal>
+          <Reveal><p className="text-lg text-foreground font-medium">This is how I became &ldquo;The Preceptor.&rdquo;</p></Reveal>
+          <Reveal><p>This is not a story crafted for effect. It is my life as it unfolded.</p></Reveal>
+          <Reveal><p>Some may call it destiny. Others may call it free will.</p></Reveal>
+          <Reveal><p>But to me, what truly matters is the intention. To guide those who seek answers, and to stand for those who are still searching.</p></Reveal>
         </div>
       </section>
 
-      {/* ── Philosophy ── */}
-      <section className="py-24 md:py-32">
-        <div className="max-w-7xl mx-auto px-6 lg:px-10 grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
-          <Reveal>
-            <span className="eyebrow">— Our Philosophy</span>
-            <h2 className="mt-5 text-3xl md:text-4xl text-balance">The chart is a map,<br />not a sentence.</h2>
-            <p className="mt-6 text-base md:text-lg text-muted-foreground leading-relaxed">
-              Classical astrology was built for a world without psychology, neuroscience, or freedom of choice. We honour the rigour of that tradition while translating it into language that serves modern lives.
-            </p>
-            <p className="mt-4 text-base md:text-lg text-muted-foreground leading-relaxed">
-              Every session is built around clarity — not comfort. We will tell you what the chart says, what it does not say, and what you can actually do with that information.
-            </p>
-            <ul className="mt-8 space-y-3">
-              {beliefs.map((b) => (
-                <li key={b} className="flex items-start gap-3">
-                  <CheckIcon className="w-4 h-4 text-gold mt-0.5 shrink-0" />
-                  <span className="text-sm md:text-base text-muted-foreground">{b}</span>
-                </li>
-              ))}
-            </ul>
-          </Reveal>
-          <Reveal delay={0.15}>
-            <div className="grid grid-cols-2 gap-4">
-              {[
-                { value: "12+", label: "Years of practice" },
-                { value: "6000+", label: "Sessions delivered" },
-                { value: "27+", label: "Countries served" },
-                { value: "4.98★", label: "Average rating" },
-              ].map((s) => (
-                <div key={s.label} className="glass-card rounded-2xl p-6 text-center">
-                  <p className="font-serif text-3xl md:text-4xl bg-gradient-gold">{s.value}</p>
-                  <p className="mt-2 text-sm uppercase tracking-widest text-muted-foreground">{s.label}</p>
-                </div>
-              ))}
-            </div>
-          </Reveal>
+      {/* Philosophy cards */}
+      <section className="max-w-7xl mx-auto px-6 lg:px-10 pb-20">
+        <div className="grid md:grid-cols-3 gap-6">
+          {[
+            { t: "Mission",    d: "To make profound spiritual insight feel modern, accessible, and quietly luxurious." },
+            { t: "Philosophy", d: "Astrology reveals design, not destiny. Knowing your design is the work of a lifetime." },
+            { t: "Approach",   d: "Cinematic, focused sessions with a real human. Never templates, never generic readings." },
+          ].map((c, i) => (
+            <Reveal key={c.t} delay={i * 0.08}>
+              <div className="glass-card rounded-2xl p-8 h-full">
+                <h3 className="text-2xl text-gold">{c.t}</h3>
+                <p className="mt-3 text-muted-foreground leading-relaxed">{c.d}</p>
+              </div>
+            </Reveal>
+          ))}
         </div>
       </section>
 
-      {/* ── Timeline ── */}
-      <section className="py-24 md:py-32 bg-deep relative overflow-hidden">
-        <div className="absolute inset-0 bg-hero opacity-40 pointer-events-none" />
-        <div className="relative max-w-5xl mx-auto px-6 lg:px-10">
-          <Reveal className="text-center">
-            <span className="eyebrow">— The Journey</span>
-            <h2 className="mt-5 text-3xl md:text-4xl text-balance">A practice built slowly,<br />with intention.</h2>
-          </Reveal>
-          <div className="mt-16 relative">
-            <div className="absolute left-6 md:left-1/2 top-0 bottom-0 w-px bg-gold/20 -translate-x-1/2" aria-hidden />
-            <div className="space-y-10">
-              {milestones.map((m, i) => (
-                <Reveal key={m.year} delay={i * 0.07}>
-                  <div
-                    className={`relative flex items-start gap-8 md:gap-0 ${
-                      i % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"
-                    }`}
-                    onClick={() => setActiveYear(activeYear === m.year ? null : m.year)}
-                  >
-                    <div className={`flex-1 md:w-[calc(50%-2rem)] ${ i % 2 === 0 ? "md:pr-12 md:text-right" : "md:pl-12" } pl-14 md:pl-0`}>
-                      <div
-                        className={`glass-card rounded-2xl p-6 cursor-pointer transition-all duration-300 hover:ring-1 hover:ring-gold/30 ${
-                          activeYear === m.year ? "ring-1 ring-gold/40" : ""
-                        }`}
-                      >
-                        <span className="text-xs uppercase tracking-[0.2em] text-gold">{m.year}</span>
-                        <h3 className="mt-2 text-lg font-medium">{m.title}</h3>
-                        <motion.div
-                          initial={false}
-                          animate={{ height: activeYear === m.year ? "auto" : 0, opacity: activeYear === m.year ? 1 : 0 }}
-                          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                          className="overflow-hidden"
-                        >
-                          <p className="mt-3 text-sm md:text-base text-muted-foreground leading-relaxed">{m.body}</p>
-                        </motion.div>
-                      </div>
-                    </div>
-                    <div className="absolute left-6 md:left-1/2 w-3 h-3 rounded-full bg-gold ring-4 ring-background -translate-x-1/2 mt-6" />
-                  </div>
-                </Reveal>
-              ))}
+      {/* Contact */}
+      <section className="max-w-7xl mx-auto px-6 lg:px-10 py-20 grid lg:grid-cols-2 gap-12">
+        <Reveal>
+          <span className="text-xs uppercase tracking-[0.3em] text-gold">Contact</span>
+          <h2 className="mt-4 text-4xl md:text-5xl">Let&apos;s talk.</h2>
+          <p className="mt-5 text-muted-foreground">
+            For private enquiries, collaborations, or press, reach out below.
+          </p>
+          <div className="mt-10 space-y-5">
+            <div className="flex items-center gap-4">
+              <MailIcon className="w-5 h-5 text-gold" />
+              <a href={`mailto:${email}`} className="hover:text-gold transition-colors">
+                {email}
+              </a>
+            </div>
+            <div className="flex items-center gap-4">
+              <MapPinIcon className="w-5 h-5 text-gold" />
+              <span>Worldwide · Online consultations</span>
             </div>
           </div>
-        </div>
-      </section>
+        </Reveal>
 
-      {/* ── Testimonials ── */}
-      <section className="py-24 md:py-32">
-        <div className="max-w-7xl mx-auto px-6 lg:px-10">
-          <Reveal className="text-center">
-            <span className="eyebrow">— Client Words</span>
-            <h2 className="mt-5 text-3xl md:text-4xl text-balance">What clients say.</h2>
-          </Reveal>
-          <div className="mt-12 grid md:grid-cols-3 gap-6">
-            {testimonials.map((t, i) => (
-              <Reveal key={i} delay={i * 0.08}>
-                <div className="glass-card rounded-2xl p-8 flex flex-col h-full">
-                  <QuoteIcon className="w-8 h-8 text-gold/40 mb-4 shrink-0" />
-                  <p className="text-base md:text-lg text-muted-foreground leading-relaxed flex-1">&ldquo;{t.quote}&rdquo;</p>
-                  <div className="mt-6 flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium">{t.name}</p>
-                      <p className="text-xs text-muted-foreground">{t.location}</p>
-                    </div>
-                    <div className="flex gap-0.5">
-                      {[...Array(t.rating)].map((_, j) => <StarIcon key={j} className="w-3.5 h-3.5 fill-gold text-gold" />)}
-                    </div>
-                  </div>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── CTA ── */}
-      <section className="py-24 md:py-32 bg-deep relative overflow-hidden">
-        <div className="absolute inset-0 bg-hero opacity-40 pointer-events-none" />
-        <div className="relative max-w-4xl mx-auto px-6 lg:px-10 text-center">
-          <Reveal>
-            <span className="eyebrow">— Begin</span>
-            <h2 className="mt-5 text-3xl md:text-4xl text-balance">Let&apos;s talk.</h2>
-            <p className="mt-6 text-base md:text-lg text-muted-foreground mx-auto max-w-xl leading-relaxed">
-              A single session can shift how you read the next decade. Book a private consultation or send a message first.
-            </p>
-          </Reveal>
-          <Reveal delay={0.1}>
-            <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link to="/book" className="btn-primary group">
-                Book a Session
-                <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-0.5 transition" />
-              </Link>
-              <Link to="/contact" className="btn-secondary">Send a Message</Link>
-            </div>
-          </Reveal>
-        </div>
+        <Reveal delay={0.1}>
+          <form
+            onSubmit={handleContactSubmit}
+            className="glass-card rounded-3xl p-8 space-y-5 shadow-elegant"
+          >
+            <input
+              name="name"
+              placeholder="Full Name"
+              required
+              className="w-full bg-secondary/50 border border-border rounded-xl px-4 py-3 focus:border-gold focus:outline-none"
+            />
+            <input
+              name="email"
+              placeholder="Email"
+              type="email"
+              required
+              className="w-full bg-secondary/50 border border-border rounded-xl px-4 py-3 focus:border-gold focus:outline-none"
+            />
+            <input
+              name="subject"
+              placeholder="Subject"
+              className="w-full bg-secondary/50 border border-border rounded-xl px-4 py-3 focus:border-gold focus:outline-none"
+            />
+            <textarea
+              name="message"
+              placeholder="Your message"
+              rows={5}
+              className="w-full bg-secondary/50 border border-border rounded-xl px-4 py-3 focus:border-gold focus:outline-none"
+            />
+            <button
+              type="submit"
+              className="inline-flex items-center gap-2 px-7 py-3 rounded-full bg-primary text-primary-foreground font-medium shadow-gold hover:scale-[1.02] transition"
+            >
+              Send Message <SendIcon className="w-4 h-4" />
+            </button>
+          </form>
+        </Reveal>
       </section>
 
     </div>

@@ -40,7 +40,7 @@ export function AchievementsSection() {
       <div className="max-w-7xl mx-auto px-6 lg:px-10 relative z-10">
         <Reveal className="text-center">
           <span className="text-sm uppercase tracking-[0.3em] text-gold">{sectionLabel}</span>
-          <h2 className="mt-4 text-3xl md:text-4xl">{sectionHeading}</h2>
+          <h2 className="mt-4 text-4xl md:text-5xl">{sectionHeading}</h2>
         </Reveal>
         <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8">
           {achievements.map((a, i) => (
@@ -49,8 +49,8 @@ export function AchievementsSection() {
                 <div className="flex justify-center mb-4">
                   <AwardIcon className="w-6 h-6 text-gold" />
                 </div>
-                <p className="font-serif text-4xl md:text-5xl bg-gradient-gold">{a.value}</p>
-                <p className="mt-3 text-sm uppercase tracking-widest text-muted-foreground">{a.label}</p>
+                <p className="font-serif text-5xl bg-gradient-gold">{a.value}</p>
+                <p className="mt-3 text-xs uppercase tracking-widest text-muted-foreground">{a.label}</p>
               </div>
             </Reveal>
           ))}

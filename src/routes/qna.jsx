@@ -1,30 +1,35 @@
-import { Helmet } from "react-helmet-async";
-import { useState, useMemo } from "react";
+import SEO from "@/components/site/SEO";
+import { PAGE_SEO } from "@/content/seo";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Reveal } from "@/components/site/Reveal";
+import Reveal from "@/components/site/Reveal";
+import { useSanity } from "@/lib/useSanity";
 import { useSiteSettings } from "@/lib/useSiteSettings";
-import { FAQS } from "@/utils/constants";
+import { FAQ_QUERY } from "@/lib/sanityQueries";
 
-function ChevronDownIcon({ className }) {
+// ── Inline SVG icons — removes lucide-react dependency ────────────────────
+function PlusIcon({ className }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
       fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
       className={className} aria-hidden="true">
-      <path d="m6 9 6 6 6-6" />
+      <path d="M5 12h14" />
+      <path d="M12 5v14" />
     </svg>
   );
 }
-function SearchIcon({ className }) {
+
+function MinusIcon({ className }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
       fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
       className={className} aria-hidden="true">
-      <circle cx="11" cy="11" r="8" />
-      <path d="m21 21-4.35-4.35" />
+      <path d="M5 12h14" />
     </svg>
   );
 }
+
 function SparklesIcon({ className }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -35,6 +40,19 @@ function SparklesIcon({ className }) {
     </svg>
   );
 }
+
+function MessageCircleQuestionIcon({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      className={className} aria-hidden="true">
+      <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
+      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+      <path d="M12 17h.01" />
+    </svg>
+  );
+}
+
 function ArrowRightIcon({ className }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -45,206 +63,315 @@ function ArrowRightIcon({ className }) {
     </svg>
   );
 }
-function XIcon({ className }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-      className={className} aria-hidden="true">
-      <path d="M18 6 6 18" /><path d="m6 6 12 12" />
-    </svg>
-  );
-}
 
-const CATEGORIES = ["All", "Sessions", "Booking & Payment", "Astrology", "Privacy & Confidentiality", "International Clients"];
-
-const LOCAL_FAQS = [
-  { category: "Sessions", q: "What can I expect in my first session?", a: "Your first session is a structured 60-minute conversation. You'll share your birth details beforehand, and The Preceptor will prepare a detailed chart reading focused on your stated area of inquiry — whether career, relationships, timing, or a specific life question." },
-  { category: "Sessions", q: "How long is a typical session?", a: "Sessions run between 45 and 90 minutes depending on the service selected. Extended or Relationship sessions are typically 75–90 minutes. All sessions include a follow-up summary note sent within 48 hours." },
-  { category: "Sessions", q: "Are sessions conducted in person or online?", a: "All sessions are conducted online via Zoom or Google Meet. This allows clients across all time zones to access the same quality of consultation without compromise." },
-  { category: "Booking & Payment", q: "How do I book a session?", a: "Visit the Book a Session page, select your preferred service, and choose a time slot. Payment is collected at booking to confirm your appointment. You'll receive a confirmation and preparation notes by email." },
-  { category: "Booking & Payment", q: "What payment methods do you accept?", a: "We accept all major credit and debit cards, as well as bank transfers for clients who prefer. All transactions are processed securely through Stripe." },
-  { category: "Booking & Payment", q: "What is your cancellation policy?", a: "Cancellations made more than 48 hours before the session are eligible for a full refund or reschedule. Cancellations within 48 hours are eligible for a credit note valid for 90 days." },
-  { category: "Astrology", q: "Do you use Vedic or Western astrology?", a: "The Preceptor works with both systems, drawing from whichever framework is most illuminating for the question at hand. Most chart readings integrate Vedic (Jyotish) foundations with Western psychological frameworks." },
-  { category: "Astrology", q: "Do I need to know my exact birth time?", a: "An exact birth time significantly improves the precision of a reading — particularly for questions involving life timing and the Ascendant. If you don't have it, birth time rectification is available as a separate service." },
-  { category: "Astrology", q: "Can astrology predict the future?", a: "Not in the deterministic sense that popular culture suggests. What the chart offers is a map of tendencies, cycles, and patterns. A skilled reading helps you understand the terrain and navigate it — not surrender to it." },
-  { category: "Privacy & Confidentiality", q: "Are my sessions confidential?", a: "Entirely. Every session, message, and piece of shared information is treated with the same discretion as a private legal or medical consultation. Nothing is stored beyond what's needed to prepare for your session." },
-  { category: "International Clients", q: "Do you work with clients outside India?", a: "Yes — clients from 27 countries including the US, UK, UAE, Singapore, Australia, and Canada. Sessions are scheduled to accommodate your timezone, and we're available across most working hours globally." },
-  { category: "International Clients", q: "Are sessions available in languages other than English?", a: "Currently, sessions are conducted in English and Hindi. If you require another language, please mention it in your booking note and we'll do our best to accommodate." },
+const STATIC_CATEGORIES = [
+  {
+    id: "sessions",
+    label: "Sessions",
+    questions: [
+      {
+        q: "What happens in a typical consultation?",
+        a: "Each session is a private, 60-minute one-on-one video call. We begin with your birth chart and move into whatever area of life is most calling for attention, career, relationships, timing, or spiritual direction.",
+      },
+      {
+        q: "Do I need to know anything about astrology beforehand?",
+        a: "Not at all. Sessions are designed to be fully accessible whether you're a complete newcomer or have studied astrology for years. The language is always clear, grounded, and practical.",
+      },
+      {
+        q: "How do I prepare for my session?",
+        a: "The most important thing is your accurate birth time, date, exact time, and city. Beyond that, simply arrive with an open mind and one or two areas of life you'd like to explore. There's no homework required.",
+      },
+      {
+        q: "Can I book sessions for someone else as a gift?",
+        a: "Yes. Gift sessions are available. Simply note 'gift' in the concern field during booking and include the recipient's details. A personalised gift confirmation is sent to you.",
+      },
+    ],
+  },
+  {
+    id: "astrology",
+    label: "Astrology",
+    questions: [
+      {
+        q: "Which system of astrology do you use?",
+        a: "The Preceptor blends Vedic (Jyotish) and Western tropical astrology depending on your question. Vedic is used for precise timing and life-path readings; Western is used for psychological and relationship insight. Both are explained in simple terms.",
+      },
+      {
+        q: "Is astrology the same as fortune-telling?",
+        a: "No. Astrology maps energetic patterns and timing cycles. It reveals design, not fixed destiny. The goal is always to give you more agency, not less. Knowing the weather doesn't stop you from going outside; it just helps you dress well.",
+      },
+      {
+        q: "What is a birth chart?",
+        a: "Your birth chart (or natal chart) is a snapshot of the sky at the exact moment and location of your birth. It shows the position of the Sun, Moon, and planets across 12 houses, each governing a different area of life. It is the primary map used in every consultation.",
+      },
+      {
+        q: "Can astrology predict exact events?",
+        a: "Astrology reveals windows of high probability and energetic themes, not fixed outcomes. Timing tools like transits and dashas highlight when certain areas of life are activated, but free will always plays a central role in how those energies manifest.",
+      },
+    ],
+  },
+  {
+    id: "logistics",
+    label: "Logistics",
+    questions: [
+      {
+        q: "Where do sessions take place?",
+        a: "All consultations are held online via a private video call link sent to your email after booking. Sessions are available to clients anywhere in the world across all timezones.",
+      },
+      {
+        q: "What timezone are sessions scheduled in?",
+        a: "Sessions are displayed in your local timezone during booking. The astrologer is based in IST (India Standard Time, UTC+5:30) and offers slots across multiple windows to accommodate international clients.",
+      },
+      {
+        q: "How far in advance should I book?",
+        a: "The booking window opens 14 days in advance. Demand is high, so booking 5 to 7 days ahead is recommended. Same-week slots occasionally open when cancellations occur, check the booking page regularly.",
+      },
+      {
+        q: "What is the cancellation policy?",
+        a: "Cancellations made 48 hours or more before the session receive a full credit toward a future session. Cancellations within 24 hours are non-refundable. No-shows forfeit the session.",
+      },
+    ],
+  },
+  {
+    id: "readings",
+    label: "Types of Readings",
+    questions: [
+      {
+        q: "What is a Kundli Analysis?",
+        a: "Kundli Analysis is a deep Vedic birth chart examination covering all 12 houses, planetary placements, yogas (special combinations), and dashas (timing periods). It is the most comprehensive reading offered and is ideal for first-time clients or those at a major life crossroads.",
+      },
+      {
+        q: "What does a Relationship Consultation cover?",
+        a: "Relationship sessions use composite chart and synastry analysis to examine compatibility, recurring patterns, karmic themes, and timing. They are suitable for romantic partnerships, business relationships, or family dynamics.",
+      },
+      {
+        q: "How is a Tarot Reading different from an astrology session?",
+        a: "Tarot readings are intuitive and symbolic. They respond to the energy of the present moment and your specific question. Astrology readings are chart-based and timing-specific. Many clients find the two work beautifully together.",
+      },
+      {
+        q: "Can I request a follow-up session?",
+        a: "Yes. Follow-up sessions are available and encouraged every 6 to 12 months as major planetary cycles shift. Returning clients receive priority booking access and a discounted rate on their second session.",
+      },
+    ],
+  },
 ];
 
-export default function QnAPageWrapper() {
-  return (
-    <>
-      <Helmet>
-        <title>FAQ — Common Questions | The Preceptor</title>
-        <meta name="description" content="Answers to the most common questions about The Preceptor's astrology consultations, booking process, and approach." />
-        <link rel="canonical" href="https://www.thepreceptorglobal.com/qna" />
-      </Helmet>
-      <QnAPage />
-    </>
-  );
+const CATEGORY_META = [
+  { id: "sessions", label: "Sessions" },
+  { id: "astrology", label: "Astrology" },
+  { id: "logistics", label: "Logistics" },
+  { id: "readings", label: "Types of Readings" },
+];
+
+function groupByCategory(faqs) {
+  const map = {};
+  CATEGORY_META.forEach(({ id }) => { map[id] = []; });
+
+  faqs.forEach((faq) => {
+    const cat = faq.category ?? "sessions";
+    if (!map[cat]) map[cat] = [];
+    map[cat].push({ q: faq.question, a: faq.answer });
+  });
+
+  return CATEGORY_META
+    .filter(({ id }) => map[id].length > 0)
+    .map(({ id, label }) => ({ id, label, questions: map[id] }));
 }
 
-function QnAPage() {
+export default function QnAPage() {
+  const { data: cmsFaqs } = useSanity(FAQ_QUERY, null);
   const { settings } = useSiteSettings();
-  const faqs = settings?.faqs ?? LOCAL_FAQS;
 
-  const [activeCategory, setActiveCategory] = useState("All");
-  const [openIndex, setOpenIndex]           = useState(null);
-  const [query, setQuery]                   = useState("");
+  const CATEGORIES =
+    cmsFaqs && cmsFaqs.length > 0
+      ? groupByCategory(cmsFaqs)
+      : STATIC_CATEGORIES;
 
-  const filtered = useMemo(() => {
-    let list = faqs.length > 0 ? faqs : LOCAL_FAQS;
-    if (activeCategory !== "All") list = list.filter((f) => f.category === activeCategory);
-    if (query.trim()) {
-      const q = query.toLowerCase();
-      list = list.filter((f) => f.q.toLowerCase().includes(q) || f.a.toLowerCase().includes(q));
-    }
-    return list;
-  }, [faqs, activeCategory, query]);
+  const [activeCategory, setActiveCategory] = useState(CATEGORIES[0]?.id ?? "sessions");
+  const [openIndex, setOpenIndex] = useState(null);
+
+  const activeQuestions =
+    CATEGORIES.find((c) => c.id === activeCategory)?.questions ?? [];
+
+  const handleCategoryChange = (id) => {
+    setActiveCategory(id);
+    setOpenIndex(null);
+  };
+
+  const toggle = (i) => setOpenIndex(openIndex === i ? null : i);
 
   return (
-    <div className="relative">
+    <>
+      <SEO {...PAGE_SEO.qna} />
 
-      {/* Hero */}
-      <section className="relative overflow-hidden pt-40 pb-28 md:pt-52 md:pb-36">
-        <div className="absolute inset-0 bg-hero" />
-        <div className="absolute inset-0 starfield" />
-        <motion.div
-          animate={{ opacity: [0.3, 0.55, 0.3] }}
-          transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[55%] aspect-square rounded-full bg-[radial-gradient(circle,oklch(0.82_0.12_85_/_0.15),transparent_65%)] blur-3xl pointer-events-none"
+      <div className="bg-hero starfield min-h-screen relative overflow-hidden">
+        <div
+          className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-[700px] h-[700px] rounded-full opacity-25 blur-3xl"
+          style={{
+            background: "radial-gradient(circle, var(--gold) 0%, transparent 60%)",
+          }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background pointer-events-none" />
-        <div className="relative max-w-4xl mx-auto px-6 lg:px-10 text-center">
+
+        <section className="relative max-w-5xl mx-auto px-6 lg:px-10 pt-20 pb-16 text-center">
           <Reveal>
-            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-card text-xs uppercase tracking-[0.25em] text-gold">
-              <SparklesIcon className="w-3 h-3" /> Questions & Answers
-            </span>
-          </Reveal>
-          <Reveal delay={0.1}>
-            <h1
-              className="mt-8 text-balance"
-              style={{ fontFamily: "var(--font-serif)", fontSize: "clamp(2.5rem, 5vw, 4.5rem)", fontWeight: 400 }}
+            <motion.span
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.35em] text-gold"
             >
-              Everything you&apos;d<br />
-              <span className="display-italic text-gold">want to know.</span>
+              <SparklesIcon className="w-3.5 h-3.5" /> Questions &amp; Answers
+            </motion.span>
+            <h1
+              className="mt-6 text-5xl md:text-7xl leading-[1.05] bg-gradient-gold bg-clip-text text-transparent"
+              style={{ fontFamily: "var(--font-serif)" }}
+            >
+              {settings?.faqSectionHeading ?? "Everything you want to know."}
             </h1>
-          </Reveal>
-          <Reveal delay={0.2}>
-            <p className="mt-8 lead text-lg md:text-xl mx-auto">
-              Browse the most common questions about sessions, booking, astrology, and privacy — or search for something specific below.
-            </p>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* Search + Filter */}
-      <section className="sticky top-16 z-20 bg-background/80 backdrop-blur-md border-b border-border/40 py-4">
-        <div className="max-w-5xl mx-auto px-6 lg:px-10 flex flex-col sm:flex-row gap-3">
-          <div className="relative flex-1">
-            <SearchIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <input
-              type="search"
-              placeholder="Search questions…"
-              value={query}
-              onChange={(e) => { setQuery(e.target.value); setOpenIndex(null); }}
-              className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-secondary/50 border border-border text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all"
-            />
-            {query && (
-              <button onClick={() => setQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition">
-                <XIcon className="w-4 h-4" />
-              </button>
-            )}
-          </div>
-          <div className="flex gap-2 flex-wrap">
-            {CATEGORIES.map((c) => (
-              <button
-                key={c}
-                onClick={() => { setActiveCategory(c); setOpenIndex(null); }}
-                className={`px-3 py-2 rounded-lg text-xs uppercase tracking-[0.15em] transition-all ${
-                  activeCategory === c
-                    ? "bg-gold/20 text-gold border border-gold/30"
-                    : "bg-secondary/40 text-muted-foreground border border-border hover:border-gold/20"
-                }`}
-              >
-                {c}
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ list */}
-      <section className="py-20 md:py-28">
-        <div className="max-w-5xl mx-auto px-6 lg:px-10">
-          {filtered.length === 0 ? (
-            <div className="text-center py-20">
-              <p className="text-muted-foreground">No questions match your search. <button onClick={() => { setQuery(""); setActiveCategory("All"); }} className="text-gold underline">Clear filters</button></p>
+            <div className="mt-6 flex justify-center">
+              <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl text-center" style={{ textAlign: 'center' }}>
+                From how sessions work to the deeper philosophy behind the practice,
+                find honest, clear answers below.
+              </p>
             </div>
-          ) : (
-            <div className="space-y-3">
-              {filtered.map((f, i) => (
-                <Reveal key={i} delay={Math.min(i * 0.04, 0.3)}>
-                  <div className="glass-card rounded-2xl overflow-hidden">
-                    <button
-                      onClick={() => setOpenIndex(openIndex === i ? null : i)}
-                      className="w-full p-6 flex items-start justify-between text-left gap-4"
-                      aria-expanded={openIndex === i}
-                    >
-                      <div className="flex-1 min-w-0">
-                        {f.category && f.category !== "All" && (
-                          <span className="block text-xs uppercase tracking-[0.2em] text-gold mb-2">{f.category}</span>
-                        )}
-                        <span className="font-serif text-base md:text-lg">{f.q}</span>
-                      </div>
-                      <ChevronDownIcon className={`w-5 h-5 text-gold shrink-0 transition-transform duration-500 mt-0.5 ${ openIndex === i ? "rotate-180" : "" }`} />
-                    </button>
-                    <AnimatePresence initial={false}>
-                      {openIndex === i && (
-                        <motion.div
-                          key="body"
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                          className="overflow-hidden"
-                        >
-                          <p className="px-6 pb-6 text-base md:text-lg text-muted-foreground leading-relaxed">{f.a}</p>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                </Reveal>
+          </Reveal>
+
+          <Reveal delay={0.15}>
+            <div className="mt-12 inline-flex items-center justify-center w-20 h-20 rounded-full gold-border shadow-gold">
+              <MessageCircleQuestionIcon className="w-9 h-9 text-gold" />
+            </div>
+          </Reveal>
+        </section>
+
+        <section className="max-w-5xl mx-auto px-6 lg:px-10 pb-6">
+          <Reveal>
+            <div className="flex flex-wrap gap-3 justify-center">
+              {CATEGORIES.map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => handleCategoryChange(cat.id)}
+                  className={`px-6 py-2.5 rounded-full text-sm transition-all duration-300 border ${
+                    activeCategory === cat.id
+                      ? "bg-gold/15 border-gold text-gold shadow-gold"
+                      : "border-border text-muted-foreground hover:border-gold/50 hover:text-foreground"
+                  }`}
+                >
+                  {cat.label}
+                </button>
               ))}
             </div>
-          )}
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="py-24 md:py-32 bg-deep relative overflow-hidden">
-        <div className="absolute inset-0 bg-hero opacity-40 pointer-events-none" />
-        <div className="relative max-w-4xl mx-auto px-6 lg:px-10 text-center">
-          <Reveal>
-            <span className="eyebrow">— Still unsure?</span>
-            <h2 className="mt-5 text-3xl md:text-4xl text-balance">Didn&apos;t find what you were looking for?</h2>
-            <p className="mt-6 text-base md:text-lg text-muted-foreground mx-auto max-w-xl leading-relaxed">
-              Send a message and we&apos;ll respond personally within 24 hours.
-            </p>
           </Reveal>
-          <Reveal delay={0.1}>
-            <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link to="/contact" className="btn-primary group">
-                Contact Us
-                <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-0.5 transition" />
-              </Link>
-              <Link to="/book" className="btn-secondary">Book a Session</Link>
+        </section>
+
+        <section className="max-w-3xl mx-auto px-6 lg:px-10 pb-28">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeCategory}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+              className="space-y-3"
+            >
+              {activeQuestions.map((item, i) => {
+                const isOpen = openIndex === i;
+                return (
+                  <Reveal key={i} delay={i * 0.05}>
+                    <div
+                      className={`glass-card rounded-2xl border transition-all duration-300 ${
+                        isOpen
+                          ? "border-gold/60 shadow-gold"
+                          : "border-border hover:border-gold/30"
+                      }`}
+                    >
+                      <button
+                        onClick={() => toggle(i)}
+                        className="w-full flex items-center justify-between gap-4 px-7 py-6 text-left"
+                        aria-expanded={isOpen}
+                      >
+                        <span
+                          className={`font-medium text-base leading-snug transition-colors ${
+                            isOpen ? "text-gold" : "text-foreground"
+                          }`}
+                        >
+                          {item.q}
+                        </span>
+                        <span
+                          className={`shrink-0 flex items-center justify-center w-8 h-8 rounded-full border transition-all ${
+                            isOpen
+                              ? "border-gold bg-gold/10 text-gold rotate-0"
+                              : "border-border text-muted-foreground"
+                          }`}
+                        >
+                          {isOpen ? (
+                            <MinusIcon className="w-4 h-4" />
+                          ) : (
+                            <PlusIcon className="w-4 h-4" />
+                          )}
+                        </span>
+                      </button>
+
+                      <AnimatePresence initial={false}>
+                        {isOpen && (
+                          <motion.div
+                            key="answer"
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                            className="overflow-hidden"
+                          >
+                            <p className="px-7 pb-7 text-muted-foreground leading-relaxed">
+                              {item.a}
+                            </p>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  </Reveal>
+                );
+              })}
+            </motion.div>
+          </AnimatePresence>
+        </section>
+
+        <section className="max-w-3xl mx-auto px-6 lg:px-10 pb-28">
+          <Reveal>
+            <div className="glass-card rounded-3xl p-10 md:p-14 text-center border border-gold/20 shadow-elegant relative overflow-hidden">
+              <div
+                className="pointer-events-none absolute inset-0 opacity-10"
+                style={{
+                  background:
+                    "radial-gradient(ellipse at 50% 0%, var(--gold), transparent 70%)",
+                }}
+              />
+              <span className="text-xs uppercase tracking-[0.35em] text-gold">
+                Still curious?
+              </span>
+              <h2 className="mt-4 text-3xl md:text-4xl">
+                Didn&apos;t find your answer?
+              </h2>
+              <p className="mt-4 text-muted-foreground max-w-md mx-auto">
+                Reach out directly. Every question is welcome. A response lands
+                in your inbox within 24 hours.
+              </p>
+              <div className="mt-8 flex flex-wrap gap-4 justify-center">
+                <a
+                  href="mailto:thepreceptor1111@gmail.com"
+                  className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-primary text-primary-foreground font-medium shadow-gold hover:scale-[1.03] transition"
+                >
+                  Ask a Question <ArrowRightIcon className="w-4 h-4" />
+                </a>
+                <Link
+                  to="/book"
+                  className="btn-primary inline-flex items-center gap-2"
+                >
+                  Book a Session <ArrowRightIcon className="w-4 h-4" />
+                </Link>
+              </div>
             </div>
           </Reveal>
-        </div>
-      </section>
-
-    </div>
+        </section>
+      </div>
+    </>
   );
 }
