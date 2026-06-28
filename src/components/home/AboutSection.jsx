@@ -23,20 +23,30 @@ export function AboutSection() {
     <section className="relative overflow-hidden">
       <div className="grid lg:grid-cols-2 items-stretch min-h-[600px] lg:min-h-[680px]">
 
-        {/* ── Left: image flush to edge ── */}
+        {/* ── Left: image with margin + rounded corners ── */}
         <Reveal delay={0.1}>
-          <div className="relative overflow-hidden h-full min-h-[420px] lg:min-h-[680px]">
-            <img
-              src={imageSrc}
-              alt={imageAlt}
-              loading="lazy"
-              decoding="async"
-              width={640}
-              height={720}
-              className="absolute inset-0 w-full h-full object-cover"
-            />
-            {/* subtle bottom fade so image bleeds into background */}
-            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background/80 to-transparent pointer-events-none z-10" />
+          <div className="relative p-6 lg:p-10 flex items-center justify-center h-full">
+            <div
+              className="relative w-full rounded-2xl overflow-hidden"
+              style={{ maxHeight: "580px", aspectRatio: "4/5" }}
+              onMouseEnter={e => e.currentTarget.style.transform = "scale(1.02)"}
+              onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
+              transition= "transform 0.5s cubic-bezier(0.22,1,0.36,1)"
+            >
+              <div className="absolute inset-0 rounded-2xl ring-1 ring-gold/20 pointer-events-none z-10" />
+              <img
+                src={imageSrc}
+                alt={imageAlt}
+                loading="lazy"
+                decoding="async"
+                width={640}
+                height={720}
+                className="absolute inset-0 w-full h-full object-cover"
+                style={{ transition: "transform 0.5s cubic-bezier(0.22,1,0.36,1)" }}
+              />
+              {/* subtle bottom fade */}
+              <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background/80 to-transparent pointer-events-none z-10" />
+            </div>
           </div>
         </Reveal>
 
