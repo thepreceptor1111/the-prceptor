@@ -95,7 +95,7 @@ export default function Footer() {
         <div className="md:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-8">
 
           <div>
-            <h3 className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-5">Explore</h3>
+            <h4 className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-5">Explore</h4>
             <ul className="space-y-3">
               {footerLinks.explore.map((l) => (
                 <li key={l.to}>
@@ -108,7 +108,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-5">Legal</h3>
+            <h4 className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-5">Legal</h4>
             <ul className="space-y-3">
               {footerLinks.legal.map((l) => (
                 <li key={l.to}>
@@ -122,7 +122,7 @@ export default function Footer() {
 
           {/* Contact — spans full width on mobile so email has room to breathe */}
           <div className="col-span-2 sm:col-span-1">
-            <h3 className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-5">Contact</h3>
+            <h4 className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-5">Contact</h4>
             <ul className="space-y-3">
 
               {/* Email — min-w-0 + truncate keeps it on one line; title shows full address on hover */}
@@ -139,7 +139,7 @@ export default function Footer() {
 
               <li className="flex items-center gap-2 text-sm text-muted-foreground">
                 <MapPinIcon className="w-3.5 h-3.5 text-gold shrink-0" />
-                India — Worldwide
+                Worldwide
               </li>
             </ul>
           </div>

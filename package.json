@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "playwright test"
   },
   "dependencies": {
     "@calcom/embed-react": "^1.5.0",
@@ -25,6 +26,7 @@
     "tw-animate-css": "^1.2.5"
   },
   "devDependencies": {
+    "@playwright/test": "^1.46.0",
     "@tailwindcss/vite": "^4.0.0",
     "@vitejs/plugin-react": "^4.3.4",
     "tailwindcss": "^4.0.0",

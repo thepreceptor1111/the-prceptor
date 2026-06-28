@@ -432,14 +432,14 @@ function ContactPage() {
                     options={consultationTypes}
                     value={data.consultationType}
                     onChange={(v) => setData((prev) => ({ ...prev, consultationType: v }))}
-                    placeholder="Type to search or scroll\u2026"
+                    placeholder="Type to search or scroll"
                   />
                 </Field>
                 <Field label="Subject" error={errors.subject} className="sm:col-span-2">
                   <input value={data.subject} onChange={update("subject")} className={inputCls} placeholder="What can we help you with?" />
                 </Field>
                 <Field label="Your Message" error={errors.message} className="sm:col-span-2">
-                  <textarea rows={6} value={data.message} onChange={update("message")} className={`${inputCls} resize-none`} placeholder="Share what&#39;s on your mind\u2026" />
+                  <textarea rows={6} value={data.message} onChange={update("message")} className={`${inputCls} resize-none`} placeholder="Share what&#39;s on your mind" />
                 </Field>
               </div>
 
@@ -449,7 +449,7 @@ function ContactPage() {
                 </p>
                 <button type="submit" disabled={sending || sent}
                   className="btn-primary group disabled:opacity-60 disabled:cursor-not-allowed">
-                  {sending ? "Sending\u2026" : sent ? "Message Sent" : "Send Message"}
+                  {sending ? "Sending" : sent ? "Message Sent" : "Send Message"}
                   {!sending && !sent && <SendIcon className="w-4 h-4 group-hover:translate-x-0.5 transition" />}
                 </button>
               </div>
