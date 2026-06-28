@@ -4,7 +4,6 @@ import aboutImg from "@/assets/about-section.jpg?format=webp&quality=80";
 import { Reveal } from "@/components/site/Reveal";
 import { useSiteSettings } from "@/lib/useSiteSettings";
 
-// ── Inline SVG icons — no lucide-react ──────────────────────────
 function MailIcon({ className }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -47,7 +46,6 @@ export default function AboutWrapper() {
 
 function AboutContent() {
   const { settings } = useSiteSettings();
-
   const email = settings?.email ?? SITE.email;
 
   function handleContactSubmit(e) {
@@ -63,41 +61,47 @@ function AboutContent() {
   return (
     <div className="bg-hero starfield">
 
-      {/* ── Hero ── */}
+      {/* ── Hero ── fills 100vh, art visible top, text anchored bottom */}
       <section
-        className="relative w-full min-h-[90vh] flex items-center justify-center overflow-hidden"
+        className="relative w-full flex flex-col justify-end overflow-hidden"
         style={{
+          minHeight: "100svh",
           backgroundImage: `url(${aboutImg})`,
-          backgroundPosition: "50% 30%",
+          backgroundPosition: "50% 20%",
           backgroundSize: "cover",
           backgroundRepeat: "no-repeat",
         }}
       >
-        {/* 4-edge vignette — vivid centre, dark edges */}
+        {/* Vignette — clear in upper-centre so ram is vivid, heavy at bottom behind text */}
         <div
-          className="absolute inset-0"
+          className="absolute inset-0 pointer-events-none"
           style={{
             background: [
-              "radial-gradient(ellipse 80% 80% at 50% 50%, transparent 30%, rgba(10,8,18,0.55) 70%, rgba(10,8,18,0.88) 100%)",
-              "linear-gradient(to bottom, rgba(10,8,18,0.52) 0%, transparent 22%, transparent 72%, rgba(10,8,18,0.75) 100%)",
+              /* top edge — very light so zodiac wheel & horns show */
+              "linear-gradient(to bottom, rgba(10,8,18,0.35) 0%, transparent 18%)",
+              /* bottom ramp — heavy dark so text is readable */
+              "linear-gradient(to top, rgba(10,8,18,0.92) 0%, rgba(10,8,18,0.6) 28%, transparent 55%)",
+              /* side edges — subtle */
+              "linear-gradient(to right, rgba(10,8,18,0.25) 0%, transparent 12%, transparent 88%, rgba(10,8,18,0.25) 100%)",
             ].join(", "),
           }}
         />
 
+        {/* Text block — anchored to bottom, never obscures the art above */}
         <Reveal>
-          <div className="relative z-10 text-center px-6 pb-10" style={{ marginTop: "-2rem" }}>
+          <div className="relative z-10 text-center px-6 pb-16 pt-0">
 
             {/* Eyebrow */}
-            <span className="block text-xs uppercase tracking-[0.38em] text-gold mb-6">
+            <span className="block text-xs uppercase tracking-[0.38em] text-gold mb-4">
               Our Story
             </span>
 
-            {/* Line 1 — 'About The' — lightweight, gold */}
+            {/* Line 1 — 'About The' */}
             <h1
               className="font-light leading-[1.1]"
               style={{
                 fontFamily: "var(--font-serif)",
-                fontSize: "clamp(2rem, 4vw, 3.5rem)",
+                fontSize: "clamp(1.8rem, 3.5vw, 3rem)",
                 color: "var(--color-gold)",
                 letterSpacing: "0.02em",
               }}
@@ -105,19 +109,20 @@ function AboutContent() {
               About The
             </h1>
 
-            {/* Line 2 — 'PRECEPTOR' — large, bold, gold gradient */}
+            {/* Line 2 — 'PRECEPTOR' — large but width-capped so it never bleeds */}
             <div
-              className="font-bold leading-none tracking-[0.22em] bg-gradient-gold bg-clip-text text-transparent"
+              className="font-bold leading-none bg-gradient-gold bg-clip-text text-transparent mx-auto"
               style={{
                 fontFamily: "var(--font-serif)",
-                fontSize: "clamp(4rem, 10vw, 8.5rem)",
-                marginTop: "0.1em",
+                fontSize: "clamp(3rem, 7vw, 6.5rem)",
+                letterSpacing: "0.18em",
+                marginTop: "0.08em",
+                maxWidth: "90vw",
               }}
               aria-hidden="true"
             >
               PRECEPTOR
             </div>
-            {/* sr-only for accessibility since h1 above already says 'About The' */}
             <span className="sr-only">Preceptor</span>
 
           </div>
