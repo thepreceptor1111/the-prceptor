@@ -224,10 +224,12 @@ export default function QnAPage() {
             <h1 className="mt-6 text-5xl md:text-7xl leading-[1.05] bg-gradient-gold bg-clip-text text-transparent">
               {settings?.faqSectionHeading ?? "Everything you want to know."}
             </h1>
-            <p className="mt-6 text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-              From how sessions work to the deeper philosophy behind the practice,
-              find honest, clear answers below.
-            </p>
+            <div className="mt-6 flex justify-center">
+              <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl text-center" style={{ textAlign: 'center' }}>
+                From how sessions work to the deeper philosophy behind the practice,
+                find honest, clear answers below.
+              </p>
+            </div>
           </Reveal>
 
           <Reveal delay={0.15}>
@@ -358,9 +360,9 @@ export default function QnAPage() {
                 </a>
                 <Link
                   to="/book"
-                  className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full gold-border text-foreground hover:bg-gold/10 transition"
+                  className="btn-primary inline-flex items-center gap-2"
                 >
-                  Book a Session
+                  Book a Session <ArrowRightIcon className="w-4 h-4" />
                 </Link>
               </div>
             </div>

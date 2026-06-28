@@ -85,7 +85,7 @@ export default function ShopPage() {
 
       <div className="bg-hero starfield min-h-screen">
         <section className="max-w-5xl mx-auto px-6 lg:px-10 py-24 lg:py-32 text-center">
-          <Reveal>
+          <Reveal className="text-center">
             <motion.div
               animate={{ rotate: [0, 360] }}
               transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
@@ -100,9 +100,11 @@ export default function ShopPage() {
 
             <h1 className="mt-4 text-6xl md:text-7xl">Coming Soon.</h1>
 
-            <p className="mt-6 text-lg text-muted-foreground max-w-xl mx-auto">
-              A curated collection of ebooks and courses, crafted with the same care as our consultations.
-            </p>
+            <div className="mt-6 max-w-xl mx-auto text-center">
+              <p className="text-lg text-muted-foreground">
+                A curated collection of ebooks and courses, crafted with the same care as our consultations.
+              </p>
+            </div>
           </Reveal>
 
           <Reveal delay={0.15}>

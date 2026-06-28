@@ -345,7 +345,7 @@ export default function ServicesPage() {
                               )}
                             </div>
                             <div className="flex-1">
-                              <h2 className="text-2xl font-serif leading-snug">{s.title}</h2>
+                              <h4 className="text-2xl font-serif leading-snug">{s.title}</h4>
                               <p className="mt-3 text-muted-foreground text-sm leading-relaxed">{s.desc}</p>
                             </div>
                             <div className="flex items-center justify-between pt-4 border-t border-gold/10">

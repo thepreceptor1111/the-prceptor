@@ -134,7 +134,7 @@ function LockScreen({ onUnlock }) {
             </div>
           </div>
 
-          <h1 className="text-center text-2xl font-serif text-gold mb-1">Command Centre</h1>
+          <h4 className="text-center text-2xl font-serif text-gold mb-1">Command Centre</h4>
           <p className="text-center text-xs text-muted-foreground tracking-widest uppercase mb-8">
             Restricted Access
           </p>

@@ -95,7 +95,7 @@ export default function Footer() {
         <div className="md:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-8">
 
           <div>
-            <h4 className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-5">Explore</h4>
+            <h6 className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-5">Explore</h6>
             <ul className="space-y-3">
               {footerLinks.explore.map((l) => (
                 <li key={l.to}>
@@ -108,7 +108,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-5">Legal</h4>
+            <h6 className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-5">Legal</h6>
             <ul className="space-y-3">
               {footerLinks.legal.map((l) => (
                 <li key={l.to}>
@@ -122,7 +122,7 @@ export default function Footer() {
 
           {/* Contact — spans full width on mobile so email has room to breathe */}
           <div className="col-span-2 sm:col-span-1">
-            <h4 className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-5">Contact</h4>
+            <h6 className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-5">Contact</h6>
             <ul className="space-y-3">
 
               {/* Email — min-w-0 + truncate keeps it on one line; title shows full address on hover */}
