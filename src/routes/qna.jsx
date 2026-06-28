@@ -222,8 +222,8 @@ export default function QnAPage() {
               <SparklesIcon className="w-3.5 h-3.5" /> Questions &amp; Answers
             </motion.span>
             <h1
-              className="mt-6 text-5xl md:text-7xl leading-[1.05] bg-gradient-gold bg-clip-text text-transparent"
-              style={{ fontFamily: "var(--font-serif)" }}
+              className="mt-6 leading-[1.05] bg-gradient-gold bg-clip-text text-transparent"
+              style={{ fontFamily: "var(--font-serif)", fontSize: "clamp(2.5rem, 5vw, 4.5rem)" }}
             >
               {settings?.faqSectionHeading ?? "Everything you want to know."}
             </h1>
@@ -320,7 +320,7 @@ export default function QnAPage() {
                             transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                             className="overflow-hidden"
                           >
-                            <p className="px-7 pb-7 text-muted-foreground leading-relaxed">
+                            <p className="px-7 pb-7 text-base text-muted-foreground leading-relaxed">
                               {item.a}
                             </p>
                           </motion.div>
@@ -350,7 +350,7 @@ export default function QnAPage() {
               <h2 className="mt-4 text-3xl md:text-4xl">
                 Didn&apos;t find your answer?
               </h2>
-              <p className="mt-4 text-muted-foreground max-w-md mx-auto">
+              <p className="mt-4 text-base text-muted-foreground max-w-md mx-auto">
                 Reach out directly. Every question is welcome. A response lands
                 in your inbox within 24 hours.
               </p>
