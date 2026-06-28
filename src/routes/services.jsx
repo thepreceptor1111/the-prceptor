@@ -11,7 +11,6 @@ import { useSiteSettings } from "@/lib/useSiteSettings";
 import { useOfferActive } from "@/lib/useOfferActive";
 import { SERVICES_QUERY } from "@/lib/sanityQueries";
 
-// ── Inline SVG icons ───────────────────────────────────────────────────
 function ArrowRightIcon({ className }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -208,7 +207,6 @@ export default function ServicesPage() {
   const { data: cmsServices, loading } = useSanity(SERVICES_QUERY, null);
   const { settings } = useSiteSettings();
   const [activeTab, setActiveTab] = useState('all');
-  // Only show the crossed-out original price while the offer is live.
   const offerActive = useOfferActive();
 
   const raw = cmsServices && cmsServices.length > 0 ? cmsServices : SERVICES;
@@ -306,7 +304,7 @@ export default function ServicesPage() {
             {loading ? (
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="glass-card rounded-2xl p-8 h-64 animate-pulse" />
+                  <div key={i} className="rounded-2xl p-8 h-64 animate-pulse bg-[#1a1825]" />
                 ))}
               </div>
             ) : (
@@ -321,21 +319,17 @@ export default function ServicesPage() {
                 >
                   {filtered.map((s, i) => {
                     const Icon = ICON_MAP[s.icon] || StarIcon;
-                    // When offer is active: show discounted price (s.price) with originalPrice struck through.
-                    // When offer has expired: show the original price (s.originalPrice) with no strikethrough.
-                    // If there is no originalPrice, always show s.price regardless of offer state.
                     const displayedPrice = !offerActive && s.originalPrice ? s.originalPrice : s.price;
                     return (
                       <Reveal key={s.slug} delay={i * 0.06}>
                         <motion.div
                           whileHover={{ y: -6 }}
                           transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                          className="glass-card glow-gold-hover rounded-2xl p-8 flex flex-col gap-3 group hover:border-primary/40 relative overflow-hidden"
+                          className="bg-[#1a1825] border border-white/5 rounded-2xl p-8 flex flex-col gap-3 group hover:border-primary/40 relative overflow-hidden"
                         >
-                          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,oklch(0.82_0.12_85_/_0.06),transparent_40%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                           <div className="relative z-10 flex flex-col gap-3 h-full">
-                            <div className="w-12 h-12 rounded-full bg-primary/10 text-gold flex items-center justify-center">
-                              <Icon className="w-5 h-5" />
+                            <div className="w-10 h-10 rounded-full bg-white/5 text-gold flex items-center justify-center">
+                              <Icon className="w-4 h-4" />
                             </div>
                             <div className="flex flex-wrap gap-1.5">
                               {s.isPopular && (
