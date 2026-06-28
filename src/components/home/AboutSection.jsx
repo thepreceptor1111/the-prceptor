@@ -180,7 +180,7 @@ export function AboutSection() {
 
             <h2
               className="text-4xl md:text-5xl leading-[1.08]"
-              style={{ fontFamily: "var(--font-serif)", fontWeight: 400 }}
+              style={{ fontFamily: "var(--font-serif)", fontWeight: 300 }}
             >
               <span className="block">{heading1}</span>
               <span className="block bg-gradient-gold italic">{heading2Gold}</span>
