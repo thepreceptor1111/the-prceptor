@@ -354,7 +354,7 @@ export default function QnAPage() {
                 Didn&apos;t find your answer?
               </h2>
               <p
-                className="mt-4 text-base text-muted-foreground max-w-md mx-auto"
+                className="mt-4 text-base text-muted-foreground"
                 style={{ textAlign: "center" }}
               >
                 Reach out directly. Every question is welcome. A response lands
