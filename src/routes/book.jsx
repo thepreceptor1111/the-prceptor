@@ -220,6 +220,7 @@ function IntroStep({ onStart }) {
       <motion.h1
         initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
         className="mt-6 text-5xl md:text-7xl leading-[1.05] bg-gradient-gold bg-clip-text text-transparent"
+        style={{ fontFamily: "var(--font-serif)" }}
       >
         Begin Your Spiritual Consultation
       </motion.h1>
@@ -311,12 +312,12 @@ function BookingFailedBanner({ onDismiss }) {
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-foreground leading-snug">
-            We couldn’t complete your booking.
+            We couldn't complete your booking.
           </p>
           <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">
-            This usually happens when the selected time slot doesn’t align with your timezone.
+            This usually happens when the selected time slot doesn't align with your timezone.
             Please <strong className="text-foreground font-medium">try a different time slot</strong>,
-            or reach us directly and we’ll schedule your session manually.
+            or reach us directly and we'll schedule your session manually.
           </p>
           <a
             href={`mailto:${siteConfig.email}?subject=Session%20Booking%20Help`}
