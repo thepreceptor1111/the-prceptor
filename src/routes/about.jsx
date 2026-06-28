@@ -61,7 +61,7 @@ function AboutContent() {
   return (
     <div className="bg-hero starfield">
 
-      {/* ── Hero ── fills 100vh, art visible top, text anchored bottom */}
+      {/* ── Hero: 100svh, art fills top, text anchors bottom ── */}
       <section
         className="relative w-full flex flex-col justify-end overflow-hidden"
         style={{
@@ -72,51 +72,59 @@ function AboutContent() {
           backgroundRepeat: "no-repeat",
         }}
       >
-        {/* Vignette — clear in upper-centre so ram is vivid, heavy at bottom behind text */}
+        {/* Vignette — clear upper-centre, heavy bottom ramp */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
             background: [
-              /* top edge — very light so zodiac wheel & horns show */
               "linear-gradient(to bottom, rgba(10,8,18,0.35) 0%, transparent 18%)",
-              /* bottom ramp — heavy dark so text is readable */
               "linear-gradient(to top, rgba(10,8,18,0.92) 0%, rgba(10,8,18,0.6) 28%, transparent 55%)",
-              /* side edges — subtle */
               "linear-gradient(to right, rgba(10,8,18,0.25) 0%, transparent 12%, transparent 88%, rgba(10,8,18,0.25) 100%)",
             ].join(", "),
           }}
         />
 
-        {/* Text block — anchored to bottom, never obscures the art above */}
         <Reveal>
-          <div className="relative z-10 text-center px-6 pb-16 pt-0">
+          <div className="relative z-10 text-center px-6 pb-16">
 
             {/* Eyebrow */}
-            <span className="block text-xs uppercase tracking-[0.38em] text-gold mb-4">
+            <span
+              className="block uppercase text-gold mb-4"
+              style={{
+                fontFamily: "var(--font-sans)",
+                fontSize: "0.7rem",
+                letterSpacing: "0.38em",
+                fontWeight: 500,
+              }}
+            >
               Our Story
             </span>
 
-            {/* Line 1 — 'About The' */}
+            {/* Line 1 — 'About The' — Cormorant Garamond 300, gold */}
             <h1
-              className="font-light leading-[1.1]"
               style={{
-                fontFamily: "var(--font-serif)",
+                fontFamily: "var(--font-display)",
                 fontSize: "clamp(1.8rem, 3.5vw, 3rem)",
+                fontWeight: 300,
                 color: "var(--color-gold)",
-                letterSpacing: "0.02em",
+                letterSpacing: "0.04em",
+                lineHeight: 1.1,
+                margin: 0,
               }}
             >
               About The
             </h1>
 
-            {/* Line 2 — 'PRECEPTOR' — large but width-capped so it never bleeds */}
+            {/* Line 2 — 'PRECEPTOR' — Cormorant Garamond 600, gold gradient */}
             <div
-              className="font-bold leading-none bg-gradient-gold bg-clip-text text-transparent mx-auto"
+              className="bg-gradient-gold bg-clip-text text-transparent mx-auto"
               style={{
-                fontFamily: "var(--font-serif)",
+                fontFamily: "var(--font-display)",
                 fontSize: "clamp(3rem, 7vw, 6.5rem)",
+                fontWeight: 600,
                 letterSpacing: "0.18em",
-                marginTop: "0.08em",
+                lineHeight: 1,
+                marginTop: "0.06em",
                 maxWidth: "90vw",
               }}
               aria-hidden="true"
