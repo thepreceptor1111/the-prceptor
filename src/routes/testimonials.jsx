@@ -185,7 +185,7 @@ function ScreenshotCard({ r, cardH, stripH, isActive = false, showControls = fal
             {r.avatarInitial || r.name.charAt(0).toUpperCase()}
           </div>
           <div style={{ textAlign: "left" }}>
-            <p style={{ color: "#d4af37", fontFamily: "serif", fontWeight: 500, fontSize: "0.95rem", lineHeight: 1.2 }}>
+            <p style={{ color: "#d4af37", fontFamily: "var(--font-serif)", fontWeight: 500, fontSize: "0.95rem", lineHeight: 1.2 }}>
               {r.name}
             </p>
             {r.country && (

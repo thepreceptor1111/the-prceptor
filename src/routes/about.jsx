@@ -64,31 +64,28 @@ function AboutContent() {
     <div className="bg-hero starfield">
 
       {/* Hero */}
-      <section className="relative w-full min-h-[70vh] flex items-center justify-center overflow-hidden">
-        <img
-          src={aboutImg}
-          alt=""
-          aria-hidden="true"
-          width={1800}
-          height={1200}
-          loading="eager"
-          decoding="async"
-          className="absolute inset-0 w-full h-full object-cover object-center"
-          style={{ opacity: 0.50 }}
-        />
+      <section
+        className="relative w-full min-h-[60vh] flex items-center justify-center overflow-hidden"
+        style={{
+          backgroundImage: `url(${aboutImg})`,
+          backgroundPosition: "50% 50%",
+          backgroundSize: "cover",
+          backgroundRepeat: "no-repeat",
+        }}
+      >
         <div
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(to bottom, rgba(10,8,18,0.30) 0%, rgba(10,8,18,0.10) 40%, rgba(10,8,18,0.65) 100%)",
+              "linear-gradient(to bottom, rgba(10,8,18,0.9) 0%, rgba(10,8,18,0.4) 40%, rgba(10,8,18,0.9) 100%)",
           }}
         />
         <Reveal>
-          <div className="relative z-10 text-center px-6 py-24">
+          <div className="relative z-10 text-center px-6 py-20">
             <span className="block text-xs uppercase tracking-[0.4em] text-gold mb-6">
               Our Story
             </span>
-            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-light leading-[1.05] bg-gradient-gold">
+            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-light leading-[1.05] text-white">
               About The
               <br />
               <span className="tracking-[0.15em] font-semibold">PRECEPTOR</span>

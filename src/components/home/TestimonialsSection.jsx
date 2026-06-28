@@ -224,7 +224,7 @@ export function TestimonialsSection({ initialTestimonials = null, testimonialsLo
                         {t.avatarInitial || t.name.charAt(0).toUpperCase()}
                       </div>
                       <div style={{ textAlign: "left" }}>
-                        <p style={{ color: "#d4af37", fontFamily: "serif", fontWeight: 500, fontSize: "0.95rem", lineHeight: 1.2 }}>
+                        <p style={{ color: "#d4af37", fontFamily: "var(--font-serif)", fontWeight: 500, fontSize: "0.95rem", lineHeight: 1.2 }}>
                           {t.name}
                         </p>
                         {t.country && (

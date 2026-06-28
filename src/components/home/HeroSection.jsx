@@ -86,7 +86,7 @@ function StaggeredHeading({ line1, line2Gold, delay = 0 }) {
     <h1
       className="mt-6 sm:mt-8 leading-[1.04]"
       style={{
-        fontFamily: "var(--font-serif)",
+        fontFamily: "var(--font-display)",
         fontSize: "clamp(2rem, 5vw + 0.5rem, 5.75rem)",
         letterSpacing: "-0.025em",
         fontWeight: 400,
@@ -301,7 +301,7 @@ export function HeroSection() {
             initial={{ opacity: 0, x: -14 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 1.4, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-            className="mt-7 sm:mt-10 flex flex-col xs:flex-row flex-wrap items-start xs:items-center gap-3 sm:gap-4"
+            className="mt-7 sm:mt-10 flex flex-col sm:flex-row items-center gap-3 sm:gap-4"
           >
             <motion.div
               animate={{ boxShadow: ["0 0 0 0 oklch(0.82 0.12 85 / 0.0)", "0 0 0 10px oklch(0.82 0.12 85 / 0.12)", "0 0 0 20px oklch(0.82 0.12 85 / 0.0)"] }}
