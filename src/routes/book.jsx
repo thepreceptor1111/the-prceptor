@@ -225,18 +225,12 @@ function IntroStep({ onStart }) {
         Begin Your Spiritual Consultation
       </motion.h1>
 
-      {/*
-        Inline textAlign:"center" is required here.
-        The global styles.css rule  p, li, figcaption { text-wrap: pretty }
-        causes Chromium to reset text-align to "start" on constrained <p> blocks
-        (max-w-xl creates a new block formatting context).
-        Tailwind utility text-center loses the cascade battle against that global
-        rule in Tailwind v4's @layer ordering. Inline style wins unconditionally.
-      */}
+      {/* !text-center uses Tailwind v4's !important modifier to beat the global
+          p {} rule in styles.css which sits outside @layer and wins the cascade
+          over regular Tailwind utilities. */}
       <motion.p
         initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
-        className="mt-6 text-lg text-muted-foreground leading-relaxed max-w-xl mx-auto"
-        style={{ textAlign: "center" }}
+        className="mt-6 text-lg text-muted-foreground leading-relaxed max-w-xl mx-auto !text-center"
       >
         A calm, private space to explore your chart with clarity and care.
         Each session is crafted around your story, guided by quiet intention.
@@ -255,7 +249,7 @@ function IntroStep({ onStart }) {
             className="glass-card rounded-2xl p-5"
           >
             <item.icon className="w-5 h-5 text-gold mx-auto" />
-            <p className="mt-3 text-sm text-foreground/90">{item.label}</p>
+            <p className="mt-3 text-sm text-foreground/90 !text-center">{item.label}</p>
           </motion.div>
         ))}
       </div>
@@ -264,7 +258,7 @@ function IntroStep({ onStart }) {
         initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
         className="mt-10 max-w-lg mx-auto glass-card rounded-2xl p-6 text-left"
       >
-        <p className="text-xs uppercase tracking-[0.3em] text-gold mb-5 text-center">How it works</p>
+        <p className="text-xs uppercase tracking-[0.3em] text-gold mb-5 !text-center">How it works</p>
         <div className="space-y-4">
           {[
             { icon: CalendarDaysIcon, step: "01", text: "Choose your date & time slot" },
@@ -290,7 +284,7 @@ function IntroStep({ onStart }) {
 
       <motion.p
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}
-        className="mt-5 text-xs text-muted-foreground tracking-wide"
+        className="mt-5 text-xs text-muted-foreground tracking-wide !text-center"
       >
         Takes about 3 minutes · Confirmed instantly
       </motion.p>
@@ -464,7 +458,7 @@ function CalStep({ onBack, onBooked }) {
       <div className="max-w-2xl mx-auto">
         <span className="text-xs uppercase tracking-[0.35em] text-gold">Book Your Session</span>
         <h2 className="mt-3 text-4xl md:text-5xl">Choose your time</h2>
-        <p className="mt-4 text-muted-foreground" style={{ textAlign: "center" }}>
+        <p className="mt-4 text-muted-foreground !text-center">
           Pick a date and slot, then fill in your details on the next screen.
           All times are shown in your local timezone.
         </p>
@@ -551,8 +545,7 @@ function ConfirmedStep({ bookedData }) {
 
       <motion.p
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }}
-        className="mt-4 text-muted-foreground max-w-md mx-auto"
-        style={{ textAlign: "center" }}
+        className="mt-4 text-muted-foreground max-w-md mx-auto !text-center"
       >
         {firstName !== "friend" ? `Thank you, ${firstName}.` : "Thank you."} Your private
         consultation is booked. A calendar invite and meeting link are on their way to your inbox.
@@ -566,7 +559,7 @@ function ConfirmedStep({ bookedData }) {
         {name      && <SummaryRow label="Name"        value={name} />}
         {email     && <SummaryRow label="Confirmation sent to" value={email} last />}
         {!startTime && !name && !email && (
-          <p className="text-sm text-muted-foreground text-center py-4">Check your email for booking details.</p>
+          <p className="text-sm text-muted-foreground !text-center py-4">Check your email for booking details.</p>
         )}
       </motion.div>
 
