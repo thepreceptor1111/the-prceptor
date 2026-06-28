@@ -301,7 +301,7 @@ export function HeroSection() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.8, duration: 0.9 }}
-            className="mt-8 sm:mt-12 flex flex-wrap items-center gap-3 sm:gap-5 text-sm"
+            className="mt-8 sm:mt-12 flex flex-wrap items-center gap-3 sm:gap-5 text-base"
             style={{ color: "oklch(0.7 0.02 80)" }}
           >
             <div className="flex gap-0.5">
