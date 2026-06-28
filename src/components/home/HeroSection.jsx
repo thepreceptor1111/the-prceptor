@@ -89,7 +89,7 @@ function StaggeredHeading({ line1, line2Gold, delay = 0 }) {
         fontFamily: "var(--font-display)",
         fontSize: "clamp(2rem, 5vw + 0.5rem, 5.75rem)",
         letterSpacing: "-0.035em",
-        fontWeight: 400,
+        fontWeight: 700,
       }}
     >
       <span className="block overflow-hidden">
