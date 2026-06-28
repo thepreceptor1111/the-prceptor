@@ -225,9 +225,12 @@ function IntroStep({ onStart }) {
         Begin Your Spiritual Consultation
       </motion.h1>
 
+      {/* FIX: explicit text-center on the <p> itself so text-wrap:pretty
+          cannot override the inherited alignment when the block is constrained
+          by max-w-xl. Without this, wrapped lines snap to left-aligned. */}
       <motion.p
         initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
-        className="mt-6 text-lg text-muted-foreground leading-relaxed max-w-xl mx-auto"
+        className="mt-6 text-lg text-muted-foreground leading-relaxed max-w-xl mx-auto text-center"
       >
         A calm, private space to explore your chart with clarity and care.
         Each session is crafted around your story, guided by quiet intention.
@@ -451,9 +454,6 @@ function CalStep({ onBack, onBooked }) {
   }, [onBooked]);
 
   return (
-    // FIX B1 + B2: text-center moved to the outer wrapper so the eyebrow
-    // <span>, h2, and feature pills all inherit centering reliably at every
-    // viewport width — previously only the inner max-w-2xl div had it.
     <div className="max-w-5xl mx-auto text-center">
       <div className="max-w-2xl mx-auto">
         <span className="text-xs uppercase tracking-[0.35em] text-gold">Book Your Session</span>
@@ -545,7 +545,7 @@ function ConfirmedStep({ bookedData }) {
 
       <motion.p
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }}
-        className="mt-4 text-muted-foreground max-w-md mx-auto"
+        className="mt-4 text-muted-foreground max-w-md mx-auto text-center"
       >
         {firstName !== "friend" ? `Thank you, ${firstName}.` : "Thank you."} Your private
         consultation is booked. A calendar invite and meeting link are on their way to your inbox.
@@ -571,9 +571,7 @@ function ConfirmedStep({ bookedData }) {
         Check your inbox for the confirmation email &amp; meeting link.
       </motion.div>
 
-      {/* FIX B3: privacy note card uses text-left scoped to itself via the
-          flex row — the outer ConfirmedStep wrapper stays text-center for
-          headings/body; this card is intentionally left-aligned content. */}
+      {/* Privacy note card — intentionally text-left scoped to the card itself */}
       <motion.div
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.65 }}
         className="mt-5 flex items-start gap-3 p-4 rounded-2xl bg-secondary/40 border border-border max-w-md mx-auto text-left"
