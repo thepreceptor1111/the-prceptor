@@ -212,33 +212,53 @@ function ServiceCard({ s, i }) {
           className="bg-[oklch(0.14_0.030_270)] border border-[oklch(0.25_0.020_270)] rounded-2xl p-8 h-full group cursor-pointer hover:border-gold/40 relative overflow-hidden"
         >
           <div className="relative z-10 flex flex-col h-full gap-3">
+
+            {/* Icon */}
             <div className="w-10 h-10 rounded-full bg-gold/10 text-gold flex items-center justify-center">
               <Icon className="w-4 h-4" />
             </div>
+
+            {/* Badges — bumped from text-[10px] to text-xs (12px floor) */}
             <div className="flex flex-wrap gap-1.5">
               {s.isPopular && (
-                <span className="inline-block text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border border-gold/30 text-gold bg-gold/5">Popular</span>
+                <span className="inline-block text-xs uppercase tracking-widest px-2 py-0.5 rounded-full border border-gold/30 text-gold bg-gold/5">Popular</span>
               )}
               {s.badge && (
-                <span className="inline-block text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border border-gold/20 text-gold break-words">{s.badge}</span>
+                <span className="inline-block text-xs uppercase tracking-widest px-2 py-0.5 rounded-full border border-gold/20 text-gold break-words">{s.badge}</span>
               )}
               {s.isSoldOut && (
-                <span className="inline-block text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border border-red-400/30 text-red-400">Sold Out</span>
+                <span className="inline-block text-xs uppercase tracking-widest px-2 py-0.5 rounded-full border border-red-400/30 text-red-400">Sold Out</span>
               )}
             </div>
-            <h4 className="text-xl leading-snug">{s.title}</h4>
-            <p className="text-muted-foreground text-sm leading-relaxed line-clamp-3 flex-1">{s.desc}</p>
+
+            {/* Title — reduced from text-xl → text-base, lighter weight */}
+            <h4
+              className="text-base leading-snug font-medium tracking-wide"
+              style={{ fontFamily: "var(--font-serif)" }}
+            >
+              {s.title}
+            </h4>
+
+            {/* Description — bumped from text-sm → text-base for readability */}
+            <p className="text-muted-foreground text-base leading-relaxed line-clamp-3 flex-1">{s.desc}</p>
+
+            {/* Footer: duration + price */}
             <div className="mt-2 flex items-center justify-between border-t border-gold/10 pt-3">
-              <span className="flex items-center gap-1 text-xs text-gold">
-                <ClockIcon className="w-3 h-3" />{s.duration}
+
+              {/* Duration — bumped from text-xs → text-sm */}
+              <span className="flex items-center gap-1.5 text-sm text-gold">
+                <ClockIcon className="w-3.5 h-3.5" />{s.duration}
               </span>
+
               <div className="flex items-baseline gap-2">
                 {offerActive && s.originalPrice && (
-                  <span className="text-xs text-muted-foreground line-through">{s.originalPrice}</span>
+                  <span className="text-sm text-muted-foreground line-through">{s.originalPrice}</span>
                 )}
-                <span className="font-semibold text-gold text-lg">{displayedPrice}</span>
+                {/* Price — bumped from text-lg → text-xl, semibold */}
+                <span className="font-semibold text-gold text-xl">{displayedPrice}</span>
               </div>
             </div>
+
           </div>
         </motion.div>
       </Link>
