@@ -3,6 +3,27 @@ import { useSiteSettings } from "@/lib/useSiteSettings";
 import { useLenisResize } from "@/hooks/useLenisResize";
 import { ACHIEVEMENTS } from "@/utils/constants";
 
+function AwardIcon({ className }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="8" r="6" />
+      <path d="M8.21 13.89 7 23l5-3 5 3-1.21-9.12" />
+    </svg>
+  );
+}
+
 export function AchievementsSection() {
   useLenisResize();
 
@@ -25,6 +46,9 @@ export function AchievementsSection() {
           {achievements.map((a, i) => (
             <Reveal key={i} delay={i * 0.07}>
               <div className="glass-card rounded-2xl p-8 text-center">
+                <div className="flex justify-center mb-4">
+                  <AwardIcon className="w-6 h-6 text-gold" />
+                </div>
                 <p className="font-serif text-5xl bg-gradient-gold">{a.value}</p>
                 <p className="mt-3 text-xs uppercase tracking-widest text-muted-foreground">{a.label}</p>
               </div>
