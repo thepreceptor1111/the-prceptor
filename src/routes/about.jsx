@@ -3,7 +3,6 @@ import { PAGE_SEO, SITE } from "@/content/seo";
 import aboutImg from "@/assets/about-section.jpg?format=webp&quality=80";
 import { Reveal } from "@/components/site/Reveal";
 import { useSiteSettings } from "@/lib/useSiteSettings";
-import aboutHeroImg from "@/assets/about-section.jpg";
 
 // ── Inline SVG icons — no lucide-react ──────────────────────────
 function MailIcon({ className }) {
@@ -64,46 +63,73 @@ function AboutContent() {
   return (
     <div className="bg-hero starfield">
 
-      {/* Hero */}
+      {/* ── Hero ── */}
       <section
-        className="relative w-full min-h-[60vh] flex items-center justify-center overflow-hidden"
+        className="relative w-full min-h-[90vh] flex items-center justify-center overflow-hidden"
         style={{
           backgroundImage: `url(${aboutImg})`,
-          backgroundPosition: "50% 50%",
+          backgroundPosition: "50% 30%",
           backgroundSize: "cover",
           backgroundRepeat: "no-repeat",
         }}
       >
+        {/* 4-edge vignette — vivid centre, dark edges */}
         <div
           className="absolute inset-0"
           style={{
-            background:
-              "linear-gradient(to bottom, rgba(10,8,18,0.9) 0%, rgba(10,8,18,0.4) 40%, rgba(10,8,18,0.9) 100%)",
+            background: [
+              "radial-gradient(ellipse 80% 80% at 50% 50%, transparent 30%, rgba(10,8,18,0.55) 70%, rgba(10,8,18,0.88) 100%)",
+              "linear-gradient(to bottom, rgba(10,8,18,0.52) 0%, transparent 22%, transparent 72%, rgba(10,8,18,0.75) 100%)",
+            ].join(", "),
           }}
         />
+
         <Reveal>
-          <div className="relative z-10 text-center px-6 py-20">
-            <span className="block text-xs uppercase tracking-[0.4em] text-gold mb-6">
+          <div className="relative z-10 text-center px-6 pb-10" style={{ marginTop: "-2rem" }}>
+
+            {/* Eyebrow */}
+            <span className="block text-xs uppercase tracking-[0.38em] text-gold mb-6">
               Our Story
             </span>
+
+            {/* Line 1 — 'About The' — lightweight, gold */}
             <h1
-              className="font-light leading-[1.05] text-white"
-              style={{ fontFamily: "var(--font-serif)", fontSize: "clamp(2.5rem, 5vw, 4.5rem)" }}
+              className="font-light leading-[1.1]"
+              style={{
+                fontFamily: "var(--font-serif)",
+                fontSize: "clamp(2rem, 4vw, 3.5rem)",
+                color: "var(--color-gold)",
+                letterSpacing: "0.02em",
+              }}
             >
               About The
-              <br />
-              <span className="tracking-[0.15em] font-semibold">PRECEPTOR</span>
             </h1>
+
+            {/* Line 2 — 'PRECEPTOR' — large, bold, gold gradient */}
+            <div
+              className="font-bold leading-none tracking-[0.22em] bg-gradient-gold bg-clip-text text-transparent"
+              style={{
+                fontFamily: "var(--font-serif)",
+                fontSize: "clamp(4rem, 10vw, 8.5rem)",
+                marginTop: "0.1em",
+              }}
+              aria-hidden="true"
+            >
+              PRECEPTOR
+            </div>
+            {/* sr-only for accessibility since h1 above already says 'About The' */}
+            <span className="sr-only">Preceptor</span>
+
           </div>
         </Reveal>
       </section>
 
-      {/* Short intro paragraphs */}
-      <section className="max-w-3xl mx-auto px-6 lg:px-10 py-20">
+      {/* ── Short intro paragraphs ── */}
+      <section className="max-w-3xl mx-auto px-6 lg:px-10 py-20 border-t border-gold/10">
         <Reveal>
           <p className="text-lg text-muted-foreground leading-relaxed">
             {settings?.aboutParagraph1 ??
-              "The Preceptor began as a small private practice for friends seeking real answers. Over 6 years, it has grown into a global consultation studio serving founders, artists, healers, and high-intention seekers across 27+ countries."}
+              "The Preceptor began as a small private practice for friends seeking real answers. Over 7 years, it has grown into a global consultation studio serving founders, artists, healers, and high-intention seekers across 18+ countries."}
           </p>
           <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
             {settings?.aboutParagraph2 ??
@@ -112,7 +138,7 @@ function AboutContent() {
         </Reveal>
       </section>
 
-      {/* How The Preceptor Was Born */}
+      {/* ── How The Preceptor Was Born ── */}
       <section className="max-w-3xl mx-auto px-6 lg:px-10 pb-24">
         <Reveal>
           <h2
@@ -148,7 +174,7 @@ function AboutContent() {
         </div>
       </section>
 
-      {/* Philosophy cards */}
+      {/* ── Philosophy cards ── */}
       <section className="max-w-7xl mx-auto px-6 lg:px-10 pb-20">
         <div className="grid md:grid-cols-3 gap-6">
           {[
@@ -166,7 +192,7 @@ function AboutContent() {
         </div>
       </section>
 
-      {/* Contact */}
+      {/* ── Contact ── */}
       <section className="max-w-7xl mx-auto px-6 lg:px-10 py-20 grid lg:grid-cols-2 gap-12">
         <Reveal>
           <span className="text-xs uppercase tracking-[0.3em] text-gold">Contact</span>
