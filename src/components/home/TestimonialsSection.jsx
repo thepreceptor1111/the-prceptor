@@ -70,13 +70,15 @@ function normalise(t) {
   };
 }
 
-const CARD_HEIGHT = 520;
-const STRIP_H    = 72;
+// Card height: 420px on mobile, 520px on md+
+const CARD_HEIGHT_MOBILE = 420;
+const CARD_HEIGHT_DESK   = 520;
+const STRIP_H            = 72;
 
 /**
  * TestimonialsSection
  *
- * Props (optional — provided by the home route's batched Sanity fetch):
+ * Props (optional — provided by the home route’s batched Sanity fetch):
  *   initialTestimonials  {Array|null}  — pre-fetched testimonials
  *   testimonialsLoading  {boolean}     — loading state from the batched hook
  *
@@ -107,6 +109,19 @@ export function TestimonialsSection({ initialTestimonials = null, testimonialsLo
     : all;
 
   const [idx, setIdx] = useState(0);
+  // Track viewport width to swap card height
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== "undefined" ? window.innerWidth < 768 : false
+  );
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    const handler = (e) => setIsMobile(e.matches);
+    mq.addEventListener("change", handler);
+    setIsMobile(mq.matches);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
   useEffect(() => { setIdx(0); }, [testimonials.length]);
 
   const t = testimonials[idx] ?? testimonials[0];
@@ -129,6 +144,9 @@ export function TestimonialsSection({ initialTestimonials = null, testimonialsLo
 
   const goPrev = () => setIdx((c) => (c + testimonials.length - 1) % testimonials.length);
   const goNext = () => setIdx((c) => (c + 1) % testimonials.length);
+
+  const cardHeight = isMobile ? CARD_HEIGHT_MOBILE : CARD_HEIGHT_DESK;
+  const stripPadding = isMobile ? "0 1rem" : "0 1.75rem";
 
   const NavBtn = ({ onClick, label, children }) => (
     <button onClick={onClick} aria-label={label}
@@ -170,7 +188,7 @@ export function TestimonialsSection({ initialTestimonials = null, testimonialsLo
               exit={{ opacity: 0, scale: 0.97 }}
               transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
               className="mt-14 glass-card rounded-3xl relative"
-              style={{ height: `${CARD_HEIGHT}px` }}
+              style={{ height: `${cardHeight}px` }}
             >
               {hasImage ? (
                 <div style={{ position: "relative", width: "100%", height: "100%", borderRadius: "inherit", overflow: "hidden" }}>
@@ -211,7 +229,7 @@ export function TestimonialsSection({ initialTestimonials = null, testimonialsLo
                     height: `${STRIP_H}px`,
                     display: "flex", alignItems: "center",
                     justifyContent: "space-between",
-                    padding: "0 1.75rem", gap: "1rem", zIndex: 2,
+                    padding: stripPadding, gap: "1rem", zIndex: 2,
                   }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "0.65rem" }}>
                       <div style={{
@@ -242,10 +260,10 @@ export function TestimonialsSection({ initialTestimonials = null, testimonialsLo
                   </div>
                 </div>
               ) : (
-                <div className="p-12 relative z-10 h-full flex flex-col justify-center">
+                <div className="p-6 md:p-12 relative z-10 h-full flex flex-col justify-center">
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,oklch(0.82_0.12_85_/_0.07),transparent_40%)] pointer-events-none" />
                   <Quote className="w-10 h-10 text-gold/30 mx-auto" />
-                  <p className="mt-6 font-serif text-2xl md:text-3xl leading-relaxed">
+                  <p className="mt-6 font-serif text-xl md:text-3xl leading-relaxed max-w-prose mx-auto">
                     &ldquo;{t?.text}&rdquo;
                   </p>
                   <div className="mt-8 flex justify-center gap-1">

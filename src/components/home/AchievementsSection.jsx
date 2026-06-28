@@ -42,14 +42,14 @@ export function AchievementsSection() {
           <span className="text-sm uppercase tracking-[0.3em] text-gold">{sectionLabel}</span>
           <h2 className="mt-4 text-4xl md:text-5xl">{sectionHeading}</h2>
         </Reveal>
-        <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
           {achievements.map((a, i) => (
             <Reveal key={i} delay={i * 0.07}>
-              <div className="glass-card rounded-2xl p-8 text-center">
+              <div className="glass-card rounded-2xl p-5 md:p-8 text-center">
                 <div className="flex justify-center mb-4">
                   <AwardIcon className="w-6 h-6 text-gold" />
                 </div>
-                <p className="font-serif text-5xl bg-gradient-gold">{a.value}</p>
+                <p className="font-serif text-4xl md:text-5xl bg-gradient-gold">{a.value}</p>
                 <p className="mt-3 text-xs uppercase tracking-widest text-muted-foreground">{a.label}</p>
               </div>
             </Reveal>
