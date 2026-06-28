@@ -304,8 +304,8 @@ export default function TestimonialsPage() {
               {settings?.testimonialsSectionLabel ?? "Testimonials"}
             </span>
             <h1
-              className="mt-4 text-5xl md:text-6xl"
-              style={{ fontFamily: "var(--font-serif)" }}
+              className="mt-4"
+              style={{ fontFamily: "var(--font-serif)", fontSize: "clamp(2.5rem, 5vw, 4.5rem)" }}
             >
               {settings?.testimonialsSectionHeading ?? "Stories from the seekers."}
             </h1>
