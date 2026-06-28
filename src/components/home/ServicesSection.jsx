@@ -194,6 +194,11 @@ function ServiceCard({ s, i }) {
   const Icon = ICON_MAP[s.icon] || StarIcon;
   const offerActive = useOfferActive();
 
+  // When offer is active: show discounted price (s.price) with originalPrice struck through.
+  // When offer has expired: show the original price (s.originalPrice) with no strikethrough.
+  // If there is no originalPrice, always show s.price regardless of offer state.
+  const displayedPrice = !offerActive && s.originalPrice ? s.originalPrice : s.price;
+
   return (
     <motion.div
       key={s.slug}
@@ -235,7 +240,7 @@ function ServiceCard({ s, i }) {
                 {offerActive && s.originalPrice && (
                   <span className="text-xs text-muted-foreground line-through">{s.originalPrice}</span>
                 )}
-                <span className="font-semibold text-gold text-lg">{s.price}</span>
+                <span className="font-semibold text-gold text-lg">{displayedPrice}</span>
               </div>
             </div>
           </div>
