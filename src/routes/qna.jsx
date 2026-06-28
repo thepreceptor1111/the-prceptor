@@ -347,10 +347,10 @@ export default function QnAPage() {
               <span className="text-xs uppercase tracking-[0.35em] text-gold">
                 Still curious?
               </span>
-              <h2 className="mt-4 text-3xl md:text-4xl">
+              <h2 className="mt-4 text-xl md:text-2xl">
                 Didn&apos;t find your answer?
               </h2>
-              <p className="mt-4 text-base text-muted-foreground max-w-md mx-auto">
+              <p className="mt-4 text-base text-muted-foreground max-w-md mx-auto text-center">
                 Reach out directly. Every question is welcome. A response lands
                 in your inbox within 24 hours.
               </p>
