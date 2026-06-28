@@ -221,7 +221,10 @@ export default function QnAPage() {
             >
               <SparklesIcon className="w-3.5 h-3.5" /> Questions &amp; Answers
             </motion.span>
-            <h1 className="mt-6 text-5xl md:text-7xl leading-[1.05] bg-gradient-gold bg-clip-text text-transparent">
+            <h1
+              className="mt-6 text-5xl md:text-7xl leading-[1.05] bg-gradient-gold bg-clip-text text-transparent"
+              style={{ fontFamily: "var(--font-serif)" }}
+            >
               {settings?.faqSectionHeading ?? "Everything you want to know."}
             </h1>
             <div className="mt-6 flex justify-center">

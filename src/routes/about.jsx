@@ -85,7 +85,10 @@ function AboutContent() {
             <span className="block text-xs uppercase tracking-[0.4em] text-gold mb-6">
               Our Story
             </span>
-            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-light leading-[1.05] text-white">
+            <h1
+              className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-light leading-[1.05] text-white"
+              style={{ fontFamily: "var(--font-serif)" }}
+            >
               About The
               <br />
               <span className="tracking-[0.15em] font-semibold">PRECEPTOR</span>

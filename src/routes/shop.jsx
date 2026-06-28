@@ -98,7 +98,12 @@ export default function ShopPage() {
               Shop
             </span>
 
-            <h1 className="mt-4 text-6xl md:text-7xl">Coming Soon.</h1>
+            <h1
+              className="mt-4 text-6xl md:text-7xl"
+              style={{ fontFamily: "var(--font-serif)" }}
+            >
+              Coming Soon.
+            </h1>
 
             <div className="mt-6 max-w-xl mx-auto text-center">
               <p className="text-lg text-muted-foreground">

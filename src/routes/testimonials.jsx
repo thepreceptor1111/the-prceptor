@@ -303,7 +303,10 @@ export default function TestimonialsPage() {
             <span className="text-xs uppercase tracking-[0.3em] text-gold">
               {settings?.testimonialsSectionLabel ?? "Testimonials"}
             </span>
-            <h1 className="mt-4 text-5xl md:text-6xl">
+            <h1
+              className="mt-4 text-5xl md:text-6xl"
+              style={{ fontFamily: "var(--font-serif)" }}
+            >
               {settings?.testimonialsSectionHeading ?? "Stories from the seekers."}
             </h1>
             <p className="mt-5 text-muted-foreground">Trust earned, one consultation at a time.</p>
