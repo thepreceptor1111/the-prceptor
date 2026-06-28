@@ -61,13 +61,13 @@ function AboutContent() {
   return (
     <div className="bg-hero starfield">
 
-      {/* ── Hero: 100svh, art fills top, text anchors bottom ── */}
+      {/* ── Hero: 100svh, art fills viewport, face centered, text anchors bottom ── */}
       <section
         className="relative w-full flex flex-col justify-end overflow-hidden"
         style={{
           minHeight: "100svh",
           backgroundImage: `url(${aboutImg})`,
-          backgroundPosition: "50% 20%",
+          backgroundPosition: "50% 55%",
           backgroundSize: "cover",
           backgroundRepeat: "no-repeat",
         }}
@@ -85,7 +85,7 @@ function AboutContent() {
         />
 
         <Reveal>
-          <div className="relative z-10 text-center px-6 pb-16">
+          <div className="relative z-10 text-center px-6 pb-28 md:pb-36">
 
             {/* Eyebrow */}
             <span
@@ -104,7 +104,7 @@ function AboutContent() {
             <h1
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "clamp(1.8rem, 3.5vw, 3rem)",
+                fontSize: "clamp(2.8rem, 4.5vw, 4.2rem)",
                 fontWeight: 300,
                 color: "var(--color-gold)",
                 letterSpacing: "0.04em",
@@ -120,12 +120,12 @@ function AboutContent() {
               className="bg-gradient-gold bg-clip-text text-transparent mx-auto"
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "clamp(3rem, 7vw, 6.5rem)",
+                fontSize: "clamp(4rem, 10vw, 9rem)",
                 fontWeight: 600,
                 letterSpacing: "0.18em",
                 lineHeight: 1,
                 marginTop: "0.06em",
-                maxWidth: "90vw",
+                maxWidth: "95vw",
               }}
               aria-hidden="true"
             >
