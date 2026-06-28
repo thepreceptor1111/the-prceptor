@@ -86,8 +86,8 @@ function AboutContent() {
               Our Story
             </span>
             <h1
-              className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-light leading-[1.05] text-white"
-              style={{ fontFamily: "var(--font-serif)" }}
+              className="font-light leading-[1.05] text-white"
+              style={{ fontFamily: "var(--font-serif)", fontSize: "clamp(2.5rem, 5vw, 4.5rem)" }}
             >
               About The
               <br />
