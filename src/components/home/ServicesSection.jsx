@@ -10,7 +10,7 @@ import { useOfferActive } from "@/lib/useOfferActive";
 import { SERVICES_QUERY } from "@/lib/sanityQueries";
 import { useLenisResize } from "@/hooks/useLenisResize";
 
-// ── Inline SVG icons ───────────────────────────────────────────────────
+// ── Inline SVG icons ───────────────────────────────────────────────────────────────────────
 function StarIcon({ className }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -209,10 +209,10 @@ function ServiceCard({ s, i }) {
         <motion.div
           whileHover={{ y: -6 }}
           transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-          className="bg-[#1a1825] border border-white/5 rounded-2xl p-8 h-full group cursor-pointer hover:border-primary/40 relative overflow-hidden"
+          className="bg-[oklch(0.14_0.030_270)] border border-[oklch(0.25_0.020_270)] rounded-2xl p-8 h-full group cursor-pointer hover:border-gold/40 relative overflow-hidden"
         >
           <div className="relative z-10 flex flex-col h-full gap-3">
-            <div className="w-10 h-10 rounded-full bg-white/5 text-gold flex items-center justify-center">
+            <div className="w-10 h-10 rounded-full bg-gold/10 text-gold flex items-center justify-center">
               <Icon className="w-4 h-4" />
             </div>
             <div className="flex flex-wrap gap-1.5">
