@@ -230,7 +230,8 @@ function IntroStep({ onStart }) {
           over regular Tailwind utilities. */}
       <motion.p
         initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
-        className="mt-6 text-lg text-muted-foreground leading-relaxed max-w-xl mx-auto !text-center"
+        className="mt-6 text-lg text-muted-foreground leading-relaxed mx-auto text-center"
+        style={{ maxWidth: '44rem' }}
       >
         A calm, private space to explore your chart with clarity and care.
         Each session is crafted around your story, guided by quiet intention.
