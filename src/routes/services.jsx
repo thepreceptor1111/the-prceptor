@@ -321,6 +321,10 @@ export default function ServicesPage() {
                 >
                   {filtered.map((s, i) => {
                     const Icon = ICON_MAP[s.icon] || StarIcon;
+                    // When offer is active: show discounted price (s.price) with originalPrice struck through.
+                    // When offer has expired: show the original price (s.originalPrice) with no strikethrough.
+                    // If there is no originalPrice, always show s.price regardless of offer state.
+                    const displayedPrice = !offerActive && s.originalPrice ? s.originalPrice : s.price;
                     return (
                       <Reveal key={s.slug} delay={i * 0.06}>
                         <motion.div
@@ -356,7 +360,7 @@ export default function ServicesPage() {
                                 {offerActive && s.originalPrice && (
                                   <span className="text-sm text-muted-foreground line-through">{s.originalPrice}</span>
                                 )}
-                                <span className="font-serif text-xl text-gold">{s.price}</span>
+                                <span className="font-serif text-xl text-gold">{displayedPrice}</span>
                               </div>
                             </div>
                             {s.isSoldOut ? (
