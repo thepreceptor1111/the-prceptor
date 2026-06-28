@@ -3,6 +3,7 @@ import { PAGE_SEO, SITE } from "@/content/seo";
 import aboutImg from "@/assets/about-section.jpg?format=webp&quality=80";
 import { Reveal } from "@/components/site/Reveal";
 import { useSiteSettings } from "@/lib/useSiteSettings";
+import aboutHeroImg from "@/assets/about-section.jpg";
 
 // ── Inline SVG icons — no lucide-react ──────────────────────────
 function MailIcon({ className }) {
