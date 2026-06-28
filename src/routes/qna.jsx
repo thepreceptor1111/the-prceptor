@@ -228,7 +228,7 @@ export default function QnAPage() {
               {settings?.faqSectionHeading ?? "Everything you want to know."}
             </h1>
             <div className="mt-6 flex justify-center">
-              <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl text-center" style={{ textAlign: 'center' }}>
+              <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl" style={{ textAlign: "center" }}>
                 From how sessions work to the deeper philosophy behind the practice,
                 find honest, clear answers below.
               </p>
@@ -353,7 +353,10 @@ export default function QnAPage() {
               >
                 Didn&apos;t find your answer?
               </h2>
-              <p className="mt-4 text-base text-muted-foreground max-w-md mx-auto text-center">
+              <p
+                className="mt-4 text-base text-muted-foreground max-w-md mx-auto"
+                style={{ textAlign: "center" }}
+              >
                 Reach out directly. Every question is welcome. A response lands
                 in your inbox within 24 hours.
               </p>
