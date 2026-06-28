@@ -226,12 +226,7 @@ function ServiceCard({ s, i }) {
                 <span className="inline-block text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border border-red-400/30 text-red-400">Sold Out</span>
               )}
             </div>
-            <h3
-              className="text-xl leading-snug"
-              style={{ fontFamily: "var(--font-serif)", fontWeight: 400 }}
-            >
-              {s.title}
-            </h3>
+            <h4 className="text-xl leading-snug">{s.title}</h4>
             <p className="text-muted-foreground text-sm leading-relaxed line-clamp-3 flex-1">{s.desc}</p>
             <div className="mt-2 flex items-center justify-between border-t border-gold/10 pt-3">
               <span className="flex items-center gap-1 text-xs text-gold">
