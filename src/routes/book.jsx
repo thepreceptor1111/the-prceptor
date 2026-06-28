@@ -225,12 +225,18 @@ function IntroStep({ onStart }) {
         Begin Your Spiritual Consultation
       </motion.h1>
 
-      {/* FIX: explicit text-center on the <p> itself so text-wrap:pretty
-          cannot override the inherited alignment when the block is constrained
-          by max-w-xl. Without this, wrapped lines snap to left-aligned. */}
+      {/*
+        Inline textAlign:"center" is required here.
+        The global styles.css rule  p, li, figcaption { text-wrap: pretty }
+        causes Chromium to reset text-align to "start" on constrained <p> blocks
+        (max-w-xl creates a new block formatting context).
+        Tailwind utility text-center loses the cascade battle against that global
+        rule in Tailwind v4's @layer ordering. Inline style wins unconditionally.
+      */}
       <motion.p
         initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
-        className="mt-6 text-lg text-muted-foreground leading-relaxed max-w-xl mx-auto text-center"
+        className="mt-6 text-lg text-muted-foreground leading-relaxed max-w-xl mx-auto"
+        style={{ textAlign: "center" }}
       >
         A calm, private space to explore your chart with clarity and care.
         Each session is crafted around your story, guided by quiet intention.
@@ -458,7 +464,7 @@ function CalStep({ onBack, onBooked }) {
       <div className="max-w-2xl mx-auto">
         <span className="text-xs uppercase tracking-[0.35em] text-gold">Book Your Session</span>
         <h2 className="mt-3 text-4xl md:text-5xl">Choose your time</h2>
-        <p className="mt-4 text-muted-foreground">
+        <p className="mt-4 text-muted-foreground" style={{ textAlign: "center" }}>
           Pick a date and slot, then fill in your details on the next screen.
           All times are shown in your local timezone.
         </p>
@@ -545,7 +551,8 @@ function ConfirmedStep({ bookedData }) {
 
       <motion.p
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }}
-        className="mt-4 text-muted-foreground max-w-md mx-auto text-center"
+        className="mt-4 text-muted-foreground max-w-md mx-auto"
+        style={{ textAlign: "center" }}
       >
         {firstName !== "friend" ? `Thank you, ${firstName}.` : "Thank you."} Your private
         consultation is booked. A calendar invite and meeting link are on their way to your inbox.
