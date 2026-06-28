@@ -53,7 +53,7 @@ export function AboutSection() {
               style={{ fontFamily: "var(--font-serif)", fontWeight: 400 }}
             >
               <span className="block">{heading1}</span>
-              <span className="block bg-gradient-gold">{heading2Gold}</span>
+              <span className="block bg-gradient-gold italic">{heading2Gold}</span>
             </h2>
 
             {/* Body */}
