@@ -9,7 +9,7 @@ import { TESTIMONIALS_QUERY } from "@/lib/sanityQueries";
 import { sanityImage, preloadImage } from "@/lib/sanityImage";
 import { useLenisResize } from "@/hooks/useLenisResize";
 
-// ── Inline SVG icons — removes lucide-react dependency ────────────────────
+// ── Inline SVG icons ────────────────────────────────────────────────────────
 function ArrowLeft({ className }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -70,21 +70,11 @@ function normalise(t) {
   };
 }
 
-// Card height: 420px on mobile, 520px on md+
+// Fixed heights ONLY used for screenshot-mode card (scroll area requires it)
 const CARD_HEIGHT_MOBILE = 420;
 const CARD_HEIGHT_DESK   = 520;
 const STRIP_H            = 72;
 
-/**
- * TestimonialsSection
- *
- * Props (optional — provided by the home route’s batched Sanity fetch):
- *   initialTestimonials  {Array|null}  — pre-fetched testimonials
- *   testimonialsLoading  {boolean}     — loading state from the batched hook
- *
- * When neither prop is passed (e.g. on /testimonials page), falls back
- * to its own useSanity call.
- */
 export function TestimonialsSection({ initialTestimonials = null, testimonialsLoading = false }) {
   useLenisResize();
 
@@ -109,11 +99,11 @@ export function TestimonialsSection({ initialTestimonials = null, testimonialsLo
     : all;
 
   const [idx, setIdx] = useState(0);
-  // Track viewport width to swap card height
+
+  // matchMedia for screenshot card fixed height only
   const [isMobile, setIsMobile] = useState(
     typeof window !== "undefined" ? window.innerWidth < 768 : false
   );
-
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 767px)");
     const handler = (e) => setIsMobile(e.matches);
@@ -145,7 +135,8 @@ export function TestimonialsSection({ initialTestimonials = null, testimonialsLo
   const goPrev = () => setIdx((c) => (c + testimonials.length - 1) % testimonials.length);
   const goNext = () => setIdx((c) => (c + 1) % testimonials.length);
 
-  const cardHeight = isMobile ? CARD_HEIGHT_MOBILE : CARD_HEIGHT_DESK;
+  const hasImage = Boolean(t?.screenshotUrl);
+  const screenshotCardHeight = isMobile ? CARD_HEIGHT_MOBILE : CARD_HEIGHT_DESK;
   const stripPadding = isMobile ? "0 1rem" : "0 1.75rem";
 
   const NavBtn = ({ onClick, label, children }) => (
@@ -165,8 +156,6 @@ export function TestimonialsSection({ initialTestimonials = null, testimonialsLo
       ))}
     </div>
   );
-
-  const hasImage = Boolean(t?.screenshotUrl);
 
   return (
     <section className="py-32 relative overflow-hidden">
@@ -188,9 +177,12 @@ export function TestimonialsSection({ initialTestimonials = null, testimonialsLo
               exit={{ opacity: 0, scale: 0.97 }}
               transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
               className="mt-14 glass-card rounded-3xl relative"
-              style={{ height: `${cardHeight}px` }}
+              // Screenshot card needs fixed height for internal scroll area.
+              // Text-only card: NO height set — grows naturally with content.
+              style={hasImage ? { height: `${screenshotCardHeight}px` } : {}}
             >
               {hasImage ? (
+                // ── Screenshot mode — fixed height + internal scroll ─────────
                 <div style={{ position: "relative", width: "100%", height: "100%", borderRadius: "inherit", overflow: "hidden" }}>
                   <div
                     data-lenis-prevent
@@ -260,21 +252,22 @@ export function TestimonialsSection({ initialTestimonials = null, testimonialsLo
                   </div>
                 </div>
               ) : (
-                <div className="p-6 md:p-12 relative z-10 h-full flex flex-col justify-center">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,oklch(0.82_0.12_85_/_0.07),transparent_40%)] pointer-events-none" />
-                  <Quote className="w-10 h-10 text-gold/30 mx-auto" />
-                  <p className="mt-6 font-serif text-xl md:text-3xl leading-relaxed max-w-prose mx-auto">
+                // ── Text-only mode — auto height, grows with content ──────────
+                <div className="p-6 md:p-10 relative z-10 flex flex-col items-center">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,oklch(0.82_0.12_85_/_0.07),transparent_40%)] pointer-events-none rounded-3xl" />
+                  <Quote className="w-8 h-8 text-gold/30" />
+                  <p className="mt-5 font-serif text-lg md:text-2xl leading-relaxed max-w-sm md:max-w-xl mx-auto text-center">
                     &ldquo;{t?.text}&rdquo;
                   </p>
-                  <div className="mt-8 flex justify-center gap-1">
+                  <div className="mt-6 flex justify-center gap-1">
                     {[...Array(t?.rating ?? 5)].map((_, k) => (
                       <Star key={k} className="w-4 h-4 fill-gold text-gold" />
                     ))}
                   </div>
-                  <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="mt-6 w-full flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div className="text-left">
-                      <p className="font-serif text-lg text-gold">{t?.name}</p>
-                      <p className="text-xs text-muted-foreground">{t?.country}</p>
+                      <p className="font-serif text-base text-gold">{t?.name}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">{t?.country}</p>
                     </div>
                     <div className="flex items-center gap-3">
                       <NavBtn onClick={goPrev} label="Previous"><ArrowLeft className="w-4 h-4" /></NavBtn>
