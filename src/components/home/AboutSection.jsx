@@ -12,78 +12,149 @@ export function AboutSection() {
   const heading2Gold = settings?.aboutHeading2Gold ?? "for a modern world.";
   const paragraph1   = settings?.aboutParagraph1   ?? "For over twelve years, The Preceptor has guided executives, artists, and seekers through life\u2019s most pivotal chapters \u2014 translating classical Vedic and Western astrology into language that is grounded, modern, and quietly powerful.";
   const paragraph2   = settings?.aboutParagraph2   ?? "Our philosophy is simple: the stars do not predict your fate \u2014 they reveal your design. We help you read it.";
-  const stat1        = settings?.stat1 ?? { value: "6+",     label: "Years of practice" };
+  const stat1        = settings?.stat1 ?? { value: "6+",      label: "Years of practice" };
   const stat4        = settings?.stat4 ?? { value: "4.98\u2605", label: "Average rating" };
 
   const imageSrc = settings?.aboutImage?.asset?.url ?? aboutImg;
   const imageAlt = settings?.aboutImage?.alt ?? "The Preceptor \u2014 astrologer portrait";
 
+  // Gold OKLCH shorthand
+  const gold = (a) => `oklch(0.82 0.12 85 / ${a})`;
+
+  // Sparkle dot positions (degrees around the ring)
+  const sparkles = [0, 90, 180, 270];
+
   return (
     <section className="relative overflow-hidden">
-      {/* Orbital ring keyframe — injected once */}
       <style>{`
-        @keyframes orbit-spin {
-          from { transform: rotate(0deg); }
-          to   { transform: rotate(360deg); }
+        @keyframes cw  { from { transform: rotate(0deg);   } to { transform: rotate(360deg);  } }
+        @keyframes ccw { from { transform: rotate(0deg);   } to { transform: rotate(-360deg); } }
+        @keyframes pulse-glow {
+          0%, 100% { opacity: 0.12; }
+          50%       { opacity: 0.30; }
         }
-        .about-orbit {
-          animation: orbit-spin 28s linear infinite;
+        @keyframes sparkle-fade {
+          0%, 100% { opacity: 0.9; transform: scale(1);   }
+          50%       { opacity: 0.4; transform: scale(0.6); }
         }
+
+        .about-ring-1  { animation: cw  20s linear infinite; }
+        .about-ring-2  { animation: ccw 35s linear infinite; }
+        .about-ring-3  { animation: cw  55s linear infinite; }
+        .about-pulse   { animation: pulse-glow 4s ease-in-out infinite; }
+
+        .about-portrait-wrap:hover .about-ring-1 { animation-duration: 8s; }
+        .about-portrait-wrap:hover .about-ring-2 { animation-duration: 14s; }
+        .about-portrait-wrap:hover .about-ring-3 { animation-duration: 24s; }
+        .about-portrait-wrap:hover .about-pulse  { animation-duration: 1.8s; }
+
+        @media (prefers-reduced-motion: reduce) {
+          .about-ring-1, .about-ring-2, .about-ring-3,
+          .about-pulse, .sparkle-dot { animation: none !important; }
+        }
+
+        .sparkle-dot {
+          position: absolute;
+          width: 5px;
+          height: 5px;
+          border-radius: 50%;
+          background: ${gold("0.9")};
+          box-shadow: 0 0 6px 2px ${gold("0.6")};
+          top: 50%;
+          left: 50%;
+          transform-origin: 0 0;
+          animation: sparkle-fade 2.4s ease-in-out infinite;
+        }
+        .sparkle-dot:nth-child(2) { animation-delay: 0.6s; }
+        .sparkle-dot:nth-child(3) { animation-delay: 1.2s; }
+        .sparkle-dot:nth-child(4) { animation-delay: 1.8s; }
       `}</style>
 
-      <div className="grid lg:grid-cols-2 items-center min-h-[600px] lg:min-h-[680px]">
+      <div className="grid lg:grid-cols-2 items-center min-h-[600px] lg:min-h-[720px]">
 
-        {/* ── Left: circular portrait ── */}
+        {/* ── Left: circular portrait with orbital rings ── */}
         <Reveal delay={0.1}>
-          <div className="relative flex items-center justify-center p-10 lg:p-14">
+          <div
+            className="about-portrait-wrap relative flex items-center justify-center p-10 lg:p-16"
+            style={{ overflow: "visible" }}
+          >
 
-            {/* Outer orbital dashed ring */}
+            {/* Pulsing ambient glow */}
             <div
-              className="about-orbit absolute rounded-full pointer-events-none"
+              className="about-pulse absolute rounded-full pointer-events-none"
               style={{
-                width:  "clamp(300px, 42vw, 460px)",
-                height: "clamp(300px, 42vw, 460px)",
-                border: "1px dashed oklch(0.82 0.12 85 / 0.18)",
+                width:      "clamp(320px, 48vw, 560px)",
+                height:     "clamp(320px, 48vw, 560px)",
+                background: `radial-gradient(circle, ${gold("0.18")} 0%, transparent 68%)`,
+                filter:     "blur(32px)",
               }}
             />
 
-            {/* Second static decorative ring */}
+            {/* Ring 3 — outermost, very slow clockwise, dotted */}
             <div
-              className="absolute rounded-full pointer-events-none"
+              className="about-ring-3 absolute rounded-full pointer-events-none"
               style={{
-                width:  "clamp(276px, 38.5vw, 436px)",
-                height: "clamp(276px, 38.5vw, 436px)",
-                border: "1px solid oklch(0.82 0.12 85 / 0.10)",
+                width:  "clamp(430px, 58vw, 630px)",
+                height: "clamp(430px, 58vw, 630px)",
+                border: `1px dotted ${gold("0.10")}`,
               }}
             />
 
-            {/* Gold glow ambient */}
+            {/* Ring 2 — middle, counter-clockwise, dashed */}
             <div
-              className="absolute rounded-full pointer-events-none"
+              className="about-ring-2 absolute rounded-full pointer-events-none"
               style={{
-                width:  "clamp(260px, 36vw, 420px)",
-                height: "clamp(260px, 36vw, 420px)",
-                background: "radial-gradient(circle, oklch(0.82 0.12 85 / 0.12) 0%, transparent 70%)",
-                filter: "blur(24px)",
+                width:  "clamp(380px, 52vw, 580px)",
+                height: "clamp(380px, 52vw, 580px)",
+                border: `1px dashed ${gold("0.18")}`,
               }}
             />
 
-            {/* Circle image container */}
+            {/* Ring 1 — innermost, clockwise, solid + sparkle dots */}
+            <div
+              className="about-ring-1 absolute rounded-full pointer-events-none"
+              style={{
+                width:  "clamp(340px, 47vw, 540px)",
+                height: "clamp(340px, 47vw, 540px)",
+                border: `1px solid ${gold("0.30")}`,
+              }}
+            >
+              {/* Sparkle dots at N / E / S / W */}
+              {sparkles.map((deg, i) => {
+                const rad = (deg * Math.PI) / 180;
+                // radius in px at midpoint of clamp — approx 270px
+                const r = 270;
+                const x = Math.cos(rad - Math.PI / 2) * r;
+                const y = Math.sin(rad - Math.PI / 2) * r;
+                return (
+                  <span
+                    key={i}
+                    className="sparkle-dot"
+                    style={{
+                      marginLeft: `${x - 2.5}px`,
+                      marginTop:  `${y - 2.5}px`,
+                    }}
+                  />
+                );
+              })}
+            </div>
+
+            {/* Circle image */}
             <div
               className="relative rounded-full overflow-hidden flex-shrink-0"
               style={{
-                width:     "clamp(240px, 34vw, 400px)",
-                height:    "clamp(240px, 34vw, 400px)",
-                boxShadow: "0 0 0 2px oklch(0.82 0.12 85 / 0.45), 0 0 48px oklch(0.82 0.12 85 / 0.22), 0 24px 64px oklch(0 0 0 / 0.5)",
+                width:      "clamp(300px, 44vw, 500px)",
+                height:     "clamp(300px, 44vw, 500px)",
+                boxShadow:  `0 0 0 2px ${gold("0.50")}, 0 0 60px ${gold("0.25")}, 0 28px 72px oklch(0 0 0 / 0.55)`,
                 transition: "transform 0.5s cubic-bezier(0.22,1,0.36,1), box-shadow 0.5s cubic-bezier(0.22,1,0.36,1)",
               }}
               onMouseEnter={e => {
-                e.currentTarget.style.transform = "scale(1.03)";
-                e.currentTarget.style.boxShadow = "0 0 0 2px oklch(0.82 0.12 85 / 0.65), 0 0 72px oklch(0.82 0.12 85 / 0.32), 0 24px 64px oklch(0 0 0 / 0.5)";
+                e.currentTarget.style.transform  = "scale(1.04)";
+                e.currentTarget.style.boxShadow = `0 0 0 2px ${gold("0.70")}, 0 0 90px ${gold("0.38")}, 0 28px 72px oklch(0 0 0 / 0.55)`;
               }}
               onMouseLeave={e => {
-                e.currentTarget.style.transform = "scale(1)";
-                e.currentTarget.style.boxShadow = "0 0 0 2px oklch(0.82 0.12 85 / 0.45), 0 0 48px oklch(0.82 0.12 85 / 0.22), 0 24px 64px oklch(0 0 0 / 0.5)";
+                e.currentTarget.style.transform  = "scale(1)";
+                e.currentTarget.style.boxShadow = `0 0 0 2px ${gold("0.50")}, 0 0 60px ${gold("0.25")}, 0 28px 72px oklch(0 0 0 / 0.55)`;
               }}
             >
               <img
@@ -91,8 +162,8 @@ export function AboutSection() {
                 alt={imageAlt}
                 loading="lazy"
                 decoding="async"
-                width={400}
-                height={400}
+                width={500}
+                height={500}
                 className="w-full h-full object-cover object-top"
                 style={{ transition: "transform 0.5s cubic-bezier(0.22,1,0.36,1)" }}
               />
