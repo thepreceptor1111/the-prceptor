@@ -10,14 +10,16 @@
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   FIX: Self-hosted fonts via @fontsource
+   Fonts via @fontsource (self-hosted on Vercel CDN edge)
    ─────────────────────────────────────────────────────────────────────────────
-   Fonts now served from YOUR Vercel CDN edge — zero external RTT,
-   no CORS preflight, no render-blocking Google Fonts stylesheet.
-   Packages: @fontsource-variable/inter  @fontsource/fraunces
+   --font-serif   → Fraunces   (body, section headings, cards)
+   --font-display → Cormorant Garamond (hero h1 ONLY — high-contrast Didone)
+   --font-sans    → Inter      (UI chrome)
    ─────────────────────────────────────────────────────────────────────────────
 */
 @import '@fontsource-variable/inter';
+
+/* Fraunces — body & section headings */
 @import '@fontsource/fraunces/300.css';
 @import '@fontsource/fraunces/400.css';
 @import '@fontsource/fraunces/500.css';
@@ -25,13 +27,19 @@
 @import '@fontsource/fraunces/300-italic.css';
 @import '@fontsource/fraunces/400-italic.css';
 
+/* Cormorant Garamond — display/hero heading only */
+@import '@fontsource/cormorant-garamond/300.css';
+@import '@fontsource/cormorant-garamond/400.css';
+@import '@fontsource/cormorant-garamond/300-italic.css';
+@import '@fontsource/cormorant-garamond/400-italic.css';
+
 @import "tailwindcss";
 
 /* ── Design tokens ─────────────────────────────────────────────────────── */
 @theme {
   --font-sans:    "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-serif:   "Fraunces", "Georgia", serif;
-  --font-display: "Fraunces", "Georgia", serif;
+  --font-display: "Cormorant Garamond", "Georgia", serif;
   --font-mono:  ui-monospace, SFMono-Regular, Menlo, monospace;
 
   /* Gold palette */
