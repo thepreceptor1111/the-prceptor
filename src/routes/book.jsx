@@ -312,12 +312,12 @@ function BookingFailedBanner({ onDismiss }) {
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-foreground leading-snug">
-            We couldn’t complete your booking.
+            We couldn't complete your booking.
           </p>
           <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">
-            This usually happens when the selected time slot doesn’t align with your timezone.
+            This usually happens when the selected time slot doesn't align with your timezone.
             Please <strong className="text-foreground font-medium">try a different time slot</strong>,
-            or reach us directly and we’ll schedule your session manually.
+            or reach us directly and we'll schedule your session manually.
           </p>
           <a
             href={`mailto:${siteConfig.email}?subject=Session%20Booking%20Help`}
@@ -451,8 +451,11 @@ function CalStep({ onBack, onBooked }) {
   }, [onBooked]);
 
   return (
-    <div className="max-w-5xl mx-auto">
-      <div className="text-center max-w-2xl mx-auto">
+    // FIX B1 + B2: text-center moved to the outer wrapper so the eyebrow
+    // <span>, h2, and feature pills all inherit centering reliably at every
+    // viewport width — previously only the inner max-w-2xl div had it.
+    <div className="max-w-5xl mx-auto text-center">
+      <div className="max-w-2xl mx-auto">
         <span className="text-xs uppercase tracking-[0.35em] text-gold">Book Your Session</span>
         <h2 className="mt-3 text-4xl md:text-5xl">Choose your time</h2>
         <p className="mt-4 text-muted-foreground">
@@ -476,7 +479,7 @@ function CalStep({ onBack, onBooked }) {
 
       <AnimatePresence>
         {bookingFailed && (
-          <div className="mt-6">
+          <div className="mt-6 text-left">
             <BookingFailedBanner onDismiss={() => setBookingFailed(false)} />
           </div>
         )}
@@ -496,7 +499,7 @@ function CalStep({ onBack, onBooked }) {
         />
       </div>
 
-      <div className="mt-5">
+      <div className="mt-5 flex justify-start">
         <button
           onClick={onBack}
           className="inline-flex items-center gap-2 px-5 py-3 rounded-full gold-border hover:bg-secondary transition text-sm"
@@ -568,12 +571,15 @@ function ConfirmedStep({ bookedData }) {
         Check your inbox for the confirmation email &amp; meeting link.
       </motion.div>
 
+      {/* FIX B3: privacy note card uses text-left scoped to itself via the
+          flex row — the outer ConfirmedStep wrapper stays text-center for
+          headings/body; this card is intentionally left-aligned content. */}
       <motion.div
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.65 }}
-        className="mt-5 flex items-start gap-3 p-4 rounded-2xl bg-secondary/40 border border-border max-w-md mx-auto"
+        className="mt-5 flex items-start gap-3 p-4 rounded-2xl bg-secondary/40 border border-border max-w-md mx-auto text-left"
       >
         <ShieldCheckIcon className="w-5 h-5 text-gold shrink-0 mt-0.5" />
-        <p className="text-sm text-muted-foreground text-left">
+        <p className="text-sm text-muted-foreground">
           Your birth details have been securely noted for session preparation.
         </p>
       </motion.div>
