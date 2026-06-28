@@ -347,7 +347,10 @@ export default function QnAPage() {
               <span className="text-xs uppercase tracking-[0.35em] text-gold">
                 Still curious?
               </span>
-              <h2 className="mt-4 text-xl md:text-2xl">
+              <h2
+                className="mt-4"
+                style={{ fontSize: "clamp(1.25rem, 2.5vw, 1.5rem)", letterSpacing: "-0.01em" }}
+              >
                 Didn&apos;t find your answer?
               </h2>
               <p className="mt-4 text-base text-muted-foreground max-w-md mx-auto text-center">
