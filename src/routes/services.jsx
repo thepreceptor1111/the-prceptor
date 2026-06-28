@@ -304,7 +304,7 @@ export default function ServicesPage() {
             {loading ? (
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="rounded-2xl p-8 h-64 animate-pulse bg-[#1a1825]" />
+                  <div key={i} className="rounded-2xl p-8 h-64 animate-pulse bg-[oklch(0.14_0.030_270)]" />
                 ))}
               </div>
             ) : (
@@ -325,10 +325,10 @@ export default function ServicesPage() {
                         <motion.div
                           whileHover={{ y: -6 }}
                           transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                          className="bg-[#1a1825] border border-white/5 rounded-2xl p-8 flex flex-col gap-3 group hover:border-primary/40 relative overflow-hidden"
+                          className="bg-[oklch(0.14_0.030_270)] border border-[oklch(0.25_0.020_270)] rounded-2xl p-8 flex flex-col gap-3 group hover:border-gold/40 relative overflow-hidden"
                         >
                           <div className="relative z-10 flex flex-col gap-3 h-full">
-                            <div className="w-10 h-10 rounded-full bg-white/5 text-gold flex items-center justify-center">
+                            <div className="w-10 h-10 rounded-full bg-gold/10 text-gold flex items-center justify-center">
                               <Icon className="w-4 h-4" />
                             </div>
                             <div className="flex flex-wrap gap-1.5">
@@ -343,7 +343,7 @@ export default function ServicesPage() {
                               )}
                             </div>
                             <div className="flex-1">
-                              <h4 className="text-2xl font-serif leading-snug">{s.title}</h4>
+                              <h4 className="text-xl leading-snug">{s.title}</h4>
                               <p className="mt-3 text-muted-foreground text-sm leading-relaxed">{s.desc}</p>
                             </div>
                             <div className="flex items-center justify-between pt-4 border-t border-gold/10">
@@ -354,7 +354,7 @@ export default function ServicesPage() {
                                 {offerActive && s.originalPrice && (
                                   <span className="text-sm text-muted-foreground line-through">{s.originalPrice}</span>
                                 )}
-                                <span className="font-serif text-xl text-gold">{displayedPrice}</span>
+                                <span className="font-semibold text-gold text-lg">{displayedPrice}</span>
                               </div>
                             </div>
                             {s.isSoldOut ? (
