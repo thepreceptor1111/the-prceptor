@@ -328,35 +328,52 @@ export default function ServicesPage() {
                           className="bg-[oklch(0.14_0.030_270)] border border-[oklch(0.25_0.020_270)] rounded-2xl p-8 flex flex-col gap-3 group hover:border-gold/40 relative overflow-hidden"
                         >
                           <div className="relative z-10 flex flex-col gap-3 h-full">
+
+                            {/* Icon */}
                             <div className="w-10 h-10 rounded-full bg-gold/10 text-gold flex items-center justify-center">
                               <Icon className="w-4 h-4" />
                             </div>
+
+                            {/* Badges — text-[10px] → text-xs (12px floor) */}
                             <div className="flex flex-wrap gap-1.5">
                               {s.isPopular && (
-                                <span className="inline-block text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border border-gold/30 text-gold bg-gold/5">Popular</span>
+                                <span className="inline-block text-xs uppercase tracking-widest px-2 py-0.5 rounded-full border border-gold/30 text-gold bg-gold/5">Popular</span>
                               )}
                               {s.badge && (
-                                <span className="inline-block text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border border-gold/20 text-gold break-words">{s.badge}</span>
+                                <span className="inline-block text-xs uppercase tracking-widest px-2 py-0.5 rounded-full border border-gold/20 text-gold break-words">{s.badge}</span>
                               )}
                               {s.isSoldOut && (
-                                <span className="inline-block text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border border-red-400/30 text-red-400">Sold Out</span>
+                                <span className="inline-block text-xs uppercase tracking-widest px-2 py-0.5 rounded-full border border-red-400/30 text-red-400">Sold Out</span>
                               )}
                             </div>
+
                             <div className="flex-1">
-                              <h4 className="text-xl leading-snug">{s.title}</h4>
-                              <p className="mt-3 text-muted-foreground text-sm leading-relaxed">{s.desc}</p>
+                              {/* Title — text-xl → text-base + var(--font-serif) */}
+                              <h4
+                                className="text-base leading-snug font-medium tracking-wide"
+                                style={{ fontFamily: "var(--font-serif)" }}
+                              >
+                                {s.title}
+                              </h4>
+                              {/* Description — text-sm → text-base */}
+                              <p className="mt-3 text-muted-foreground text-base leading-relaxed">{s.desc}</p>
                             </div>
+
+                            {/* Footer: duration + price */}
                             <div className="flex items-center justify-between pt-4 border-t border-gold/10">
-                              <span className="flex items-center gap-1 text-xs text-gold">
-                                <ClockIcon className="w-3 h-3" />{s.duration}
+                              {/* Duration — text-xs → text-sm, icon bump */}
+                              <span className="flex items-center gap-1.5 text-sm text-gold">
+                                <ClockIcon className="w-3.5 h-3.5" />{s.duration}
                               </span>
                               <div className="flex items-baseline gap-2">
                                 {offerActive && s.originalPrice && (
                                   <span className="text-sm text-muted-foreground line-through">{s.originalPrice}</span>
                                 )}
-                                <span className="font-semibold text-gold text-lg">{displayedPrice}</span>
+                                {/* Price — text-lg → text-xl */}
+                                <span className="font-semibold text-gold text-xl">{displayedPrice}</span>
                               </div>
                             </div>
+
                             {s.isSoldOut ? (
                               <span className="mt-1 inline-flex items-center gap-2 text-sm font-medium text-muted-foreground cursor-not-allowed">Sold Out</span>
                             ) : (
