@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import Reveal from "@/components/site/Reveal";
 import { siteConfig } from "@/content/site";
 
-const EFFECTIVE_DATE = "June 30, 2025";
+const EFFECTIVE_DATE = "June 30, 2026";
 const SITE_URL       = "https://www.thepreceptorglobal.com";
 
 // ── Inline SVG icons — no lucide-react dependency ──────────────────────
