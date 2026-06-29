@@ -65,9 +65,10 @@ function AboutContent() {
       <section
         className="relative w-full flex flex-col justify-end overflow-hidden"
         style={{
-          minHeight: "100svh",
+          minHeight: "80svh",
+          
           backgroundImage: `url(${aboutImg})`,
-          backgroundPosition: "50% 55%",
+          backgroundPosition: "50% 45%",
           backgroundSize: "cover",
           backgroundRepeat: "no-repeat",
         }}
@@ -77,9 +78,7 @@ function AboutContent() {
           className="absolute inset-0 pointer-events-none"
           style={{
             background: [
-              "linear-gradient(to bottom, rgba(10,8,18,0.35) 0%, transparent 18%)",
-              "linear-gradient(to top, rgba(10,8,18,0.92) 0%, rgba(10,8,18,0.6) 28%, transparent 55%)",
-              "linear-gradient(to right, rgba(10,8,18,0.25) 0%, transparent 12%, transparent 88%, rgba(10,8,18,0.25) 100%)",
+              "linear-gradient(to bottom, rgba(10,8,18,0.8) 0%, rgba(10,8,18,0.3) 60%, rgba(10,8,18,0.8) 100%)"
             ].join(", "),
           }}
         />
