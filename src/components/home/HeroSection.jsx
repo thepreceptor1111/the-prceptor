@@ -84,7 +84,7 @@ function StaggeredHeading({ line1, line2Gold, delay = 0 }) {
 
   return (
     <h1
-      className="mt-6 sm:mt-8 leading-[1.04]"
+      className="mt-6 sm:mt-8 leading-[1.04] pb-[0.15em]"
       style={{
         fontFamily: "var(--font-display)",
         fontSize: "clamp(2rem, 5vw + 0.5rem, 5.75rem)",
@@ -106,7 +106,7 @@ function StaggeredHeading({ line1, line2Gold, delay = 0 }) {
           </motion.span>
         ))}
       </span>
-      <span className="block overflow-hidden mt-1">
+      <span className="block overflow-visible mt-1">
         {words2.map((word, i) => (
           <motion.span
             key={i}
