@@ -151,7 +151,7 @@ export default function PrivacyPage() {
             </Reveal>
             <Reveal delay={0.3}>
               <p className="mt-4 text-xs text-muted-foreground tracking-wide">
-                Effective {EFFECTIVE_DATE} &middot; Last reviewed June 2025
+                Effective {EFFECTIVE_DATE} &middot; Last reviewed June 2026
               </p>
             </Reveal>
           </div>
