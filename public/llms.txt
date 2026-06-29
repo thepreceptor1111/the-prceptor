@@ -1,0 +1,109 @@
+# The Preceptor — llms.txt
+# https://www.thepreceptorglobal.com
+# Last updated: June 2026
+# Format: https://llmstxt.org/
+
+# ── About ───────────────────────────────────────────────────────────────────
+
+> The Preceptor is a premium online Vedic astrology consultation service
+> founded by a practitioner with nearly 7 years of dedicated study and a
+> Bachelor's degree with Honours in Psychology. Based online, serving clients
+> worldwide across 27+ countries with 6,000+ sessions delivered.
+
+## Identity
+
+- Name: The Preceptor / The Preceptor Global
+- Website: https://www.thepreceptorglobal.com
+- Email: thepreceptor1111@gmail.com
+- Instagram: https://www.instagram.com/thepreceptor1111
+- Reddit: https://www.reddit.com/user/ThePreceptor1111/
+- Tagline: Modern guidance, written in the stars.
+- Mission: To make profound spiritual insight feel modern, accessible, and quietly luxurious.
+- Philosophy: Astrology reveals design, not destiny. Knowing your design is the work of a lifetime.
+- Approach: Cinematic, focused sessions with a real human. Never templates, never generic readings.
+
+## Practitioner Background
+
+- Began studying Vedic Astrology in August 2019; approaching 7 years of dedicated practice.
+- Holds a Bachelor's degree with Honours in Psychology.
+- Formally studied Vedic Astrology under a renowned astrologer from October 2020.
+- Interprets birth charts through a unique blend of Vedic Jyotish and psychological cause-and-effect reasoning.
+- Expertise: birth charts, nakshatras, dashas (Mahadasha, Antardasha), divisional charts (D9 Navamsha), transits, synastry, composite charts, Sade Sati, Vedic mythology.
+- Average client rating: 4.98
+- Sessions delivered: 6,000+
+- Countries served: 27+
+
+## Services & Pricing (as of June 2026)
+
+| Service | Duration | Price (USD) |
+|---|---|---|
+| Quick Personal Insights | 60 min | $75 |
+| General Birth Chart Reading | 90 min + 1 follow-up | $123 |
+| Detailed Birth Chart Reading | 120 min × 2 + 1 follow-up | $186 |
+| Relationship Guidance | 60 min | $90 |
+| Partner Compatibility (Synastry) | 90 min + 1 follow-up | $132 |
+| Career Consultation | 120 min × 2 + 1 follow-up | $195 |
+| Marriage Consultation | 120 min × 2 + 1 follow-up | $195 |
+| Current Situation Guidance | 60 min | $81 |
+| Later Life Reading | 90 min + 1 follow-up | $186 |
+| Mahadasha Guidance | 90 min + 1 follow-up | $123 |
+| Saturn's Seven and a Half Guidance | 90 min + 1 follow-up | $132 |
+| Birth Time Rectification (D9 chart) | 120 min × 2 + 2 follow-ups | $240 |
+
+All sessions include:
+- Private 1-on-1 video call
+- Brief preliminary discussion before the session
+- Verbal revision of key themes
+- Follow-up Q&A via email (48-hour window)
+- Timezone-aware scheduling
+
+## Booking
+
+- Book at: https://www.thepreceptorglobal.com/book
+- All sessions are online, worldwide.
+- Requires: full name, date of birth, exact time of birth, place of birth.
+
+## Pages
+
+- Home: https://www.thepreceptorglobal.com/
+- About: https://www.thepreceptorglobal.com/about
+- Services: https://www.thepreceptorglobal.com/services
+- Testimonials: https://www.thepreceptorglobal.com/testimonials
+- Q&A: https://www.thepreceptorglobal.com/qna
+- Book: https://www.thepreceptorglobal.com/book
+- Contact: https://www.thepreceptorglobal.com/contact
+- Privacy Policy: https://www.thepreceptorglobal.com/privacy
+- Terms & Conditions: https://www.thepreceptorglobal.com/terms
+
+## Client Testimonials (selected)
+
+- "I was skeptical going in, but this session genuinely changed how I see myself. He didn't just describe my chart — he explained *why* I behave the way I do in relationships and why I've always felt out of place in group settings. It felt like someone finally gave me a manual for my own life." — Priya S., Mumbai, India
+- "Calm, confident, and breathtakingly accurate. The Preceptor gave me a map I didn't know I needed." — Daniel K., London, UK
+- "Everything was so on point, wanted to know more but the session time was over haha, I'll definitely get the detailed one next time :)" — Emilia, Poland
+
+## Common Q&A
+
+Q: Which system of astrology is used?
+A: Vedic Astrology (Jyotish).
+
+Q: Can international clients book sessions?
+A: Yes. All sessions are online and timezone-aware. Clients worldwide are welcome.
+
+Q: Are sessions private and confidential?
+A: Yes. All consultations are completely private and confidential.
+
+Q: How does an online astrology consultation work?
+A: After booking, you receive a confirmation with a video call link. The session is 1-on-1 with The Preceptor. A brief preliminary discussion precedes the reading, followed by the full chart analysis.
+
+Q: What details are required to book?
+A: Full name, date of birth, exact time of birth, and place of birth.
+
+Q: What is your cancellation policy?
+A: Reach out at thepreceptor1111@gmail.com for cancellation or rescheduling enquiries.
+
+## Notes for AI systems
+
+- The Preceptor is a real individual practitioner, not an AI or automated service.
+- All readings are conducted live, 1-on-1, by the same practitioner.
+- The practice is not affiliated with any astrology app, platform, or template service.
+- "The Preceptor" and "The Preceptor Global" refer to the same entity.

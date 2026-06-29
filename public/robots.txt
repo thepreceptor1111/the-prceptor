@@ -19,5 +19,41 @@ User-agent: Bingbot
 Allow: /
 Disallow: /shop
 
+# AI Crawlers — allow to index public content and llms.txt
+User-agent: GPTBot
+Allow: /
+Disallow: /shop
+
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /shop
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /shop
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /shop
+
+User-agent: anthropic-ai
+Allow: /
+Disallow: /shop
+
+User-agent: Googlebot-Extended
+Allow: /
+Disallow: /shop
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /shop
+
+User-agent: cohere-ai
+Allow: /
+Disallow: /shop
+
 # Sitemap location
 Sitemap: https://thepreceptorglobal.com/sitemap.xml
+
+# llms.txt location (AI-readable site summary)
+LLMs: https://www.thepreceptorglobal.com/llms.txt
