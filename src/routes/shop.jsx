@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import { Reveal } from "@/components/site/Reveal";
 
-// ── Inline SVG icons — no lucide-react ───────────────────────────────────
+// ── Inline SVG icons — no lucide-react ─────────────────────────────────────
 function SparklesIcon({ className }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -98,7 +98,12 @@ export default function ShopPage() {
               Shop
             </span>
 
-            <h1 className="mt-4 text-6xl md:text-7xl">Coming Soon.</h1>
+            <h1
+              className="mt-4"
+              style={{ fontFamily: "var(--font-serif)", fontSize: "clamp(2.5rem, 5vw, 4.5rem)" }}
+            >
+              Coming Soon.
+            </h1>
 
             <div className="mt-6 max-w-xl mx-auto text-center">
               <p className="text-lg text-muted-foreground">
@@ -136,7 +141,7 @@ export default function ShopPage() {
             )}
             {done && (
               <p className="mt-3 text-xs text-gold/70 text-center max-w-md mx-auto tracking-wide">
-                You're on the list. We'll reach out when the shop opens.
+                You’re on the list. We’ll reach out when the shop opens.
               </p>
             )}
           </Reveal>

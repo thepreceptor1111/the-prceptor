@@ -254,7 +254,7 @@ export default function TermsPage() {
             <TermsSection icon={ShieldIcon} title="6. Confidentiality" delay={0.20}>
               <p>All information shared during a consultation — including personal circumstances, relationships, and birth data — is treated as strictly confidential. We will never share, publish, or use session content for marketing purposes without your explicit written consent.</p>
               <p>Client testimonials shared on the website are done so with the client&apos;s express consent, or where the client&apos;s identity has been anonymized to protect their privacy.</p>
-              <p>We ask that clients extend the same courtesy. Session recordings, transcripts, or summaries shared for your personal reference are for your private use only and may not be published or redistributed without our prior written permission.</p>
+              <p>We ask that clients extend the same courtesy. Summaries shared for your personal reference are for your private use only and may not be published or redistributed without our prior written permission.</p>
             </TermsSection>
 
             {/* 7 */}
@@ -270,7 +270,7 @@ export default function TermsPage() {
                 "Decisions made in reliance on astrological guidance received during a session",
                 "Technical issues with third-party scheduling or communication platforms",
                 "Any inaccuracies arising from incorrect birth information provided by the client",
-                "Force majeure events beyond our reasonable control",
+                "Force majeure/unforeseeable events beyond our reasonable control",
               ]} />
               <p>In any event, The Preceptor&apos;s total liability in connection with any consultation or service shall not exceed the amount paid by the client for that specific consultation.</p>
             </TermsSection>
@@ -305,8 +305,8 @@ export default function TermsPage() {
             {/* Bottom CTA */}
             <Reveal delay={0.48}>
               <div className="glass-card rounded-3xl p-8 text-center">
-                <ScrollTextIcon className="w-8 h-8 text-gold mx-auto" />
-                <h3 className="mt-4 text-xl">Ready to begin?</h3>
+                <ScrollTextIcon className="w-8 h-8 text-gold mx-auto block" />
+                <h3 className="mt-4 mb-0 text-xl">Ready to begin?</h3>
                 <p className="mt-3 text-muted-foreground text-sm max-w-md mx-auto">
                   Book a private consultation and experience astrology as a tool for genuine clarity.
                 </p>
@@ -334,7 +334,7 @@ function TermsSection({ icon: Icon, title, delay, children }) {
           >
             <Icon className="w-4 h-4 text-gold" />
           </span>
-          <h2 className="text-xl md:text-2xl" style={{ fontSize: "clamp(1.1rem, 2vw, 1.5rem)" }}>{title}</h2>
+          <h2 className="mb-0 text-xl md:text-2xl" style={{ fontSize: "clamp(1.1rem, 2vw, 1.5rem)" }}>{title}</h2>
         </div>
         <div className="space-y-4 text-sm text-muted-foreground leading-relaxed">
           {children}

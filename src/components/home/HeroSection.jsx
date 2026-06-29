@@ -84,12 +84,12 @@ function StaggeredHeading({ line1, line2Gold, delay = 0 }) {
 
   return (
     <h1
-      className="mt-6 sm:mt-8 leading-[1.04]"
+      className="mt-6 sm:mt-8 leading-[1.04] pb-[0.15em]"
       style={{
         fontFamily: "var(--font-display)",
         fontSize: "clamp(2rem, 5vw + 0.5rem, 5.75rem)",
-        letterSpacing: "-0.025em",
-        fontWeight: 400,
+        letterSpacing: "-0.035em",
+        fontWeight: 700,
       }}
     >
       <span className="block overflow-hidden">
@@ -106,7 +106,7 @@ function StaggeredHeading({ line1, line2Gold, delay = 0 }) {
           </motion.span>
         ))}
       </span>
-      <span className="block overflow-hidden mt-1">
+      <span className="block overflow-visible mt-1">
         {words2.map((word, i) => (
           <motion.span
             key={i}
@@ -190,24 +190,6 @@ export function HeroSection() {
         style={{ background: "radial-gradient(ellipse at center, oklch(0.38 0.10 38 / 0.22), transparent 60%)" }}
       />
 
-      {/*
-        Hero figure — LCP element.
-
-        BEFORE: two nested <motion.div> wrappers.
-          Outer: initial={{ opacity: 0.88, y: 28, scale: 1.04 }}
-          Inner: animate={{ y: [0, -16, 0] }} repeat:Infinity
-
-        Framer Motion sets opacity:0 on motion elements until its JS chunk
-        (vendor-motion, ~350KB) downloads, parses, and hydrates. That kept
-        the hero image invisible for ~18s — the entire LCP penalty.
-
-        AFTER: two plain <div>s with CSS keyframe classes.
-          .hero-image-enter  → same entrance (opacity 0.3→0.88, y 28→0, scale 1.04→1)
-          .hero-float        → same infinite float (y 0→-16→0, 13s)
-
-        All masks, gradients, image attributes, and every other motion.*
-        in this file are completely untouched.
-      */}
       <div
         className="hero-image-enter absolute inset-y-0 right-0 w-full lg:w-[68%] xl:w-[62%] pointer-events-none"
         style={{
@@ -257,14 +239,7 @@ export function HeroSection() {
         style={{ background: "linear-gradient(to bottom, oklch(0.10 0.025 270 / 0.5) 0%, transparent 18%, transparent 75%, oklch(0.10 0.025 270) 100%)" }}
       />
 
-      {/* Content — responsive padding: more top padding on mobile to clear the fixed navbar */}
       <div className="relative z-10 max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 pt-32 pb-24 sm:pt-36 sm:pb-28 lg:py-40 w-full">
-        {/*
-          Content width:
-          - mobile: full width (text is readable over the dimmed bg image)
-          - sm: max 80% so text doesn't run edge-to-edge on tablets
-          - lg: capped at 46rem to keep it on the left half
-        */}
         <div className="w-full sm:max-w-[80%] lg:max-w-[46rem]">
 
           {/* Badge */}
@@ -285,7 +260,7 @@ export function HeroSection() {
 
           <StaggeredHeading line1={heading1} line2Gold={heading2Gold} delay={0.45} />
 
-          {/* Body copy — slightly smaller on mobile */}
+          {/* Body copy */}
           <motion.p
             initial={{ opacity: 0, x: -18 }}
             animate={{ opacity: 1, x: 0 }}
@@ -296,7 +271,7 @@ export function HeroSection() {
             {bodyCopy}
           </motion.p>
 
-          {/* CTAs — stack on very small screens, row on sm+ */}
+          {/* CTAs */}
           <motion.div
             initial={{ opacity: 0, x: -14 }}
             animate={{ opacity: 1, x: 0 }}
@@ -326,7 +301,7 @@ export function HeroSection() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.8, duration: 0.9 }}
-            className="mt-8 sm:mt-12 flex flex-wrap items-center gap-3 sm:gap-5 text-sm"
+            className="mt-8 sm:mt-12 flex flex-wrap items-center gap-3 sm:gap-5 text-base"
             style={{ color: "oklch(0.7 0.02 80)" }}
           >
             <div className="flex gap-0.5">

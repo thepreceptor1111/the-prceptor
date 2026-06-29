@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import Reveal from "@/components/site/Reveal";
 import { siteConfig } from "@/content/site";
 
-// ── Inline SVG icons — no lucide-react ──────────────────────────────
+// ── Inline SVG icons — no lucide-react ──────────────────────────
 function ArrowRightIcon({ className }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -219,14 +219,19 @@ function IntroStep({ onStart }) {
 
       <motion.h1
         initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-        className="mt-6 text-5xl md:text-7xl leading-[1.05] bg-gradient-gold bg-clip-text text-transparent"
+        className="mt-6 leading-[1.05] bg-gradient-gold bg-clip-text text-transparent"
+        style={{ fontFamily: "var(--font-serif)", fontSize: "clamp(3rem, 6vw, 5.5rem)" }}
       >
         Begin Your Spiritual Consultation
       </motion.h1>
 
+      {/* !text-center uses Tailwind v4's !important modifier to beat the global
+          p {} rule in styles.css which sits outside @layer and wins the cascade
+          over regular Tailwind utilities. */}
       <motion.p
         initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
-        className="mt-6 text-lg text-muted-foreground leading-relaxed max-w-xl mx-auto"
+        className="mt-6 text-lg text-muted-foreground leading-relaxed mx-auto text-center"
+        style={{ maxWidth: '44rem' }}
       >
         A calm, private space to explore your chart with clarity and care.
         Each session is crafted around your story, guided by quiet intention.
@@ -245,7 +250,7 @@ function IntroStep({ onStart }) {
             className="glass-card rounded-2xl p-5"
           >
             <item.icon className="w-5 h-5 text-gold mx-auto" />
-            <p className="mt-3 text-sm text-foreground/90">{item.label}</p>
+            <p className="mt-3 text-sm text-foreground/90 !text-center">{item.label}</p>
           </motion.div>
         ))}
       </div>
@@ -254,7 +259,7 @@ function IntroStep({ onStart }) {
         initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
         className="mt-10 max-w-lg mx-auto glass-card rounded-2xl p-6 text-left"
       >
-        <p className="text-xs uppercase tracking-[0.3em] text-gold mb-5 text-center">How it works</p>
+        <p className="text-xs uppercase tracking-[0.3em] text-gold mb-5 !text-center">How it works</p>
         <div className="space-y-4">
           {[
             { icon: CalendarDaysIcon, step: "01", text: "Choose your date & time slot" },
@@ -280,7 +285,7 @@ function IntroStep({ onStart }) {
 
       <motion.p
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}
-        className="mt-5 text-xs text-muted-foreground tracking-wide"
+        className="mt-5 text-xs text-muted-foreground tracking-wide !text-center"
       >
         Takes about 3 minutes · Confirmed instantly
       </motion.p>
@@ -311,12 +316,12 @@ function BookingFailedBanner({ onDismiss }) {
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-foreground leading-snug">
-            We couldn’t complete your booking.
+            We couldn't complete your booking.
           </p>
           <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">
-            This usually happens when the selected time slot doesn’t align with your timezone.
+            This usually happens when the selected time slot doesn't align with your timezone.
             Please <strong className="text-foreground font-medium">try a different time slot</strong>,
-            or reach us directly and we’ll schedule your session manually.
+            or reach us directly and we'll schedule your session manually.
           </p>
           <a
             href={`mailto:${siteConfig.email}?subject=Session%20Booking%20Help`}
@@ -450,11 +455,11 @@ function CalStep({ onBack, onBooked }) {
   }, [onBooked]);
 
   return (
-    <div className="max-w-5xl mx-auto">
-      <div className="text-center max-w-2xl mx-auto">
+    <div className="max-w-5xl mx-auto text-center">
+      <div className="max-w-2xl mx-auto">
         <span className="text-xs uppercase tracking-[0.35em] text-gold">Book Your Session</span>
         <h2 className="mt-3 text-4xl md:text-5xl">Choose your time</h2>
-        <p className="mt-4 text-muted-foreground">
+        <p className="mt-4 text-muted-foreground !text-center">
           Pick a date and slot, then fill in your details on the next screen.
           All times are shown in your local timezone.
         </p>
@@ -475,7 +480,7 @@ function CalStep({ onBack, onBooked }) {
 
       <AnimatePresence>
         {bookingFailed && (
-          <div className="mt-6">
+          <div className="mt-6 text-left">
             <BookingFailedBanner onDismiss={() => setBookingFailed(false)} />
           </div>
         )}
@@ -495,7 +500,7 @@ function CalStep({ onBack, onBooked }) {
         />
       </div>
 
-      <div className="mt-5">
+      <div className="mt-5 flex justify-start">
         <button
           onClick={onBack}
           className="inline-flex items-center gap-2 px-5 py-3 rounded-full gold-border hover:bg-secondary transition text-sm"
@@ -541,7 +546,7 @@ function ConfirmedStep({ bookedData }) {
 
       <motion.p
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }}
-        className="mt-4 text-muted-foreground max-w-md mx-auto"
+        className="mt-4 text-muted-foreground max-w-md mx-auto !text-center"
       >
         {firstName !== "friend" ? `Thank you, ${firstName}.` : "Thank you."} Your private
         consultation is booked. A calendar invite and meeting link are on their way to your inbox.
@@ -555,7 +560,7 @@ function ConfirmedStep({ bookedData }) {
         {name      && <SummaryRow label="Name"        value={name} />}
         {email     && <SummaryRow label="Confirmation sent to" value={email} last />}
         {!startTime && !name && !email && (
-          <p className="text-sm text-muted-foreground text-center py-4">Check your email for booking details.</p>
+          <p className="text-sm text-muted-foreground !text-center py-4">Check your email for booking details.</p>
         )}
       </motion.div>
 
@@ -567,12 +572,13 @@ function ConfirmedStep({ bookedData }) {
         Check your inbox for the confirmation email &amp; meeting link.
       </motion.div>
 
+      {/* Privacy note card — intentionally text-left scoped to the card itself */}
       <motion.div
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.65 }}
-        className="mt-5 flex items-start gap-3 p-4 rounded-2xl bg-secondary/40 border border-border max-w-md mx-auto"
+        className="mt-5 flex items-start gap-3 p-4 rounded-2xl bg-secondary/40 border border-border max-w-md mx-auto text-left"
       >
         <ShieldCheckIcon className="w-5 h-5 text-gold shrink-0 mt-0.5" />
-        <p className="text-sm text-muted-foreground text-left">
+        <p className="text-sm text-muted-foreground">
           Your birth details have been securely noted for session preparation.
         </p>
       </motion.div>

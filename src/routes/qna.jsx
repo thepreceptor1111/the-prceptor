@@ -221,11 +221,14 @@ export default function QnAPage() {
             >
               <SparklesIcon className="w-3.5 h-3.5" /> Questions &amp; Answers
             </motion.span>
-            <h1 className="mt-6 text-5xl md:text-7xl leading-[1.05] bg-gradient-gold bg-clip-text text-transparent">
+            <h1
+              className="mt-6 leading-[1.05] bg-gradient-gold bg-clip-text text-transparent"
+              style={{ fontFamily: "var(--font-serif)", fontSize: "clamp(2.5rem, 5vw, 4.5rem)" }}
+            >
               {settings?.faqSectionHeading ?? "Everything you want to know."}
             </h1>
             <div className="mt-6 flex justify-center">
-              <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl text-center" style={{ textAlign: 'center' }}>
+              <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl" style={{ textAlign: "center" }}>
                 From how sessions work to the deeper philosophy behind the practice,
                 find honest, clear answers below.
               </p>
@@ -317,7 +320,7 @@ export default function QnAPage() {
                             transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                             className="overflow-hidden"
                           >
-                            <p className="px-7 pb-7 text-muted-foreground leading-relaxed">
+                            <p className="px-7 pb-7 text-base text-muted-foreground leading-relaxed">
                               {item.a}
                             </p>
                           </motion.div>
@@ -344,10 +347,16 @@ export default function QnAPage() {
               <span className="text-xs uppercase tracking-[0.35em] text-gold">
                 Still curious?
               </span>
-              <h2 className="mt-4 text-3xl md:text-4xl">
+              <h2
+                className="mt-4"
+                style={{ fontSize: "clamp(1.25rem, 2.5vw, 1.5rem)", letterSpacing: "-0.01em" }}
+              >
                 Didn&apos;t find your answer?
               </h2>
-              <p className="mt-4 text-muted-foreground max-w-md mx-auto">
+              <p
+                className="mt-4 text-base text-muted-foreground"
+                style={{ textAlign: "center" }}
+              >
                 Reach out directly. Every question is welcome. A response lands
                 in your inbox within 24 hours.
               </p>

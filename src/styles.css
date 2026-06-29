@@ -10,14 +10,16 @@
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   FIX: Self-hosted fonts via @fontsource
+   Fonts via @fontsource (self-hosted on Vercel CDN edge)
    ─────────────────────────────────────────────────────────────────────────────
-   Fonts now served from YOUR Vercel CDN edge — zero external RTT,
-   no CORS preflight, no render-blocking Google Fonts stylesheet.
-   Packages: @fontsource-variable/inter  @fontsource/fraunces
+   --font-serif   → Fraunces   (body, section headings, cards)
+   --font-display → Cormorant Garamond (hero h1 ONLY — high-contrast Didone)
+   --font-sans    → Inter      (UI chrome)
    ─────────────────────────────────────────────────────────────────────────────
 */
 @import '@fontsource-variable/inter';
+
+/* Fraunces — body & section headings */
 @import '@fontsource/fraunces/300.css';
 @import '@fontsource/fraunces/400.css';
 @import '@fontsource/fraunces/500.css';
@@ -25,13 +27,21 @@
 @import '@fontsource/fraunces/300-italic.css';
 @import '@fontsource/fraunces/400-italic.css';
 
+/* Cormorant Garamond — display/hero heading only */
+@import '@fontsource/cormorant-garamond/300.css';
+@import '@fontsource/cormorant-garamond/400.css';
+@import '@fontsource/cormorant-garamond/600.css';
+@import '@fontsource/cormorant-garamond/300-italic.css';
+@import '@fontsource/cormorant-garamond/400-italic.css';
+@import '@fontsource/cormorant-garamond/600-italic.css';
+
 @import "tailwindcss";
 
 /* ── Design tokens ─────────────────────────────────────────────────────── */
 @theme {
-  --font-sans:  "Times New Roman", Times, serif;
-  --font-serif: "Times New Roman", Times, serif;
-  --font-display: "Times New Roman", Times, serif;
+  --font-sans:    "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif:   "Fraunces", "Georgia", serif;
+  --font-display: "Cormorant Garamond", "Georgia", serif;
   --font-mono:  ui-monospace, SFMono-Regular, Menlo, monospace;
 
   /* Gold palette */
@@ -103,63 +113,73 @@ body {
   border-radius: 4px;
 }
 
-/* ── Typography base ─────────────────────────────────────────────────── */
+/* ── Typography base ─────────────────────────────────────────────────────
+ *
+ * IMPORTANT — @layer base:
+ * All element-level rules live in @layer base so that Tailwind's
+ * @layer utilities sits above them in the cascade. Without this,
+ * unlayered rules (e.g. `p {}`) beat Tailwind utilities like
+ * .text-center, .text-left, .font-sans etc — causing subtle layout bugs
+ * such as centered subheading paragraphs rendering left-aligned.
+ *
+ * Layer order enforced by Tailwind v4: base → components → utilities
+ * ─────────────────────────────────────────────────────────────────────── */
+@layer base {
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    color: var(--color-foreground);
+    font-feature-settings: "ss01", "ss02", "liga", "dlig";
+    margin: 0 0 1rem;
+  }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-serif);
-  font-weight: 400;
-  color: var(--color-foreground);
-  font-feature-settings: "ss01", "ss02", "liga", "dlig";
-  margin: 0 0 1rem;
+  h1 {
+    font-size: clamp(3rem, 6vw + 0.75rem, 5.75rem);
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+  }
+
+  h2 {
+    font-size: clamp(2.25rem, 4.2vw + 0.5rem, 3.75rem);
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+  }
+
+  h3 {
+    font-size: clamp(1.75rem, 2.8vw + 0.5rem, 2.25rem);
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+  }
+
+  h4 {
+    font-size: clamp(1.35rem, 1.6vw + 0.55rem, 1.75rem);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+
+  h5 {
+    font-size: clamp(1.15rem, 1.1vw + 0.6rem, 1.35rem);
+    line-height: 1.25;
+    letter-spacing: -0.005em;
+  }
+
+  h6 {
+    font-size: 1rem;
+    line-height: 1.4;
+    letter-spacing: 0;
+  }
+
+  p {
+    margin: 0 0 1.4rem;
+    font-weight: 300;
+    line-height: 1.8;
+    color: var(--color-muted-foreground);
+  }
+
+  a {}
+
+  img, video { max-width: 100%; height: auto; }
 }
-
-h1 {
-  font-size: clamp(3rem, 6vw + 0.75rem, 5.75rem);
-  line-height: 1.05;
-  letter-spacing: -0.025em;
-}
-
-h2 {
-  font-size: clamp(2.25rem, 4.2vw + 0.5rem, 3.75rem);
-  line-height: 1.08;
-  letter-spacing: -0.02em;
-}
-
-h3 {
-  font-size: clamp(1.75rem, 2.8vw + 0.5rem, 2.25rem);
-  line-height: 1.15;
-  letter-spacing: -0.015em;
-}
-
-h4 {
-  font-size: clamp(1.35rem, 1.6vw + 0.55rem, 1.75rem);
-  line-height: 1.2;
-  letter-spacing: -0.01em;
-}
-
-h5 {
-  font-size: clamp(1.15rem, 1.1vw + 0.6rem, 1.35rem);
-  line-height: 1.25;
-  letter-spacing: -0.005em;
-}
-
-h6 {
-  font-size: 1rem;
-  line-height: 1.4;
-  letter-spacing: 0;
-}
-
-p {
-  margin: 0 0 1.4rem;
-  font-weight: 300;
-  line-height: 1.8;
-  color: var(--color-muted-foreground);
-}
-
-a {
-}
-
-img, video { max-width: 100%; height: auto; }
 
 /* ── Utility classes ─────────────────────────────────────────────────── */
 .font-serif  { font-family: var(--font-serif); }
@@ -222,7 +242,7 @@ img, video { max-width: 100%; height: auto; }
   background: linear-gradient(90deg, #ffde59 0%, #ff914d 100%);
   color: oklch(0.10 0.025 270);
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 1.0625rem;
   letter-spacing: 0.02em;
   transition: opacity 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
   cursor: pointer;

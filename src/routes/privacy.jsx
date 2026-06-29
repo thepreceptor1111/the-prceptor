@@ -277,8 +277,8 @@ export default function PrivacyPage() {
             {/* Contact card */}
             <Reveal delay={0.36}>
               <div className="glass-card rounded-3xl p-8 text-center">
-                <LockIcon className="w-8 h-8 text-gold mx-auto" />
-                <h3 className="mt-4 text-xl">Questions about your privacy?</h3>
+                <LockIcon className="w-8 h-8 text-gold mx-auto block" />
+                <h3 className="mt-4 mb-0 text-xl">Questions about your privacy?</h3>
                 <p className="mt-3 text-muted-foreground text-sm max-w-md mx-auto">
                   We take every privacy inquiry personally. Reach us directly and we&apos;ll respond within 24 hours.
                 </p>
@@ -308,7 +308,7 @@ function PolicySection({ icon: Icon, title, delay, children }) {
           >
             <Icon className="w-4 h-4 text-gold" />
           </span>
-          <h2 className="text-xl md:text-2xl" style={{ fontSize: "clamp(1.1rem, 2vw, 1.5rem)" }}>{title}</h2>
+          <h2 className="mb-0 text-xl md:text-2xl" style={{ fontSize: "clamp(1.1rem, 2vw, 1.5rem)" }}>{title}</h2>
         </div>
         <div className="space-y-4 text-sm text-muted-foreground leading-relaxed prose-luxe">
           {children}

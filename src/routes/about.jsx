@@ -4,7 +4,6 @@ import aboutImg from "@/assets/about-section.jpg?format=webp&quality=80";
 import { Reveal } from "@/components/site/Reveal";
 import { useSiteSettings } from "@/lib/useSiteSettings";
 
-// ── Inline SVG icons — no lucide-react ──────────────────────────
 function MailIcon({ className }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -47,7 +46,6 @@ export default function AboutWrapper() {
 
 function AboutContent() {
   const { settings } = useSiteSettings();
-
   const email = settings?.email ?? SITE.email;
 
   function handleContactSubmit(e) {
@@ -63,43 +61,87 @@ function AboutContent() {
   return (
     <div className="bg-hero starfield">
 
-      {/* Hero */}
+      {/* ── Hero: 100svh, art fills viewport, face centered, text anchors bottom ── */}
       <section
-        className="relative w-full min-h-[60vh] flex items-center justify-center overflow-hidden"
+        className="relative w-full flex flex-col justify-end overflow-hidden"
         style={{
+          minHeight: "80svh",
+          
           backgroundImage: `url(${aboutImg})`,
-          backgroundPosition: "50% 50%",
+          backgroundPosition: "50% 45%",
           backgroundSize: "cover",
           backgroundRepeat: "no-repeat",
         }}
       >
+        {/* Vignette — clear upper-centre, heavy bottom ramp */}
         <div
-          className="absolute inset-0"
+          className="absolute inset-0 pointer-events-none"
           style={{
-            background:
-              "linear-gradient(to bottom, rgba(10,8,18,0.9) 0%, rgba(10,8,18,0.4) 40%, rgba(10,8,18,0.9) 100%)",
+            background: [
+              "linear-gradient(to bottom, rgba(10,8,18,0.8) 0%, rgba(10,8,18,0.3) 60%, rgba(10,8,18,0.8) 100%)"
+            ].join(", "),
           }}
         />
+
         <Reveal>
-          <div className="relative z-10 text-center px-6 py-20">
-            <span className="block text-xs uppercase tracking-[0.4em] text-gold mb-6">
+          <div className="relative z-10 text-center px-6 pb-28 md:pb-36">
+
+            {/* Eyebrow — fixed to 0.75rem minimum (12px floor) */}
+            <span
+              className="block uppercase text-gold mb-4"
+              style={{
+                fontFamily: "var(--font-sans)",
+                fontSize: "0.75rem",
+                letterSpacing: "0.38em",
+                fontWeight: 500,
+              }}
+            >
               Our Story
             </span>
-            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-light leading-[1.05] text-white">
+
+            {/* Line 1 — 'About The' — bigger, fluid, still smaller than PRECEPTOR */}
+            <h1
+              style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "clamp(2.2rem, 5.5vw, 5rem)",
+                fontWeight: 300,
+                color: "var(--color-gold)",
+                letterSpacing: "0.04em",
+                lineHeight: 1.1,
+                margin: 0,
+              }}
+            >
               About The
-              <br />
-              <span className="tracking-[0.15em] font-semibold">PRECEPTOR</span>
             </h1>
+
+            {/* Line 2 — 'PRECEPTOR' — reined in: max 6.5rem (was 9rem), tighter tracking */}
+            <div
+              className="bg-gradient-gold bg-clip-text text-transparent mx-auto"
+              style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "clamp(3rem, 8vw, 6.5rem)",
+                fontWeight: 600,
+                letterSpacing: "0.12em",
+                lineHeight: 1,
+                marginTop: "0.06em",
+                maxWidth: "95vw",
+              }}
+              aria-hidden="true"
+            >
+              PRECEPTOR
+            </div>
+            <span className="sr-only">Preceptor</span>
+
           </div>
         </Reveal>
       </section>
 
-      {/* Short intro paragraphs */}
-      <section className="max-w-3xl mx-auto px-6 lg:px-10 py-20">
+      {/* ── Short intro paragraphs ── */}
+      <section className="max-w-3xl mx-auto px-6 lg:px-10 py-20 border-t border-gold/10">
         <Reveal>
           <p className="text-lg text-muted-foreground leading-relaxed">
             {settings?.aboutParagraph1 ??
-              "The Preceptor began as a small private practice for friends seeking real answers. Over 6 years, it has grown into a global consultation studio serving founders, artists, healers, and high-intention seekers across 27+ countries."}
+              "The Preceptor began as a small private practice for friends seeking real answers. Over 7 years, it has grown into a global consultation studio serving founders, artists, healers, and high-intention seekers across 18+ countries."}
           </p>
           <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
             {settings?.aboutParagraph2 ??
@@ -108,7 +150,7 @@ function AboutContent() {
         </Reveal>
       </section>
 
-      {/* How The Preceptor Was Born */}
+      {/* ── How The Preceptor Was Born ── */}
       <section className="max-w-3xl mx-auto px-6 lg:px-10 pb-24">
         <Reveal>
           <h2
@@ -144,7 +186,7 @@ function AboutContent() {
         </div>
       </section>
 
-      {/* Philosophy cards */}
+      {/* ── Philosophy cards ── */}
       <section className="max-w-7xl mx-auto px-6 lg:px-10 pb-20">
         <div className="grid md:grid-cols-3 gap-6">
           {[
@@ -162,7 +204,7 @@ function AboutContent() {
         </div>
       </section>
 
-      {/* Contact */}
+      {/* ── Contact ── */}
       <section className="max-w-7xl mx-auto px-6 lg:px-10 py-20 grid lg:grid-cols-2 gap-12">
         <Reveal>
           <span className="text-xs uppercase tracking-[0.3em] text-gold">Contact</span>
