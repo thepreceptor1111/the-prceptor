@@ -305,8 +305,8 @@ export default function TermsPage() {
             {/* Bottom CTA */}
             <Reveal delay={0.48}>
               <div className="glass-card rounded-3xl p-8 text-center">
-                <ScrollTextIcon className="w-8 h-8 text-gold mx-auto" />
-                <h3 className="mt-4 text-xl">Ready to begin?</h3>
+                <ScrollTextIcon className="w-8 h-8 text-gold mx-auto block" />
+                <h3 className="mt-4 mb-0 text-xl">Ready to begin?</h3>
                 <p className="mt-3 text-muted-foreground text-sm max-w-md mx-auto">
                   Book a private consultation and experience astrology as a tool for genuine clarity.
                 </p>
@@ -334,7 +334,7 @@ function TermsSection({ icon: Icon, title, delay, children }) {
           >
             <Icon className="w-4 h-4 text-gold" />
           </span>
-          <h2 className="text-xl md:text-2xl" style={{ fontSize: "clamp(1.1rem, 2vw, 1.5rem)" }}>{title}</h2>
+          <h2 className="mb-0 text-xl md:text-2xl" style={{ fontSize: "clamp(1.1rem, 2vw, 1.5rem)" }}>{title}</h2>
         </div>
         <div className="space-y-4 text-sm text-muted-foreground leading-relaxed">
           {children}
