@@ -1,7 +1,7 @@
 import { lazy, Suspense } from "react";
 import SEO from "@/components/site/SEO";
 import { PAGE_SEO } from "@/content/seo";
-import qnaImg from "@/assets/qna-section.jpg?format=webp&quality=80";
+import qnaImg from "@/assets/qna-section.webp?format=webp&quality=80";
 import { useHomePageData } from "@/lib/useSanity";
 
 // FIX 4: HeroSection stays EAGER — it is the LCP element, must paint immediately.
