@@ -50,7 +50,10 @@ export const PAGE_SEO = {
         "Career Astrology",
         "Spiritual Guidance",
         "Mahadasha Guidance",
-        "Sade Sati Consultation"
+        "Sade Sati Consultation",
+        "Spouse Astrology",
+        "Deep Astrology Reading Session",
+        "Personalized Astrology Guidance"
       ],
       "hasOfferCatalog": {
         "@type": "OfferCatalog",
@@ -107,7 +110,10 @@ export const PAGE_SEO = {
         "Divisional Charts",
         "Transits",
         "Vedic Mythology",
-        "Psychological Astrology"
+        "Psychological Astrology",
+        "Spouse Astrology",
+        "Deep Astrology Reading Session",
+        "Personalized Astrology Guidance"
       ],
       "sameAs": [
         "https://www.instagram.com/thepreceptor1111",
@@ -116,6 +122,8 @@ export const PAGE_SEO = {
     },
   },
 
+  // FIX 3: Book schema — "paid astrology reading" + "professional astrologer near me online" +
+  // "accurate astrology reading online US" injected into description and alternateName.
   book: {
     title:       "Book Astrology Consultation Online — The Preceptor | USA",
     description: "Book a paid astrology reading with The Preceptor — professional Vedic astrologer online USA. Private 60-min sessions for birth chart, relationship, career & spiritual guidance. All US timezones.",
@@ -125,15 +133,32 @@ export const PAGE_SEO = {
       "@context": "https://schema.org",
       "@type": "Service",
       "name": "Book Astrology Consultation — The Preceptor",
+      "alternateName": [
+        "Paid Astrology Reading USA",
+        "Professional Astrologer Near Me Online",
+        "Accurate Astrology Reading Online US",
+        "Book Astrology Session Online"
+      ],
       "url": "https://www.thepreceptorglobal.com/book",
-      "provider": { "@type": "ProfessionalService", "name": "The Preceptor Global" },
-      "areaServed": { "@type": "Country", "name": "United States" },
-      "description": "Private 1-on-1 Vedic astrology consultations online. Birth chart, career, relationship, marriage, Mahadasha and spiritual guidance sessions available for clients across the USA and worldwide. All sessions include a follow-up Q&A window.",
+      "provider": {
+        "@type": "ProfessionalService",
+        "name": "The Preceptor Global",
+        "url": "https://www.thepreceptorglobal.com"
+      },
+      "areaServed": [
+        { "@type": "Country", "name": "United States" },
+        { "@type": "Country", "name": "United Kingdom" },
+        { "@type": "Country", "name": "India" },
+        { "@type": "AdministrativeArea", "name": "California" }
+      ],
+      "description": "Book a paid astrology reading with The Preceptor — a professional Vedic astrologer online. Private 1-on-1 consultations for birth chart analysis, career direction, relationship guidance, marriage compatibility, Mahadasha, and spiritual guidance. Accurate astrology readings online, available to clients across the USA and worldwide. Timezone-aware scheduling. Sessions from $75.",
       "offers": {
-        "@type": "Offer",
-        "price": "75",
+        "@type": "AggregateOffer",
+        "lowPrice": "75",
+        "highPrice": "240",
         "priceCurrency": "USD",
-        "availability": "https://schema.org/InStock"
+        "availability": "https://schema.org/InStock",
+        "offerCount": "12"
       }
     },
   },
@@ -142,7 +167,7 @@ export const PAGE_SEO = {
     title:       "Astrology Services — The Preceptor | Birth Chart, Relationship & Spiritual Readings USA",
     description: "Explore all astrology services by The Preceptor: Vedic birth chart reading, deep astrology reading session, spouse astrology, marriage consultation, career guidance, Mahadasha & Sade Sati — all online.",
     canonical:   `${SITE.domain}/services`,
-    keywords:    "birth chart reading astrologer, deep astrology reading session, spiritual guidance astrology consultation, spouse astrology, Vedic astrology reading online USA, marriage astrology consultation, career astrology reading, Mahadasha guidance, Sade Sati consultation, astrology USA, accurate astrology reading online US",
+    keywords:    "birth chart reading astrologer, deep astrology reading session, spiritual guidance astrology consultation, spouse astrology, Vedic astrology reading online USA, marriage astrology consultation, career astrology reading, Mahadasha guidance, Sade Sati consultation, astrology USA, accurate astrology reading online US, personalized astrology guidance, professional astrologer near me online",
     schema: [
       {
         "@context": "https://schema.org",
@@ -169,7 +194,7 @@ export const PAGE_SEO = {
         "@context": "https://schema.org",
         "@type": "Service",
         "name": "Quick Personal Insights",
-        "description": "A fast, focused glimpse into your birth chart revealing stunning predictions and jaw-dropping truths about you. Uncover your core personality, hidden patterns, and life direction. Quick, sharp, and surprisingly revealing.",
+        "description": "A fast, focused glimpse into your birth chart revealing stunning predictions and jaw-dropping truths about you. Uncover your core personality, hidden patterns, and life direction. Quick, sharp, and surprisingly revealing. An accurate astrology reading online for those seeking quick, personalized astrology guidance.",
         "url": "https://www.thepreceptorglobal.com/services",
         "provider": { "@type": "ProfessionalService", "name": "The Preceptor Global" },
         "offers": { "@type": "Offer", "price": "75", "priceCurrency": "USD", "availability": "https://schema.org/InStock" }
@@ -178,7 +203,8 @@ export const PAGE_SEO = {
         "@context": "https://schema.org",
         "@type": "Service",
         "name": "General Birth Chart Reading",
-        "description": "A general yet focused overview of your natal chart — your core personality, life themes, key strengths, and the fundamental blueprint the cosmos wrote for you at birth.",
+        "alternateName": "Birth Chart Reading Astrologer",
+        "description": "A general yet focused overview of your natal chart — your core personality, life themes, key strengths, and the fundamental blueprint the cosmos wrote for you at birth. Personalized astrology guidance rooted in Vedic Jyotish.",
         "url": "https://www.thepreceptorglobal.com/services",
         "provider": { "@type": "ProfessionalService", "name": "The Preceptor Global" },
         "offers": { "@type": "Offer", "price": "123", "priceCurrency": "USD", "availability": "https://schema.org/InStock" }
@@ -186,8 +212,10 @@ export const PAGE_SEO = {
       {
         "@context": "https://schema.org",
         "@type": "Service",
+        // FIX 2: "Deep Astrology Reading Session" added as alternateName and injected into description.
         "name": "Detailed Birth Chart Reading",
-        "description": "A profound exploration of your soul's purpose through extensive chart analysis and two dedicated sessions with a follow-up. Uncovering deeper life patterns, karmic lessons, hidden potentials, and the forces shaping your path.",
+        "alternateName": "Deep Astrology Reading Session",
+        "description": "A deep astrology reading session — a profound exploration of your soul's purpose through extensive chart analysis across two dedicated sessions with a follow-up. Uncovering deeper life patterns, karmic lessons, hidden potentials, and the forces shaping your path. The definitive personalized astrology guidance experience for those seeking real clarity.",
         "url": "https://www.thepreceptorglobal.com/services",
         "provider": { "@type": "ProfessionalService", "name": "The Preceptor Global" },
         "offers": { "@type": "Offer", "price": "186", "priceCurrency": "USD", "availability": "https://schema.org/InStock" }
@@ -196,7 +224,7 @@ export const PAGE_SEO = {
         "@context": "https://schema.org",
         "@type": "Service",
         "name": "Relationship Guidance",
-        "description": "Targeted guidance on your current relationship dynamic — understanding patterns, timing, and what the chart reveals about love in your life right now. Or getting your partner's chart read.",
+        "description": "Targeted guidance on your current relationship dynamic — understanding patterns, timing, and what the chart reveals about love in your life right now. Or getting your partner's chart read. Spiritual guidance through an astrology consultation focused on your love life.",
         "url": "https://www.thepreceptorglobal.com/services",
         "provider": { "@type": "ProfessionalService", "name": "The Preceptor Global" },
         "offers": { "@type": "Offer", "price": "90", "priceCurrency": "USD", "availability": "https://schema.org/InStock" }
@@ -204,8 +232,10 @@ export const PAGE_SEO = {
       {
         "@context": "https://schema.org",
         "@type": "Service",
+        // FIX 1: alternateName "Spouse Astrology" added — surfaces for that exact keyword search.
         "name": "Partner Compatibility",
-        "description": "A synastry and composite chart reading for two individuals — assessing the strengths, challenges, karmic threads, and long-term potential of your relationship.",
+        "alternateName": ["Spouse Astrology", "Synastry Reading", "Relationship Compatibility Astrology"],
+        "description": "A synastry and composite chart reading for two individuals — assessing the strengths, challenges, karmic threads, and long-term potential of your relationship. Also known as spouse astrology, this reading reveals the deeper design of your partnership.",
         "url": "https://www.thepreceptorglobal.com/services",
         "provider": { "@type": "ProfessionalService", "name": "The Preceptor Global" },
         "offers": { "@type": "Offer", "price": "132", "priceCurrency": "USD", "availability": "https://schema.org/InStock" }
@@ -214,7 +244,8 @@ export const PAGE_SEO = {
         "@context": "https://schema.org",
         "@type": "Service",
         "name": "Career Consultation",
-        "description": "Strategic career direction aligned with your real interests and astrological chart placements. Identifies multiple aligned career paths with a personalized roadmap for each.",
+        "alternateName": "Career Astrology Reading",
+        "description": "Strategic career direction aligned with your real interests and astrological chart placements. Identifies multiple aligned career paths with a personalized roadmap for each. A deep astrology reading session focused on your professional life.",
         "url": "https://www.thepreceptorglobal.com/services",
         "provider": { "@type": "ProfessionalService", "name": "The Preceptor Global" },
         "offers": { "@type": "Offer", "price": "195", "priceCurrency": "USD", "availability": "https://schema.org/InStock" }
@@ -223,7 +254,8 @@ export const PAGE_SEO = {
         "@context": "https://schema.org",
         "@type": "Service",
         "name": "Marriage Consultation",
-        "description": "An exhaustive study of two charts across every dimension of compatibility — emotional, physical, karmic, and practical. The most thorough relationship reading offered.",
+        "alternateName": ["Marriage Astrology Consultation", "Spouse Compatibility Reading"],
+        "description": "An exhaustive study of two charts across every dimension of compatibility — emotional, physical, karmic, and practical. The most thorough spouse astrology and marriage reading offered by The Preceptor.",
         "url": "https://www.thepreceptorglobal.com/services",
         "provider": { "@type": "ProfessionalService", "name": "The Preceptor Global" },
         "offers": { "@type": "Offer", "price": "195", "priceCurrency": "USD", "availability": "https://schema.org/InStock" }
@@ -232,7 +264,7 @@ export const PAGE_SEO = {
         "@context": "https://schema.org",
         "@type": "Service",
         "name": "Current Situation Guidance",
-        "description": "For moments when you need clarity now. A focused, real-time reading of your current state of mind and circumstances — practical, grounded, and immediately applicable.",
+        "description": "For moments when you need clarity now. A focused, real-time reading of your current state of mind and circumstances — practical, grounded, and immediately applicable. Accurate astrology reading online for your present moment.",
         "url": "https://www.thepreceptorglobal.com/services",
         "provider": { "@type": "ProfessionalService", "name": "The Preceptor Global" },
         "offers": { "@type": "Offer", "price": "81", "priceCurrency": "USD", "availability": "https://schema.org/InStock" }
@@ -241,7 +273,7 @@ export const PAGE_SEO = {
         "@context": "https://schema.org",
         "@type": "Service",
         "name": "Later Life Reading",
-        "description": "A forward-looking reading of who you are becoming — what life looks and feels like as you step beyond your 20s or enter the post-marriage chapter of your journey.",
+        "description": "A forward-looking reading of who you are becoming — what life looks and feels like as you step beyond your 20s or enter the post-marriage chapter of your journey. Personalized astrology guidance for life's next chapter.",
         "url": "https://www.thepreceptorglobal.com/services",
         "provider": { "@type": "ProfessionalService", "name": "The Preceptor Global" },
         "offers": { "@type": "Offer", "price": "186", "priceCurrency": "USD", "availability": "https://schema.org/InStock" }
@@ -250,7 +282,7 @@ export const PAGE_SEO = {
         "@context": "https://schema.org",
         "@type": "Service",
         "name": "Mahadasha Guidance",
-        "description": "Deep guidance on your current planetary time period — what the ruling planet demands of you, what it promises, and how to move with its energy rather than against it.",
+        "description": "Deep guidance on your current planetary time period — what the ruling planet demands of you, what it promises, and how to move with its energy rather than against it. A spiritual guidance astrology consultation for your Mahadasha period.",
         "url": "https://www.thepreceptorglobal.com/services",
         "provider": { "@type": "ProfessionalService", "name": "The Preceptor Global" },
         "offers": { "@type": "Offer", "price": "123", "priceCurrency": "USD", "availability": "https://schema.org/InStock" }
@@ -259,7 +291,7 @@ export const PAGE_SEO = {
         "@context": "https://schema.org",
         "@type": "Service",
         "name": "Saturn's Seven and a Half Guidance (Sade Sati)",
-        "description": "Specialized guidance for when Saturn transits the 12th, natal, or 2nd sign from your Moon. Understand the purpose, navigate the pressure, and emerge stronger.",
+        "description": "Specialized guidance for when Saturn transits the 12th, natal, or 2nd sign from your Moon. Understand the purpose, navigate the pressure, and emerge stronger. Spiritual guidance astrology consultation for your Sade Sati period.",
         "url": "https://www.thepreceptorglobal.com/services",
         "provider": { "@type": "ProfessionalService", "name": "The Preceptor Global" },
         "offers": { "@type": "Offer", "price": "132", "priceCurrency": "USD", "availability": "https://schema.org/InStock" }
@@ -268,7 +300,7 @@ export const PAGE_SEO = {
         "@context": "https://schema.org",
         "@type": "Service",
         "name": "Birth Time Rectification (D9 Navamsha)",
-        "description": "Refine your birth time through a detailed analysis of life events using the D9 Navamsha chart. Ascertain your most accurate birth time for deeper astrological insights and greater accuracy.",
+        "description": "Refine your birth time through a detailed analysis of life events using the D9 Navamsha chart. Ascertain your most accurate birth time for deeper astrological insights and greater accuracy in all subsequent readings.",
         "url": "https://www.thepreceptorglobal.com/services",
         "provider": { "@type": "ProfessionalService", "name": "The Preceptor Global" },
         "offers": { "@type": "Offer", "price": "240", "priceCurrency": "USD", "availability": "https://schema.org/InStock" }
@@ -330,7 +362,7 @@ export const PAGE_SEO = {
     title:       "Astrology Q&A — The Preceptor | Vedic Astrology Questions Answered",
     description: "Answers to the most common Vedic astrology questions — birth chart readings, relationship synastry, Mahadasha, Sade Sati, session formats and what to expect from The Preceptor consultations.",
     canonical:   `${SITE.domain}/qna`,
-    keywords:    "astrology FAQ USA, Vedic astrology questions, birth chart reading FAQ, what is Mahadasha, what is Sade Sati, astrology consultation questions, The Preceptor FAQ",
+    keywords:    "astrology FAQ USA, Vedic astrology questions, birth chart reading FAQ, what is Mahadasha, what is Sade Sati, astrology consultation questions, The Preceptor FAQ, spouse astrology FAQ, deep astrology reading session",
     schema: {
       "@context": "https://schema.org",
       "@type": "FAQPage",
@@ -415,6 +447,22 @@ export const PAGE_SEO = {
           "acceptedAnswer": {
             "@type": "Answer",
             "text": "Yes. Vedic astrology (Jyotish) uses the sidereal zodiac, which accounts for the precession of the equinoxes, placing planets in slightly different signs compared to the tropical zodiac used by Western astrology. Vedic astrology also incorporates nakshatras (lunar mansions), dashas (planetary time periods), and divisional charts like the Navamsha (D9) for deeper analysis."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is spouse astrology?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Spouse astrology refers to the analysis of the 7th house, its lord, Venus, Jupiter, and related placements in a birth chart to understand the nature of your future or current spouse, relationship timing, and compatibility. The Preceptor offers dedicated Partner Compatibility and Marriage Consultation sessions covering spouse astrology in depth."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is a deep astrology reading session?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A deep astrology reading session is an in-depth, multi-hour consultation that goes beyond surface-level personality traits to analyse life patterns, karmic lessons, divisional charts, Mahadasha periods, and future transits. The Preceptor's Detailed Birth Chart Reading is the flagship deep astrology reading session — two 120-minute sessions with a follow-up."
           }
         }
       ]
