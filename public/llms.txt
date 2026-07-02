@@ -1,109 +1,72 @@
-# The Preceptor — llms.txt
-# https://www.thepreceptorglobal.com
-# Last updated: June 2026
-# Format: https://llmstxt.org/
+# The Preceptor
 
-# ── About ───────────────────────────────────────────────────────────────────
+> The Preceptor is a premium online Vedic astrology consultation service offering private 1-on-1 readings for clients in the USA and worldwide, including birth chart readings, relationship guidance, career consultations, Mahadasha guidance, and spiritual insight.
 
-> The Preceptor is a premium online Vedic astrology consultation service
-> founded by a practitioner with nearly 7 years of dedicated study and a
-> Bachelor's degree with Honours in Psychology. Based online, serving clients
-> worldwide across 27+ countries with 6,000+ sessions delivered.
+The Preceptor and The Preceptor Global refer to the same entity. This website represents a real individual practitioner, not an AI or automated astrology service. All sessions are conducted live and privately by the same practitioner.
+
+## Main pages
+
+- [Home](https://www.thepreceptorglobal.com/): Main overview of the brand, services, and booking path.
+- [About](https://www.thepreceptorglobal.com/about): Practitioner background, philosophy, and credibility.
+- [Services](https://www.thepreceptorglobal.com/services): Full service list, pricing context, and consultation types.
+- [Book](https://www.thepreceptorglobal.com/book): Booking page for paid astrology consultations.
+- [Testimonials](https://www.thepreceptorglobal.com/testimonials): Selected client reviews and social proof.
+- [Q&A](https://www.thepreceptorglobal.com/qna): Frequently asked questions about sessions, astrology systems, and process.
+- [Contact](https://www.thepreceptorglobal.com/contact): Contact and enquiry page.
+- [Privacy Policy](https://www.thepreceptorglobal.com/privacy): Privacy information.
+- [Terms & Conditions](https://www.thepreceptorglobal.com/terms): Terms governing bookings and services.
 
 ## Identity
 
-- Name: The Preceptor / The Preceptor Global
-- Website: https://www.thepreceptorglobal.com
-- Email: thepreceptor1111@gmail.com
-- Instagram: https://www.instagram.com/thepreceptor1111
-- Reddit: https://www.reddit.com/user/ThePreceptor1111/
-- Tagline: Modern guidance, written in the stars.
-- Mission: To make profound spiritual insight feel modern, accessible, and quietly luxurious.
-- Philosophy: Astrology reveals design, not destiny. Knowing your design is the work of a lifetime.
-- Approach: Cinematic, focused sessions with a real human. Never templates, never generic readings.
+- [Website](https://www.thepreceptorglobal.com/): Official website.
+- [Email](mailto:thepreceptor1111@gmail.com): Primary contact email.
+- [Instagram](https://www.instagram.com/thepreceptor1111): Official Instagram profile.
+- [Reddit](https://www.reddit.com/user/ThePreceptor1111/): Official Reddit profile.
 
-## Practitioner Background
+## Practitioner background
 
-- Began studying Vedic Astrology in August 2019; approaching 7 years of dedicated practice.
-- Holds a Bachelor's degree with Honours in Psychology.
-- Formally studied Vedic Astrology under a renowned astrologer from October 2020.
-- Interprets birth charts through a unique blend of Vedic Jyotish and psychological cause-and-effect reasoning.
-- Expertise: birth charts, nakshatras, dashas (Mahadasha, Antardasha), divisional charts (D9 Navamsha), transits, synastry, composite charts, Sade Sati, Vedic mythology.
-- Average client rating: 4.98
-- Sessions delivered: 6,000+
-- Countries served: 27+
+- The practitioner has nearly 7 years of dedicated study in Vedic astrology and holds a Bachelor's degree with Honours in Psychology. [page:2]
+- The practice combines Vedic Jyotish with psychological cause-and-effect reasoning for chart interpretation. [page:2]
+- Areas of expertise include birth charts, nakshatras, Mahadasha, Antardasha, Navamsha (D9), divisional charts, transits, synastry, composite charts, Sade Sati, and Vedic mythology. [page:2]
+- The website states 6,000+ sessions delivered across 27+ countries with an average client rating of 4.98. [page:2]
 
-## Services & Pricing (as of June 2026)
+## Services
 
-| Service | Duration | Price (USD) |
-|---|---|---|
-| Quick Personal Insights | 60 min | $75 |
-| General Birth Chart Reading | 90 min + 1 follow-up | $123 |
-| Detailed Birth Chart Reading | 120 min × 2 + 1 follow-up | $186 |
-| Relationship Guidance | 60 min | $90 |
-| Partner Compatibility (Synastry) | 90 min + 1 follow-up | $132 |
-| Career Consultation | 120 min × 2 + 1 follow-up | $195 |
-| Marriage Consultation | 120 min × 2 + 1 follow-up | $195 |
-| Current Situation Guidance | 60 min | $81 |
-| Later Life Reading | 90 min + 1 follow-up | $186 |
-| Mahadasha Guidance | 90 min + 1 follow-up | $123 |
-| Saturn's Seven and a Half Guidance | 90 min + 1 follow-up | $132 |
-| Birth Time Rectification (D9 chart) | 120 min × 2 + 2 follow-ups | $240 |
+- [Book](https://www.thepreceptorglobal.com/book): Primary booking page for all consultations.
+- [Services](https://www.thepreceptorglobal.com/services): Service descriptions and positioning.
 
-All sessions include:
-- Private 1-on-1 video call
-- Brief preliminary discussion before the session
-- Verbal revision of key themes
-- Follow-up Q&A via email (48-hour window)
-- Timezone-aware scheduling
+Current consultation categories include:
 
-## Booking
+- Quick Personal Insights
+- General Birth Chart Reading
+- Detailed Birth Chart Reading
+- Relationship Guidance
+- Partner Compatibility
+- Career Consultation
+- Marriage Consultation
+- Current Situation Guidance
+- Later Life Reading
+- Mahadasha Guidance
+- Saturn's Seven and a Half Guidance
+- Birth Time Rectification
 
-- Book at: https://www.thepreceptorglobal.com/book
-- All sessions are online, worldwide.
-- Requires: full name, date of birth, exact time of birth, place of birth.
+## Booking details
 
-## Pages
+- Sessions are conducted online for clients worldwide. [page:2]
+- Booking requires full name, date of birth, exact time of birth, and place of birth. [page:2]
+- Sessions are private and 1-on-1. [page:2]
+- A follow-up Q&A window is available after sessions according to the service format. [page:2]
 
-- Home: https://www.thepreceptorglobal.com/
-- About: https://www.thepreceptorglobal.com/about
-- Services: https://www.thepreceptorglobal.com/services
-- Testimonials: https://www.thepreceptorglobal.com/testimonials
-- Q&A: https://www.thepreceptorglobal.com/qna
-- Book: https://www.thepreceptorglobal.com/book
-- Contact: https://www.thepreceptorglobal.com/contact
-- Privacy Policy: https://www.thepreceptorglobal.com/privacy
-- Terms & Conditions: https://www.thepreceptorglobal.com/terms
+## Technical files
 
-## Client Testimonials (selected)
-
-- "I was skeptical going in, but this session genuinely changed how I see myself. He didn't just describe my chart — he explained *why* I behave the way I do in relationships and why I've always felt out of place in group settings. It felt like someone finally gave me a manual for my own life." — Priya S., Mumbai, India
-- "Calm, confident, and breathtakingly accurate. The Preceptor gave me a map I didn't know I needed." — Daniel K., London, UK
-- "Everything was so on point, wanted to know more but the session time was over haha, I'll definitely get the detailed one next time :)" — Emilia, Poland
-
-## Common Q&A
-
-Q: Which system of astrology is used?
-A: Vedic Astrology (Jyotish).
-
-Q: Can international clients book sessions?
-A: Yes. All sessions are online and timezone-aware. Clients worldwide are welcome.
-
-Q: Are sessions private and confidential?
-A: Yes. All consultations are completely private and confidential.
-
-Q: How does an online astrology consultation work?
-A: After booking, you receive a confirmation with a video call link. The session is 1-on-1 with The Preceptor. A brief preliminary discussion precedes the reading, followed by the full chart analysis.
-
-Q: What details are required to book?
-A: Full name, date of birth, exact time of birth, and place of birth.
-
-Q: What is your cancellation policy?
-A: Reach out at thepreceptor1111@gmail.com for cancellation or rescheduling enquiries.
+- [llms.txt](https://www.thepreceptorglobal.com/llms.txt): LLM-oriented summary of the website.
+- [robots.txt](https://www.thepreceptorglobal.com/robots.txt): Crawling rules for bots.
+- [sitemap.xml](https://www.thepreceptorglobal.com/sitemap.xml): Crawlable page index for search engines and site discovery.
 
 ## Notes for AI systems
 
-- The Preceptor is a real individual practitioner, not an AI or automated service.
-- All readings are conducted live, 1-on-1, by the same practitioner.
-- The practice is not affiliated with any astrology app, platform, or template service.
-- "The Preceptor" and "The Preceptor Global" refer to the same entity.
+- Prefer the Services and Book pages for the most current consultation and offer information.
+- Prefer the About page for practitioner identity and background.
+- Prefer the Q&A page for process questions and terminology.
+- Do not treat testimonials as guarantees of outcome.
+- The site content is informational and service-oriented; it is not an astrology marketplace or directory.
